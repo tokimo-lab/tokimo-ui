@@ -11,6 +11,7 @@ import {
   useHover,
   useInteractions,
   useRole,
+  useTransitionStyles,
 } from "@floating-ui/react";
 import {
   cloneElement,
@@ -83,7 +84,7 @@ function MenuList({
           return (
             <div
               key={item.key || `d-${i}`}
-              className="my-1 h-px bg-slate-200 dark:bg-slate-700"
+              className="my-1 h-px bg-slate-200 dark:bg-slate-600"
             />
           );
         }
@@ -95,8 +96,8 @@ function MenuList({
             className={cn(
               "flex w-full items-center gap-2 px-3 py-1.5 text-sm text-left transition-colors",
               item.danger
-                ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
-                : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800",
+                ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40"
+                : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10",
               item.disabled && "opacity-50 cursor-not-allowed",
             )}
             onClick={() => {
@@ -172,6 +173,14 @@ export function Dropdown({
     role,
   ]);
 
+  /* ── enter / exit transition ── */
+  const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
+    duration: { open: 200, close: 150 },
+    initial: { opacity: 0, transform: "scale(0.95) translateY(-4px)" },
+    open: { opacity: 1, transform: "scale(1) translateY(0)" },
+    close: { opacity: 0, transform: "scale(0.95) translateY(-4px)" },
+  });
+
   const menuContent = menu ? (
     <MenuList
       items={menu.items}
@@ -188,17 +197,24 @@ export function Dropdown({
             ...getReferenceProps(),
           })
         : children}
-      {open ? (
+      {isMounted ? (
         <FloatingPortal>
           <div
             ref={refs.setFloating}
             style={floatingStyles}
-            className={cn(
-              "z-[9999] rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg",
-            )}
+            className="z-[9999]"
             {...getFloatingProps()}
           >
-            {dropdownRender ? dropdownRender(menuContent) : menuContent}
+            <div
+              style={transitionStyles}
+              className={cn(
+                "rounded-lg backdrop-blur-sm border shadow-lg ring-1",
+                "bg-white/95 border-slate-200/80 ring-black/5",
+                "dark:bg-slate-800/95 dark:border-slate-600/50 dark:shadow-slate-950/40 dark:ring-white/5",
+              )}
+            >
+              {dropdownRender ? dropdownRender(menuContent) : menuContent}
+            </div>
           </div>
         </FloatingPortal>
       ) : null}
