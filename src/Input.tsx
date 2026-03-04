@@ -48,7 +48,9 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
       )}
     >
       {prefix ? (
-        <span className="text-slate-400 shrink-0">{prefix}</span>
+        <span className="text-slate-400 shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
+          {prefix}
+        </span>
       ) : null}
       <input
         ref={ref}
@@ -56,7 +58,9 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
         {...rest}
       />
       {suffix ? (
-        <span className="text-slate-400 shrink-0">{suffix}</span>
+        <span className="text-slate-400 shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
+          {suffix}
+        </span>
       ) : null}
     </div>
   ),

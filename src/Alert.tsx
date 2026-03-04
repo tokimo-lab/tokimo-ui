@@ -76,7 +76,9 @@ export function Alert({
     >
       <div className="flex items-start gap-2">
         {showIcon ? (
-          <span className="mt-0.5 shrink-0">{icon ?? config.icon}</span>
+          <span className="mt-0.5 shrink-0 [&>svg]:w-4 [&>svg]:h-4">
+            {icon ?? config.icon}
+          </span>
         ) : null}
         <div className="flex-1 min-w-0">
           <div className={cn("text-sm font-medium", config.text)}>

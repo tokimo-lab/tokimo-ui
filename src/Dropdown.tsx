@@ -108,7 +108,9 @@ function MenuList({
             }}
           >
             {item.icon ? (
-              <span className="shrink-0 inline-flex">{item.icon}</span>
+              <span className="shrink-0 inline-flex [&>svg]:w-[1em] [&>svg]:h-[1em]">
+                {item.icon}
+              </span>
             ) : null}
             <span className="flex-1">{item.label}</span>
           </button>

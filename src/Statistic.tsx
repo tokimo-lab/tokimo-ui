@@ -49,7 +49,11 @@ export function Statistic({
           className="text-2xl font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-1"
           style={valueStyle}
         >
-          {prefix ? <span className="text-lg">{prefix}</span> : null}
+          {prefix ? (
+            <span className="text-lg [&>svg]:w-[1em] [&>svg]:h-[1em]">
+              {prefix}
+            </span>
+          ) : null}
           <span>{displayValue}</span>
           {suffix ? (
             <span className="text-base font-normal text-slate-500 dark:text-slate-400">

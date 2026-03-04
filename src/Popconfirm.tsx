@@ -122,7 +122,7 @@ export function Popconfirm({
             {...getFloatingProps()}
           >
             <div className="flex items-start gap-2 mb-3">
-              <span className="shrink-0 mt-0.5 text-amber-500">
+              <span className="shrink-0 mt-0.5 text-amber-500 [&>svg]:w-4 [&>svg]:h-4">
                 {icon ?? <AlertCircle className="h-4 w-4" />}
               </span>
               <div>

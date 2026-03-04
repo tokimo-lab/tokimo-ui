@@ -98,7 +98,7 @@ export function Button({
           />
         </svg>
       ) : icon ? (
-        <span className="inline-flex items-center justify-center shrink-0">
+        <span className="inline-flex items-center justify-center shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
           {icon}
         </span>
       ) : null}

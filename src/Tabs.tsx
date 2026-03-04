@@ -92,7 +92,7 @@ export function Tabs({
               )}
               onClick={() => !item.disabled && handleChange(item.key)}
             >
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5 [&>svg]:w-[1em] [&>svg]:h-[1em]">
                 {item.icon}
                 {item.label}
               </span>

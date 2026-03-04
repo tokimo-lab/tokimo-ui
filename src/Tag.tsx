@@ -94,7 +94,9 @@ export function Tag({
       {...rest}
     >
       {icon ? (
-        <span className="inline-flex items-center shrink-0">{icon}</span>
+        <span className="inline-flex items-center shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
+          {icon}
+        </span>
       ) : null}
       {children}
       {closable ? (

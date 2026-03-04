@@ -170,7 +170,7 @@ function MenuItemRenderer({
         }}
       >
         {item.icon ? (
-          <span className="shrink-0 inline-flex w-5 justify-center">
+          <span className="shrink-0 inline-flex w-5 justify-center [&>svg]:w-[1em] [&>svg]:h-[1em]">
             {item.icon}
           </span>
         ) : null}
