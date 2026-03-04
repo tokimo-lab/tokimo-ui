@@ -94,11 +94,11 @@ function MenuList({
             type="button"
             disabled={item.disabled}
             className={cn(
-              "flex w-full items-center gap-2 px-3 py-1.5 text-sm text-left transition-colors",
+              "flex w-full items-center gap-2 px-3 py-1.5 text-sm text-left transition-colors cursor-pointer",
               item.danger
                 ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40"
                 : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10",
-              item.disabled && "opacity-50 cursor-not-allowed",
+              item.disabled && "opacity-50 !cursor-not-allowed",
             )}
             onClick={() => {
               if (item.disabled) return;

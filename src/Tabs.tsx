@@ -76,7 +76,7 @@ export function Tabs({
               type="button"
               disabled={item.disabled}
               className={cn(
-                "relative whitespace-nowrap transition-colors font-medium",
+                "relative whitespace-nowrap transition-colors font-medium cursor-pointer",
                 sizeClass,
                 type === "card" &&
                   "border border-b-0 border-slate-200 dark:border-slate-700 rounded-t -mb-px",
@@ -88,7 +88,7 @@ export function Tabs({
                 type === "card" &&
                   activeKey !== item.key &&
                   "bg-slate-50 dark:bg-slate-800",
-                item.disabled && "opacity-50 cursor-not-allowed",
+                item.disabled && "opacity-50 !cursor-not-allowed",
               )}
               onClick={() => !item.disabled && handleChange(item.key)}
             >
