@@ -46,11 +46,11 @@ export function Statistic({
         <div className="h-8 w-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
       ) : (
         <div
-          className="text-2xl font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-1"
+          className="text-2xl font-semibold text-slate-800 dark:text-slate-100 flex items-baseline gap-1"
           style={valueStyle}
         >
           {prefix ? (
-            <span className="text-lg [&>svg]:w-[1em] [&>svg]:h-[1em]">
+            <span className="inline-flex self-end [&>svg]:w-[1em] [&>svg]:h-[1em]">
               {prefix}
             </span>
           ) : null}
