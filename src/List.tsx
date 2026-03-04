@@ -190,7 +190,7 @@ function ListItemMetaComponent({
           </div>
         ) : null}
         {description ? (
-          <div className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             {description}
           </div>
         ) : null}
