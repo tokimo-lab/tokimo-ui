@@ -42,6 +42,11 @@ const borderlessColorMap: Record<string, string> = {
   orange:
     "bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400",
   gold: "bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-400",
+  geekblue:
+    "bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400",
+  purple:
+    "bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-400",
+  cyan: "bg-cyan-50 text-cyan-600 dark:bg-cyan-950 dark:text-cyan-400",
   success: "bg-green-50 text-green-600 dark:bg-green-950 dark:text-green-400",
   processing: "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
   error: "bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400",
