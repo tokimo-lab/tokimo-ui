@@ -176,34 +176,77 @@ export function Modal({
   const destroyOnClose = destroyOnCloseProp ?? destroyOnHidden ?? false;
   const contentRef = useRef<HTMLDivElement>(null);
 
+  /* ─── Animation state ─── */
+  const ANIM_DURATION = 200;
+  const [visible, setVisible] = useState(false);
+  const [animClass, setAnimClass] = useState(false);
+  const rafRef = useRef<number>(0);
+
+  // Freeze children during exit animation so content doesn't vanish before fade-out
+  const frozenChildrenRef = useRef<ReactNode>(children);
+  if (open) {
+    frozenChildrenRef.current = children;
+  }
+  const renderedChildren = open ? children : frozenChildrenRef.current;
+
+  useEffect(() => {
+    if (open) {
+      setVisible(true);
+      // Double rAF to ensure DOM is painted before adding transition class
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = requestAnimationFrame(() => {
+          setAnimClass(true);
+        });
+      });
+      return () => cancelAnimationFrame(rafRef.current);
+    }
+    // Closing: remove anim class, wait for transition, then unmount
+    setAnimClass(false);
+    const timer = setTimeout(() => {
+      setVisible(false);
+    }, ANIM_DURATION);
+    return () => clearTimeout(timer);
+  }, [open]);
+
+  // afterOpenChange
+  const afterOpenChangeRef = useRef(afterOpenChange);
+  afterOpenChangeRef.current = afterOpenChange;
+  useEffect(() => {
+    if (visible && animClass) {
+      const t = setTimeout(
+        () => afterOpenChangeRef.current?.(true),
+        ANIM_DURATION,
+      );
+      return () => clearTimeout(t);
+    }
+    if (!visible) {
+      afterOpenChangeRef.current?.(false);
+    }
+  }, [visible, animClass]);
+
   // Keyboard handler
   useEffect(() => {
-    if (!open || !keyboard) return;
+    if (!visible || !keyboard) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onCancel?.();
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [open, keyboard, onCancel]);
+  }, [visible, keyboard, onCancel]);
 
   // Body scroll lock
   useEffect(() => {
-    if (open) {
+    if (visible) {
       const prev = document.body.style.overflow;
       document.body.style.overflow = "hidden";
       return () => {
         document.body.style.overflow = prev;
       };
     }
-  }, [open]);
+  }, [visible]);
 
-  // afterOpenChange
-  useEffect(() => {
-    afterOpenChange?.(open);
-  }, [open, afterOpenChange]);
-
-  if (!open && destroyOnClose) return null;
-  if (!open) return null;
+  if (!visible && destroyOnClose) return null;
+  if (!visible) return null;
 
   const config = SIZE_CONFIG[size];
   const resolvedWidth =
@@ -233,7 +276,8 @@ export function Modal({
     // biome-ignore lint/a11y/noStaticElementInteractions: overlay mask click-to-dismiss
     <div
       className={cn(
-        "fixed inset-0 flex items-start justify-center overflow-y-auto bg-black/45",
+        "fixed inset-0 flex items-start justify-center overflow-y-auto transition-colors duration-200",
+        animClass ? "bg-black/45" : "bg-black/0",
         centered && "items-center",
         size === "full" && "items-stretch",
         wrapClassName,
@@ -247,7 +291,10 @@ export function Modal({
       <div
         ref={contentRef}
         className={cn(
-          "relative bg-white dark:bg-slate-900 rounded-lg shadow-2xl flex flex-col shrink-0",
+          "relative bg-white dark:bg-slate-900 rounded-lg shadow-2xl flex flex-col shrink-0 transition-all duration-200",
+          animClass
+            ? "opacity-100 scale-100 translate-y-0"
+            : "opacity-0 scale-95 translate-y-4",
           size === "full" && "!rounded-none",
           !centered && size !== "full" && "mt-[10vh] mb-[10vh]",
           className,
@@ -291,7 +338,7 @@ export function Modal({
             ...(config.containerStyle ?? {}),
           }}
         >
-          {children}
+          {renderedChildren}
         </div>
         {/* Footer */}
         {renderedFooter ? (
