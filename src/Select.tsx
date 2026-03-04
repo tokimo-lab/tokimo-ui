@@ -273,7 +273,7 @@ export function Select({
                     {getLabel(v)}
                     <button
                       type="button"
-                      className="hover:text-red-500"
+                      className="cursor-pointer hover:text-red-500"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleSelect(v);
@@ -302,7 +302,7 @@ export function Select({
         {allowClear && hasValue && !disabled ? (
           <button
             type="button"
-            className="shrink-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+            className="shrink-0 cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
             onClick={handleClear}
           >
             <X className="h-3.5 w-3.5" />
