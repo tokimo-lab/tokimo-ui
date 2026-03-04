@@ -195,9 +195,15 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
     }, []);
 
     const sizeClass = {
-      small: "h-6 text-xs px-2",
-      middle: "h-8 text-sm px-3",
-      large: "h-10 text-base px-3",
+      small: "text-xs px-2",
+      middle: "text-sm px-3",
+      large: "text-base px-3",
+    }[sz];
+
+    const wrapperSizeClass = {
+      small: "h-6",
+      middle: "h-8",
+      large: "h-10",
     }[sz];
 
     const borderClass = status
@@ -217,6 +223,7 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
           {...getReferenceProps()}
           className={cn(
             "flex items-center rounded-md border transition-colors focus-within:ring-2",
+            wrapperSizeClass,
             borderClass,
             disabled &&
               "opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-900",
