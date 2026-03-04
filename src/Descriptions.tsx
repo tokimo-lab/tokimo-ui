@@ -103,7 +103,7 @@ export function Descriptions({
                     <td
                       className={cn(
                         padClass,
-                        "text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700",
+                        "text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700",
                       )}
                       colSpan={
                         (item.span ?? 1) > 1 ? item.span! * 2 - 1 : undefined
