@@ -102,7 +102,7 @@ export function Tag({
       {closable ? (
         <button
           type="button"
-          className="inline-flex items-center hover:opacity-70 ml-0.5 -mr-0.5"
+          className="inline-flex items-center cursor-pointer hover:opacity-70 ml-0.5 -mr-0.5"
           onClick={(e) => {
             e.stopPropagation();
             onClose?.(e);
