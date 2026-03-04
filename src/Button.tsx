@@ -71,12 +71,12 @@ export function Button({
       type={htmlType}
       disabled={isDisabled}
       className={cn(
-        "inline-flex items-center justify-center gap-1.5 border font-medium transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 select-none",
+        "inline-flex items-center justify-center gap-1.5 border font-medium transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 select-none cursor-pointer",
         variantClasses[variant],
         variant !== "link" && sizeClasses[size],
         shapeClass,
         block && "w-full",
-        isDisabled && "opacity-50 cursor-not-allowed pointer-events-none",
+        isDisabled && "opacity-50 !cursor-not-allowed pointer-events-none",
         className,
       )}
       {...rest}
