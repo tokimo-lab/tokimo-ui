@@ -281,7 +281,7 @@ export function Form({
       <form
         className={cn(
           layout === "inline" && "flex flex-wrap gap-4",
-          layout === "vertical" && "space-y-4",
+          layout === "vertical" && "space-y-5",
           className,
         )}
         onSubmit={async (e) => {
@@ -473,7 +473,7 @@ Form.Item = function FormItem({
           ) : null}
         </label>
       ) : null}
-      <div>{child as ReactNode}</div>
+      <div className="[&>:not(button)]:w-full">{child as ReactNode}</div>
       {error ? <div className="mt-1 text-xs text-red-500">{error}</div> : null}
       {extra ? (
         <div className="mt-1 text-xs text-slate-400 dark:text-slate-500">
