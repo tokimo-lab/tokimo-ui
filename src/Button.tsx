@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode, Ref } from "react";
 import { cn } from "./utils";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -18,6 +18,8 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   htmlType?: "button" | "submit" | "reset";
   /** Danger mode (can combine with variant) */
   danger?: boolean;
+  /** Ref forwarding (React 19 style) */
+  ref?: Ref<HTMLButtonElement>;
 }
 
 const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
@@ -27,7 +29,7 @@ const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
     "bg-white text-slate-700 border-slate-300 hover:text-sky-600 hover:border-sky-500 active:text-sky-700 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:text-sky-400 dark:hover:border-sky-400",
   dashed:
     "bg-white text-slate-700 border-slate-300 border-dashed hover:text-sky-600 hover:border-sky-500 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:text-sky-400 dark:hover:border-sky-400",
-  text: "bg-transparent text-slate-700 border-transparent hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800",
+  text: "bg-transparent text-slate-700 border-transparent hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700/50 dark:border-transparent",
   link: "bg-transparent text-sky-600 border-transparent hover:text-sky-500 dark:text-sky-400 dark:hover:text-sky-300 p-0 h-auto",
   danger:
     "bg-white text-red-500 border-red-300 hover:text-red-600 hover:border-red-400 dark:bg-slate-800 dark:text-red-400 dark:border-red-500",
@@ -40,6 +42,7 @@ const sizeClasses: Record<NonNullable<ButtonProps["size"]>, string> = {
 };
 
 export function Button({
+  ref,
   variant = "default",
   size = "middle",
   loading = false,
@@ -64,6 +67,7 @@ export function Button({
 
   return (
     <button
+      ref={ref}
       type={htmlType}
       disabled={isDisabled}
       className={cn(
