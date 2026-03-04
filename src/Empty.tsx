@@ -1,4 +1,4 @@
-import { Inbox } from "lucide-react";
+import { Inbox, PackageOpen } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "./utils";
 
@@ -14,6 +14,8 @@ export interface EmptyProps {
   className?: string;
 }
 
+const SIMPLE_SENTINEL = "__empty_simple__" as const;
+
 export function Empty({
   image,
   imageStyle,
@@ -21,6 +23,14 @@ export function Empty({
   children,
   className,
 }: EmptyProps) {
+  const isSimple = image === SIMPLE_SENTINEL;
+
+  const renderedImage = isSimple ? (
+    <PackageOpen className="h-10 w-10 stroke-1 mb-2" />
+  ) : (
+    (image ?? <Inbox className="h-12 w-12 stroke-1 mb-2" />)
+  );
+
   return (
     <div
       className={cn(
@@ -28,9 +38,7 @@ export function Empty({
         className,
       )}
     >
-      <div style={imageStyle}>
-        {image ?? <Inbox className="h-12 w-12 stroke-1 mb-2" />}
-      </div>
+      <div style={imageStyle}>{renderedImage}</div>
       {description !== false && description !== null ? (
         <p className="text-sm mb-2">{description}</p>
       ) : null}
@@ -39,4 +47,4 @@ export function Empty({
   );
 }
 
-Empty.PRESENTED_IMAGE_SIMPLE = "simple" as const;
+Empty.PRESENTED_IMAGE_SIMPLE = SIMPLE_SENTINEL;
