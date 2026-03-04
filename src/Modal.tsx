@@ -230,30 +230,26 @@ export function Modal({
   const renderedFooter = footer === null ? null : (footer ?? defaultFooter);
 
   return createPortal(
+    // biome-ignore lint/a11y/noStaticElementInteractions: overlay mask click-to-dismiss
     <div
       className={cn(
-        "fixed inset-0 flex items-start justify-center",
+        "fixed inset-0 flex items-start justify-center overflow-y-auto bg-black/45",
         centered && "items-center",
         size === "full" && "items-stretch",
         wrapClassName,
       )}
-      style={{ zIndex }}
+      style={{ zIndex, ...THIN_SCROLLBAR }}
+      role="presentation"
+      onClick={maskClosable ? onCancel : undefined}
     >
-      {/* Mask */}
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: overlay mask click-to-dismiss */}
-      <div
-        className="absolute inset-0 bg-black/45 transition-opacity"
-        role="presentation"
-        onClick={maskClosable ? onCancel : undefined}
-      />
       {/* Dialog */}
       {/* biome-ignore lint/a11y/noStaticElementInteractions: dialog panel stopPropagation */}
       <div
         ref={contentRef}
         className={cn(
-          "relative bg-white dark:bg-slate-900 rounded-lg shadow-2xl flex flex-col",
+          "relative bg-white dark:bg-slate-900 rounded-lg shadow-2xl flex flex-col shrink-0",
           size === "full" && "!rounded-none",
-          !centered && size !== "full" && "mt-[10vh]",
+          !centered && size !== "full" && "mt-[10vh] mb-[10vh]",
           className,
         )}
         style={{
