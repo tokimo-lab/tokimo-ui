@@ -63,8 +63,8 @@ export interface FormInstance<T extends FieldValues = FieldValues> {
 export function useForm<T extends FieldValues = FieldValues>(
   initialValues?: Partial<T>,
 ): [FormInstance<T>] {
-  const init = (initialValues ?? {}) as T;
-  const valuesRef = useRef<T>({ ...init });
+  const initRef = useRef<T>((initialValues ?? {}) as T);
+  const valuesRef = useRef<T>({ ...initRef.current });
   const [, forceUpdate] = useState(0);
   const errorsRef = useRef<FieldErrors>({});
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -73,6 +73,7 @@ export function useForm<T extends FieldValues = FieldValues>(
   const rulesRef = useRef<Map<string, FormRule[]>>(new Map());
 
   const instance = useMemo<FormInstance<T>>(() => {
+    const init = initRef.current;
     const inst: FormInstance<T> = {
       getFieldsValue: () => ({ ...valuesRef.current }),
       getFieldValue: (name) => valuesRef.current[name],
@@ -144,7 +145,7 @@ export function useForm<T extends FieldValues = FieldValues>(
         valuesRef.current = v;
         forceUpdate((n) => n + 1);
       },
-      _errors: errors,
+      _errors: errorsRef.current,
       _setErrors: setErrors,
       _touched: touchedRef.current,
       _listeners: listenersRef.current,
@@ -154,7 +155,7 @@ export function useForm<T extends FieldValues = FieldValues>(
     };
     return inst;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errors, init]);
+  }, []);
 
   // Keep errors synced
   instance._errors = errors;
@@ -419,7 +420,12 @@ Form.Item = function FormItem({
     const childEl = children as React.ReactElement;
     if (childEl && typeof childEl === "object" && "type" in childEl) {
       const injectedProps: Record<string, unknown> = {
-        [valuePropName]: value,
+        [valuePropName]:
+          value !== undefined
+            ? value
+            : valuePropName === "checked"
+              ? false
+              : "",
         [trigger]: (...args: unknown[]) => {
           let newValue: unknown;
           // Handle native events
