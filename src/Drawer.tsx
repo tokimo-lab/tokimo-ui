@@ -1,0 +1,166 @@
+import { X } from "lucide-react";
+import { type CSSProperties, type ReactNode, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { cn } from "./utils";
+
+export interface DrawerProps {
+  /** Whether visible */
+  open?: boolean;
+  /** Title */
+  title?: ReactNode;
+  /** Placement */
+  placement?: "left" | "right" | "top" | "bottom";
+  /** Width (for left/right) */
+  width?: number | string;
+  /** Height (for top/bottom) */
+  height?: number | string;
+  /** Close callback */
+  onClose?: () => void;
+  /** Close on mask click */
+  maskClosable?: boolean;
+  /** Closable */
+  closable?: boolean;
+  /** Z index */
+  zIndex?: number;
+  /** Keyboard closable */
+  keyboard?: boolean;
+  /** Extra content in header */
+  extra?: ReactNode;
+  /** Custom footer */
+  footer?: ReactNode;
+  /** Body style */
+  bodyStyle?: CSSProperties;
+  /** Ant Design v5 styles API */
+  styles?: {
+    body?: CSSProperties;
+    wrapper?: CSSProperties;
+    header?: CSSProperties;
+    root?: CSSProperties;
+  };
+  /** Destroy on close */
+  destroyOnClose?: boolean;
+  className?: string;
+  children?: ReactNode;
+}
+
+export function Drawer({
+  open = false,
+  title,
+  placement = "right",
+  width = 378,
+  height = 378,
+  onClose,
+  maskClosable = true,
+  closable = true,
+  zIndex = 1000,
+  keyboard = true,
+  extra,
+  footer,
+  bodyStyle,
+  styles,
+  destroyOnClose = false,
+  className,
+  children,
+}: DrawerProps) {
+  useEffect(() => {
+    if (!open || !keyboard) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose?.();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [open, keyboard, onClose]);
+
+  useEffect(() => {
+    if (open) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [open]);
+
+  if (!open && destroyOnClose) return null;
+  if (!open) return null;
+
+  const isHorizontal = placement === "left" || placement === "right";
+
+  const panelStyle: CSSProperties = isHorizontal
+    ? { width, height: "100%" }
+    : { height, width: "100%" };
+
+  const positionClass = {
+    left: "left-0 top-0",
+    right: "right-0 top-0",
+    top: "top-0 left-0",
+    bottom: "bottom-0 left-0",
+  }[placement];
+
+  return createPortal(
+    <div className="fixed inset-0" style={{ zIndex }}>
+      {/* Mask */}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: overlay mask click-to-dismiss */}
+      <div
+        className="absolute inset-0 bg-black/45 transition-opacity"
+        role="presentation"
+        onClick={maskClosable ? onClose : undefined}
+      />
+      {/* Panel */}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: dialog panel stopPropagation */}
+      <div
+        className={cn(
+          "absolute bg-white dark:bg-slate-900 shadow-2xl flex flex-col",
+          positionClass,
+          className,
+        )}
+        style={{ ...panelStyle, ...styles?.wrapper }}
+        role="presentation"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        {(title || closable) && (
+          <div
+            className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700 shrink-0"
+            style={styles?.header}
+          >
+            <h3 className="text-base font-semibold text-slate-800 dark:text-slate-100 m-0">
+              {title}
+            </h3>
+            <div className="flex items-center gap-2">
+              {extra}
+              {closable ? (
+                <button
+                  type="button"
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                  onClick={onClose}
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              ) : null}
+            </div>
+          </div>
+        )}
+        {/* Body */}
+        <div
+          className="flex-1 overflow-y-auto px-6 py-4"
+          style={{
+            scrollbarWidth: "thin",
+            scrollbarColor: "rgba(128,128,128,0.4) transparent",
+            ...bodyStyle,
+            ...styles?.body,
+          }}
+        >
+          {children}
+        </div>
+        {/* Footer */}
+        {footer ? (
+          <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-700 shrink-0">
+            {footer}
+          </div>
+        ) : null}
+      </div>
+    </div>,
+    document.body,
+  );
+}

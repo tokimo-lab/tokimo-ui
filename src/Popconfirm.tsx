@@ -1,0 +1,163 @@
+import {
+  autoUpdate,
+  FloatingPortal,
+  flip,
+  offset,
+  type Placement,
+  shift,
+  useClick,
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useRole,
+} from "@floating-ui/react";
+import { AlertCircle } from "lucide-react";
+import {
+  cloneElement,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+  useState,
+} from "react";
+import { Button } from "./Button";
+import { cn } from "./utils";
+
+export interface PopconfirmProps {
+  /** Confirm title */
+  title: ReactNode;
+  /** Description text */
+  description?: ReactNode;
+  /** Placement */
+  placement?: Placement;
+  /** OK text */
+  okText?: string;
+  /** Cancel text */
+  cancelText?: string;
+  /** OK button type */
+  okType?: "primary" | "danger";
+  /** Confirm callback */
+  onConfirm?: () => void | Promise<void>;
+  /** Cancel callback */
+  onCancel?: () => void;
+  /** Trigger element */
+  children: ReactElement;
+  /** Custom icon */
+  icon?: ReactNode;
+  /** Open state */
+  open?: boolean;
+  /** Open change */
+  onOpenChange?: (open: boolean) => void;
+  /** Disabled */
+  disabled?: boolean;
+}
+
+export function Popconfirm({
+  title,
+  description,
+  placement = "top",
+  okText = "确定",
+  cancelText = "取消",
+  okType = "primary",
+  onConfirm,
+  onCancel,
+  children,
+  icon,
+  open: openProp,
+  onOpenChange,
+  disabled = false,
+}: PopconfirmProps) {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const open = openProp ?? uncontrolledOpen;
+
+  const setOpen = (v: boolean) => {
+    if (openProp === undefined) setUncontrolledOpen(v);
+    onOpenChange?.(v);
+  };
+
+  const { refs, floatingStyles, context } = useFloating({
+    open,
+    onOpenChange: setOpen,
+    placement,
+    middleware: [offset(8), flip(), shift({ padding: 5 })],
+    whileElementsMounted: autoUpdate,
+  });
+
+  const click = useClick(context, { enabled: !disabled });
+  const dismiss = useDismiss(context, { enabled: !loading });
+  const role = useRole(context);
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    click,
+    dismiss,
+    role,
+  ]);
+
+  const handleConfirm = async () => {
+    try {
+      setLoading(true);
+      await onConfirm?.();
+      setOpen(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      {isValidElement(children)
+        ? cloneElement(children as ReactElement<Record<string, unknown>>, {
+            ref: refs.setReference,
+            ...getReferenceProps(),
+          })
+        : children}
+      {open ? (
+        <FloatingPortal>
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            className={cn(
+              "z-[9999] rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg p-4 max-w-xs",
+            )}
+            {...getFloatingProps()}
+          >
+            <div className="flex items-start gap-2 mb-3">
+              <span className="shrink-0 mt-0.5 text-amber-500">
+                {icon ?? <AlertCircle className="h-4 w-4" />}
+              </span>
+              <div>
+                <div className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                  {title}
+                </div>
+                {description ? (
+                  <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    {description}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                size="small"
+                onClick={() => {
+                  onCancel?.();
+                  setOpen(false);
+                }}
+              >
+                {cancelText}
+              </Button>
+              <Button
+                size="small"
+                variant={okType === "danger" ? "danger" : "primary"}
+                loading={loading}
+                onClick={handleConfirm}
+              >
+                {okText}
+              </Button>
+            </div>
+          </div>
+        </FloatingPortal>
+      ) : null}
+    </>
+  );
+}

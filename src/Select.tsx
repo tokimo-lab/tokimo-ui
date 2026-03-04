@@ -1,0 +1,417 @@
+import {
+  autoUpdate,
+  FloatingPortal,
+  flip,
+  offset,
+  shift,
+  size as sizeMiddleware,
+  useClick,
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useListNavigation,
+  useRole,
+} from "@floating-ui/react";
+import { Check, ChevronDown, Search, X } from "lucide-react";
+import React, {
+  type ReactNode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { cn } from "./utils";
+
+export interface SelectOption {
+  label: ReactNode;
+  value: string | number;
+  disabled?: boolean;
+}
+
+export interface SelectProps {
+  /** Options */
+  options?: SelectOption[];
+  /** Value (controlled) */
+  value?: string | number | (string | number)[];
+  /** Default value */
+  defaultValue?: string | number | (string | number)[];
+  /** Change handler */
+  // biome-ignore lint/suspicious/noExplicitAny: antd compat
+  onChange?: (value: any, option?: any) => void;
+  /** Placeholder */
+  placeholder?: string;
+  /** Allow clear */
+  allowClear?: boolean;
+  /** Multiple select */
+  mode?: "multiple" | "tags";
+  /** Disabled */
+  disabled?: boolean;
+  /** Size */
+  size?: "small" | "middle" | "large";
+  /** Status */
+  status?: "error" | "warning";
+  /** Loading */
+  loading?: boolean;
+  /** Show search */
+  showSearch?: boolean;
+  /** Filter option */
+  filterOption?: boolean | ((input: string, option?: SelectOption) => boolean);
+  /** Not found content */
+  notFoundContent?: ReactNode;
+  /** Style */
+  style?: React.CSSProperties;
+  className?: string;
+  /** Dropdown class */
+  popupClassName?: string;
+  /** Option label prop (compatibility) */
+  optionFilterProp?: string;
+  /** Field names customization */
+  fieldNames?: { label?: string; value?: string };
+  /** Children (Select.Option pattern) */
+  children?: ReactNode;
+}
+
+const sizeMap = {
+  small: "min-h-6 py-0 text-xs",
+  middle: "min-h-8 py-0.5 text-sm",
+  large: "min-h-10 py-1 text-base",
+};
+
+export function Select({
+  options = [],
+  value: valueProp,
+  defaultValue,
+  onChange,
+  placeholder = "请选择",
+  allowClear = false,
+  mode,
+  disabled = false,
+  size = "middle",
+  status,
+  loading = false,
+  showSearch = false,
+  filterOption = true,
+  notFoundContent,
+  style,
+  className,
+  popupClassName,
+  children,
+}: SelectProps) {
+  const isMultiple = mode === "multiple" || mode === "tags";
+  const [internalValue, setInternalValue] = useState<
+    string | number | (string | number)[] | undefined
+  >(defaultValue);
+  const value = valueProp ?? internalValue;
+
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const listRef = useRef<Array<HTMLElement | null>>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const childOptions = useMemo(() => {
+    if (options.length > 0) return options;
+    const result: SelectOption[] = [];
+    React.Children.forEach(children, (child) => {
+      if (React.isValidElement(child) && child.props) {
+        const props = child.props as {
+          value?: string | number;
+          disabled?: boolean;
+          children?: ReactNode;
+        };
+        if (props.value !== undefined) {
+          result.push({
+            value: props.value,
+            label: props.children ?? String(props.value),
+            disabled: props.disabled,
+          });
+        }
+      }
+    });
+    return result;
+  }, [options, children]);
+
+  const { refs, floatingStyles, context } = useFloating({
+    open,
+    onOpenChange: (v) => {
+      if (disabled) return;
+      setOpen(v);
+      if (!v) setSearch("");
+    },
+    placement: "bottom-start",
+    middleware: [
+      offset(4),
+      flip(),
+      shift({ padding: 5 }),
+      sizeMiddleware({
+        apply({ rects, elements }) {
+          Object.assign(elements.floating.style, {
+            minWidth: `${rects.reference.width}px`,
+          });
+        },
+      }),
+    ],
+    whileElementsMounted: autoUpdate,
+  });
+
+  const click = useClick(context, { enabled: !disabled });
+  const dismiss = useDismiss(context);
+  const role = useRole(context, { role: "listbox" });
+  const listNav = useListNavigation(context, {
+    listRef,
+    activeIndex,
+    onNavigate: setActiveIndex,
+    virtual: true,
+    loop: true,
+  });
+
+  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions(
+    [click, dismiss, role, listNav],
+  );
+
+  // Filter options
+  const filtered =
+    search && filterOption
+      ? childOptions.filter((opt) => {
+          if (typeof filterOption === "function") {
+            return filterOption(search, opt);
+          }
+          const label =
+            typeof opt.label === "string" ? opt.label : String(opt.value);
+          return label.toLowerCase().includes(search.toLowerCase());
+        })
+      : childOptions;
+
+  // Selection helpers
+  const selectedValues = isMultiple
+    ? Array.isArray(value)
+      ? value
+      : value !== undefined
+        ? [value]
+        : []
+    : [];
+
+  const singleValue = !isMultiple ? value : undefined;
+
+  const isSelected = (optValue: string | number) =>
+    isMultiple ? selectedValues.includes(optValue) : singleValue === optValue;
+
+  const handleSelect = (optValue: string | number) => {
+    if (isMultiple) {
+      const current = [...selectedValues];
+      const idx = current.indexOf(optValue);
+      if (idx >= 0) {
+        current.splice(idx, 1);
+      } else {
+        current.push(optValue);
+      }
+      if (valueProp === undefined) setInternalValue(current);
+      onChange?.(current);
+    } else {
+      if (valueProp === undefined) setInternalValue(optValue);
+      onChange?.(optValue);
+      setOpen(false);
+      setSearch("");
+    }
+  };
+
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isMultiple) {
+      if (valueProp === undefined) setInternalValue([]);
+      onChange?.([] as string[]);
+    } else {
+      if (valueProp === undefined) setInternalValue(undefined);
+      onChange?.(undefined as unknown as string);
+    }
+  };
+
+  // Display
+  const getLabel = (v: string | number) =>
+    childOptions.find((o) => o.value === v)?.label ?? v;
+
+  const hasValue = isMultiple
+    ? selectedValues.length > 0
+    : value !== undefined && value !== null && value !== "";
+
+  useEffect(() => {
+    if (open && showSearch) {
+      setTimeout(() => inputRef.current?.focus(), 0);
+    }
+  }, [open, showSearch]);
+
+  return (
+    <>
+      <div
+        ref={refs.setReference}
+        className={cn(
+          "inline-flex items-center gap-1 px-2 rounded-md border bg-white cursor-pointer transition-colors dark:bg-slate-900",
+          open
+            ? "border-sky-500 ring-1 ring-sky-500"
+            : status === "error"
+              ? "border-red-500"
+              : status === "warning"
+                ? "border-amber-500"
+                : "border-slate-300 dark:border-slate-600",
+          disabled &&
+            "opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-800",
+          sizeMap[size],
+          className,
+        )}
+        style={style}
+        {...getReferenceProps()}
+      >
+        <div className="flex-1 flex items-center gap-1 overflow-hidden min-w-0">
+          {isMultiple ? (
+            selectedValues.length > 0 ? (
+              <div className="flex flex-wrap gap-1">
+                {selectedValues.map((v) => (
+                  <span
+                    key={String(v)}
+                    className="inline-flex items-center gap-0.5 bg-slate-100 dark:bg-slate-700 text-xs rounded px-1.5 py-0.5"
+                  >
+                    {getLabel(v)}
+                    <button
+                      type="button"
+                      className="hover:text-red-500"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelect(v);
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <span className="text-slate-400 dark:text-slate-500 truncate">
+                {placeholder}
+              </span>
+            )
+          ) : hasValue ? (
+            <span className="truncate text-slate-700 dark:text-slate-200">
+              {getLabel(value as string | number)}
+            </span>
+          ) : (
+            <span className="text-slate-400 dark:text-slate-500 truncate">
+              {placeholder}
+            </span>
+          )}
+        </div>
+        {allowClear && hasValue && !disabled ? (
+          <button
+            type="button"
+            className="shrink-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+            onClick={handleClear}
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        ) : null}
+        {loading ? (
+          <svg
+            className="h-3.5 w-3.5 animate-spin text-slate-400 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+            />
+          </svg>
+        ) : (
+          <ChevronDown
+            className={cn(
+              "h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform",
+              open && "rotate-180",
+            )}
+          />
+        )}
+      </div>
+
+      {open ? (
+        <FloatingPortal>
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            className={cn(
+              "z-[9999] rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg overflow-hidden",
+              popupClassName,
+            )}
+            {...getFloatingProps()}
+          >
+            {showSearch ? (
+              <div className="p-2 border-b border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-50 dark:bg-slate-800 rounded">
+                  <Search className="h-3.5 w-3.5 text-slate-400" />
+                  <input
+                    ref={inputRef}
+                    className="flex-1 bg-transparent outline-none text-sm placeholder:text-slate-400"
+                    placeholder="搜索..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
+              </div>
+            ) : null}
+            <div
+              className="max-h-60 overflow-y-auto py-1"
+              style={{ scrollbarWidth: "thin" }}
+            >
+              {filtered.length === 0 ? (
+                <div className="px-3 py-4 text-center text-sm text-slate-400">
+                  {notFoundContent ?? "无匹配选项"}
+                </div>
+              ) : (
+                filtered.map((opt, i) => (
+                  <div
+                    key={String(opt.value)}
+                    ref={(node) => {
+                      listRef.current[i] = node;
+                    }}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer transition-colors",
+                      isSelected(opt.value)
+                        ? "text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/30"
+                        : "text-slate-700 dark:text-slate-200",
+                      activeIndex === i && "bg-slate-100 dark:bg-slate-800",
+                      opt.disabled && "opacity-50 cursor-not-allowed",
+                    )}
+                    {...getItemProps({
+                      onClick: () => {
+                        if (!opt.disabled) handleSelect(opt.value);
+                      },
+                    })}
+                  >
+                    <span className="flex-1">{opt.label}</span>
+                    {isSelected(opt.value) ? (
+                      <Check className="h-4 w-4 shrink-0" />
+                    ) : null}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </FloatingPortal>
+      ) : null}
+    </>
+  );
+}
+
+function SelectOption(_props: {
+  value: string | number;
+  disabled?: boolean;
+  children?: ReactNode;
+}) {
+  return null; // Rendered by parent Select
+}
+Select.Option = SelectOption;

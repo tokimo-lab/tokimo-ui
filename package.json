@@ -11,6 +11,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./icons": {
+      "types": "./dist/icons/index.d.ts",
+      "default": "./dist/icons/index.js"
     }
   },
   "scripts": {
@@ -20,15 +24,18 @@
     "prepare": "pnpm build"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.27.6",
+    "lucide-react": "^0.511.0",
     "react": "^19.2.3",
-    "antd": "^6.2.0"
+    "react-dom": "^19.2.3"
   },
   "devDependencies": {
     "@types/react": "^19.2.3",
+    "@types/react-dom": "^19.2.3",
     "typescript": "^5.6.2"
   },
   "peerDependencies": {
     "react": "^19.2.3",
-    "antd": "^6.2.0"
+    "react-dom": "^19.2.3"
   }
 }
