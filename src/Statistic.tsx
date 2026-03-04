@@ -38,7 +38,7 @@ export function Statistic({
   return (
     <div className={cn("text-left", className)}>
       {title ? (
-        <div className="text-sm text-slate-500 dark:text-slate-400 mb-1">
+        <div className="text-sm text-slate-500 dark:text-slate-400 mb-2">
           {title}
         </div>
       ) : null}
@@ -50,7 +50,7 @@ export function Statistic({
           style={valueStyle}
         >
           {prefix ? (
-            <span className="inline-flex self-end [&>svg]:w-[1em] [&>svg]:h-[1em]">
+            <span className="inline-flex translate-y-[0.125em] [&>svg]:w-[1em] [&>svg]:h-[1em]">
               {prefix}
             </span>
           ) : null}
