@@ -76,7 +76,7 @@ export function Button({
         variant !== "link" && sizeClasses[size],
         shapeClass,
         block && "w-full",
-        isDisabled && "opacity-50 !cursor-not-allowed pointer-events-none",
+        isDisabled && "opacity-50 !cursor-not-allowed",
         className,
       )}
       {...rest}
