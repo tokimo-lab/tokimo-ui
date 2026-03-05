@@ -301,6 +301,7 @@ export function Modal({
         )}
         style={{
           width: resolvedWidth,
+          maxWidth: size === "default" ? "calc(100vw - 32px)" : undefined,
           ...config.dialogStyle,
           ...style,
         }}
