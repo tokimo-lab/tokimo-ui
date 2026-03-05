@@ -182,7 +182,7 @@ function renderRows<T>(
               style={{ width: col.width }}
             >
               <span
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 w-full"
                 style={
                   ci === 0 ? { paddingLeft: level * indentSize } : undefined
                 }
@@ -198,7 +198,9 @@ function renderRows<T>(
                 ) : ci === 0 && level > 0 ? (
                   <span className="w-4 shrink-0" />
                 ) : null}
-                <span className={cn(col.ellipsis && "truncate")}>
+                <span
+                  className={cn("min-w-0 flex-1", col.ellipsis && "truncate")}
+                >
                   {rendered}
                 </span>
               </span>
