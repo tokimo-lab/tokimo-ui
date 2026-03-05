@@ -278,7 +278,6 @@ export function Modal({
       className={cn(
         "fixed inset-0 flex items-start justify-center overflow-y-auto transition-colors duration-200",
         animClass ? "bg-black/45" : "bg-black/0",
-        centered && "items-center",
         size === "full" && "items-stretch",
         wrapClassName,
       )}
@@ -296,6 +295,7 @@ export function Modal({
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 translate-y-4",
           size === "full" && "!rounded-none",
+          centered && size !== "full" && "mt-[8vh] mb-[16vh]",
           !centered && size !== "full" && "mt-[10vh] mb-[10vh]",
           className,
         )}
