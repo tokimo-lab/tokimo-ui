@@ -1,4 +1,10 @@
-import { type ReactNode, useState } from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { cn } from "./utils";
 
 export interface TabItem {
@@ -60,19 +66,51 @@ export function Tabs({
     large: "text-base px-4 py-2.5",
   }[size];
 
+  const tabBarRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+  const hasInitRef = useRef(false);
+
+  const updateIndicator = useCallback(() => {
+    const tabBar = tabBarRef.current;
+    const activeTab = tabRefs.current.get(activeKey);
+    if (!tabBar || !activeTab) return;
+    const barRect = tabBar.getBoundingClientRect();
+    const tabRect = activeTab.getBoundingClientRect();
+    setIndicatorStyle({
+      left: tabRect.left - barRect.left + tabBar.scrollLeft,
+      width: tabRect.width,
+    });
+  }, [activeKey]);
+
+  useLayoutEffect(() => {
+    updateIndicator();
+    if (!hasInitRef.current) {
+      // Skip transition on first render
+      requestAnimationFrame(() => {
+        hasInitRef.current = true;
+      });
+    }
+  }, [updateIndicator]);
+
   return (
     <div className={className}>
       {/* Tab Bar */}
       <div className="flex items-center border-b border-slate-200 dark:border-slate-700">
         <div
+          ref={tabBarRef}
           className={cn(
-            "flex gap-0 flex-1 overflow-x-auto",
+            "relative flex gap-0 flex-1 overflow-x-auto",
             centered && "justify-center",
           )}
         >
           {items.map((item) => (
             <button
               key={item.key}
+              ref={(el) => {
+                if (el) tabRefs.current.set(item.key, el);
+                else tabRefs.current.delete(item.key);
+              }}
               type="button"
               disabled={item.disabled}
               className={cn(
@@ -96,12 +134,21 @@ export function Tabs({
                 {item.icon}
                 {item.label}
               </span>
-              {/* Active indicator for line type */}
-              {type === "line" && activeKey === item.key ? (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-sky-500 rounded-t" />
-              ) : null}
             </button>
           ))}
+          {/* Animated active indicator for line type */}
+          {type === "line" && (
+            <span
+              className="absolute bottom-0 h-0.5 bg-sky-500 rounded-t"
+              style={{
+                left: indicatorStyle.left,
+                width: indicatorStyle.width,
+                transition: hasInitRef.current
+                  ? "left 0.3s cubic-bezier(0.645, 0.045, 0.355, 1), width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)"
+                  : "none",
+              }}
+            />
+          )}
         </div>
         {tabBarExtraContent ? (
           <div className="shrink-0 ml-auto pl-2">{tabBarExtraContent}</div>
