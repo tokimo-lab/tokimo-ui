@@ -4,6 +4,7 @@ import {
   type FormHTMLAttributes,
   type ReactNode,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -58,6 +59,8 @@ export interface FormInstance<T extends FieldValues = FieldValues> {
   _rules: Map<string, FormRule[]>;
   _initialValues: T;
   _rerender: () => void;
+  _watchers: Map<string, Set<(v: unknown) => void>>;
+  _notifyWatchers: (name: string, value: unknown) => void;
 }
 
 export function useForm<T extends FieldValues = FieldValues>(
@@ -71,9 +74,16 @@ export function useForm<T extends FieldValues = FieldValues>(
   const touchedRef = useRef<Set<string>>(new Set());
   const listenersRef = useRef<Map<string, (v: unknown) => void>>(new Map());
   const rulesRef = useRef<Map<string, FormRule[]>>(new Map());
+  const watchersRef = useRef<Map<string, Set<(v: unknown) => void>>>(new Map());
 
   const instance = useMemo<FormInstance<T>>(() => {
     const init = initRef.current;
+    const _notifyWatchers = (name: string, value: unknown) => {
+      const set = watchersRef.current.get(name);
+      if (set) {
+        for (const fn of set) fn(value);
+      }
+    };
     const inst: FormInstance<T> = {
       getFieldsValue: () => ({ ...valuesRef.current }),
       getFieldValue: (name) => valuesRef.current[name],
@@ -81,18 +91,23 @@ export function useForm<T extends FieldValues = FieldValues>(
         Object.assign(valuesRef.current, values);
         for (const [key, val] of Object.entries(values)) {
           listenersRef.current.get(key)?.(val);
+          _notifyWatchers(key, val);
         }
         forceUpdate((n) => n + 1);
       },
       setFieldValue: (name, value) => {
         (valuesRef.current as Record<string, unknown>)[name as string] = value;
         listenersRef.current.get(name as string)?.(value);
+        _notifyWatchers(name as string, value);
         forceUpdate((n) => n + 1);
       },
       resetFields: () => {
         valuesRef.current = { ...init };
         for (const [key, fn] of listenersRef.current) {
           fn((init as Record<string, unknown>)[key]);
+        }
+        for (const [key] of watchersRef.current) {
+          _notifyWatchers(key, (init as Record<string, unknown>)[key]);
         }
         setErrors({});
         errorsRef.current = {};
@@ -152,6 +167,8 @@ export function useForm<T extends FieldValues = FieldValues>(
       _rules: rulesRef.current,
       _initialValues: init,
       _rerender: () => forceUpdate((n) => n + 1),
+      _watchers: watchersRef.current,
+      _notifyWatchers: _notifyWatchers,
     };
     return inst;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -443,6 +460,7 @@ Form.Item = function FormItem({
           }
           (form._values.current as Record<string, unknown>)[name] = newValue;
           form._touched.add(name);
+          form._notifyWatchers(name, newValue);
           form._rerender();
           // Call original handler
           const originalHandler = (childEl.props as Record<string, unknown>)[
@@ -491,3 +509,35 @@ Form.Item = function FormItem({
 };
 
 Form.useForm = useForm;
+
+/** Watch a specific form field value reactively (antd compat) */
+export function useWatch<T = unknown>(
+  name: string,
+  form: FormInstance,
+): T | undefined {
+  const [value, setValue] = useState<T | undefined>(
+    () => form.getFieldValue(name) as T | undefined,
+  );
+
+  useEffect(() => {
+    // Sync current value on mount
+    setValue(form.getFieldValue(name) as T | undefined);
+
+    const callback = (v: unknown) => setValue(v as T | undefined);
+    let set = form._watchers.get(name);
+    if (!set) {
+      set = new Set();
+      form._watchers.set(name, set);
+    }
+    set.add(callback);
+
+    return () => {
+      set.delete(callback);
+      if (set.size === 0) form._watchers.delete(name);
+    };
+  }, [name, form]);
+
+  return value;
+}
+
+Form.useWatch = useWatch;
