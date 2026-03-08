@@ -50,6 +50,7 @@ export function Button({
   shape = "default",
   icon,
   htmlType = "button",
+  danger = false,
   className,
   disabled,
   children,
@@ -77,6 +78,8 @@ export function Button({
         shapeClass,
         block && "w-full",
         isDisabled && "opacity-50 !cursor-not-allowed",
+        danger &&
+          "!text-red-500 !border-transparent hover:!text-red-600 hover:!bg-red-50 dark:!text-red-400 dark:hover:!text-red-300 dark:hover:!bg-red-900/20",
         className,
       )}
       {...rest}
