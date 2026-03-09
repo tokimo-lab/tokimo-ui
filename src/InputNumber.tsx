@@ -58,6 +58,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
       controls = true,
       status,
       className,
+      style,
       ...rest
     },
     ref,
@@ -106,6 +107,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
           sizeMap[size],
           className,
         )}
+        style={style}
       >
         {addonBefore ? (
           <span className="px-2 text-slate-500 border-r border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 h-full flex items-center rounded-l-md text-sm">
@@ -145,7 +147,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
           </div>
         ) : null}
         {addonAfter ? (
-          <span className="px-2 text-slate-500 border-l border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 h-full flex items-center rounded-r-md text-sm">
+          <span className="px-2 text-slate-500 border-l border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 h-full flex items-center rounded-r-md text-sm whitespace-nowrap">
             {addonAfter}
           </span>
         ) : null}

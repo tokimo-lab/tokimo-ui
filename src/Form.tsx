@@ -442,7 +442,7 @@ Form.Item = function FormItem({
             ? value
             : valuePropName === "checked"
               ? false
-              : "",
+              : undefined,
         [trigger]: (...args: unknown[]) => {
           let newValue: unknown;
           // Handle native events
