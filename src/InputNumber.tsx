@@ -121,7 +121,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
           disabled={disabled}
           value={value ?? ""}
           onChange={handleChange}
-          className="w-full min-w-[3em] bg-transparent outline-none text-center px-2"
+          className="w-full min-w-[3em] bg-transparent outline-none text-left px-2"
           {...rest}
         />
         {controls ? (
