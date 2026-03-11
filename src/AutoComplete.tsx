@@ -7,7 +7,7 @@ import {
   useFloating,
   useInteractions,
 } from "@floating-ui/react";
-import { X as XIcon } from "lucide-react";
+import { CircleX as ClearIcon } from "lucide-react";
 import {
   forwardRef,
   type ReactNode,
@@ -260,14 +260,14 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
           {allowClear && val ? (
             <button
               type="button"
-              className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              className="mr-2.5 cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => {
                 updateVal("");
                 inputRef.current?.focus();
               }}
             >
-              <XIcon className="w-3.5 h-3.5" />
+              <ClearIcon className="w-3.5 h-3.5" />
             </button>
           ) : null}
         </div>
