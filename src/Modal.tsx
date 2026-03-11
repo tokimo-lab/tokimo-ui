@@ -176,6 +176,9 @@ export function Modal({
   const destroyOnClose = destroyOnCloseProp ?? destroyOnHidden ?? false;
   const contentRef = useRef<HTMLDivElement>(null);
 
+  /* Track whether mousedown started on the mask itself (not on dialog content) */
+  const mouseDownOnMask = useRef(false);
+
   /* ─── Animation state ─── */
   const ANIM_DURATION = 200;
   const [visible, setVisible] = useState(false);
@@ -283,10 +286,21 @@ export function Modal({
       )}
       style={{ zIndex, ...THIN_SCROLLBAR }}
       role="presentation"
-      onClick={maskClosable ? onCancel : undefined}
+      onMouseDown={(e) => {
+        mouseDownOnMask.current = e.target === e.currentTarget;
+      }}
+      onClick={(e) => {
+        if (
+          maskClosable &&
+          e.target === e.currentTarget &&
+          mouseDownOnMask.current
+        ) {
+          onCancel?.();
+        }
+        mouseDownOnMask.current = false;
+      }}
     >
       {/* Dialog */}
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: dialog panel stopPropagation */}
       <div
         ref={contentRef}
         className={cn(
@@ -306,7 +320,6 @@ export function Modal({
           ...style,
         }}
         role="presentation"
-        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         {(title || closable) && (
