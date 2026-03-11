@@ -181,9 +181,11 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
         setActiveIdx(prev);
         if (backfill) updateVal(filtered[prev].value);
       } else if (e.key === "Enter") {
-        e.preventDefault();
         if (activeIdx >= 0 && activeIdx < filtered.length) {
+          e.preventDefault();
           handleSelect(filtered[activeIdx]);
+        } else {
+          setOpen(false);
         }
       } else if (e.key === "Escape") {
         setOpen(false);
