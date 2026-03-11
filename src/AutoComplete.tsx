@@ -106,6 +106,7 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
     const [open, setOpen] = useState(false);
     const [activeIdx, setActiveIdx] = useState(-1);
     const inputRef = useRef<HTMLInputElement>(null);
+    const interactedRef = useRef(false);
 
     const normalised: AutoCompleteOption[] = useMemo(
       () =>
@@ -164,6 +165,7 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
     );
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
+      interactedRef.current = true;
       if (!open && e.key === "ArrowDown") {
         setOpen(true);
         return;
@@ -247,11 +249,16 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
               onSearch?.(e.target.value);
               if (!open) setOpen(true);
             }}
+            onMouseDown={() => {
+              interactedRef.current = true;
+            }}
             onFocus={() => {
-              if (!disabled) setOpen(true);
+              if (!disabled && interactedRef.current) setOpen(true);
+              interactedRef.current = false;
               onFocus?.();
             }}
             onBlur={() => {
+              interactedRef.current = false;
               onBlur?.();
             }}
             onKeyDown={(e) => {
