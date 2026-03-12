@@ -76,6 +76,8 @@ export type { TabsProps } from "./Tabs";
 export { Tabs } from "./Tabs";
 export type { TagProps } from "./Tag";
 export { Tag } from "./Tag";
+export type { TemplateInputProps, TemplateVariable } from "./TemplateInput";
+export { TemplateInput } from "./TemplateInput";
 export type { ToastType } from "./Toast";
 export { ToastProvider, useToast } from "./Toast";
 export type { TooltipProps } from "./Tooltip";
