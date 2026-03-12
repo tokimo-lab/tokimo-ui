@@ -68,6 +68,25 @@ export function Badge({
   const displayCount =
     count !== undefined && count > overflowCount ? `${overflowCount}+` : count;
 
+  // Standalone count badge (no children) — render inline
+  if (showBadge && !children) {
+    return (
+      <span
+        className={cn(
+          "inline-flex items-center justify-center rounded-full",
+          size === "small"
+            ? "h-4 min-w-4 text-[10px] px-1"
+            : "h-5 min-w-5 text-xs px-1",
+          "bg-red-500 text-white font-medium leading-none",
+          className,
+        )}
+        style={color ? { backgroundColor: color } : undefined}
+      >
+        {!dot ? displayCount : null}
+      </span>
+    );
+  }
+
   return (
     <span className={cn("relative inline-flex", className)}>
       {children}
