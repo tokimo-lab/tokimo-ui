@@ -36,7 +36,7 @@ export { Dropdown } from "./Dropdown";
 export type { EmptyProps } from "./Empty";
 export { Empty } from "./Empty";
 export type { FieldValues as FormFieldValues, FormInstance } from "./Form";
-export { Form, useForm, useFormContext } from "./Form";
+export { Form, useForm, useFormContext, useWatch } from "./Form";
 export type { ImageProps } from "./Image";
 export { Image } from "./Image";
 export { Input, Password, SearchInput, TextArea } from "./Input";
