@@ -88,7 +88,7 @@ export function Tooltip({
             ref={refs.setFloating}
             style={floatingStyles}
             className={cn(
-              "z-[9999] max-w-xs rounded px-2 py-1 text-xs shadow-lg",
+              "z-[9999] max-w-xs break-all rounded px-2 py-1 text-xs shadow-lg",
               color
                 ? ""
                 : "bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-800",
