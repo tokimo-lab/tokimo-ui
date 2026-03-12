@@ -29,10 +29,18 @@ interface JinjaKeyword {
   snippet: string;
   /** Cursor position counted from the end of the snippet */
   cursorFromEnd: number;
+  /** Optional closing tag appended after the cursor (for paired blocks) */
+  closing?: string;
 }
 
 const JINJA2_KEYWORDS: JinjaKeyword[] = [
-  { key: "if", snippet: "{% if  %}", display: "{% if … %}", cursorFromEnd: 3 },
+  {
+    key: "if",
+    snippet: "{% if  %}",
+    display: "{% if … %}…{% endif %}",
+    cursorFromEnd: 3,
+    closing: "{% endif %}",
+  },
   {
     key: "elif",
     snippet: "{% elif  %}",
@@ -54,8 +62,9 @@ const JINJA2_KEYWORDS: JinjaKeyword[] = [
   {
     key: "for",
     snippet: "{% for  in  %}",
-    display: "{% for … in … %}",
+    display: "{% for … in … %}…{% endfor %}",
     cursorFromEnd: 7,
+    closing: "{% endfor %}",
   },
   {
     key: "endfor",
@@ -72,8 +81,9 @@ const JINJA2_KEYWORDS: JinjaKeyword[] = [
   {
     key: "filter",
     snippet: "{% filter  %}",
-    display: "{% filter … %}",
+    display: "{% filter … %}…{% endfilter %}",
     cursorFromEnd: 3,
+    closing: "{% endfilter %}",
   },
   {
     key: "endfilter",
@@ -81,7 +91,13 @@ const JINJA2_KEYWORDS: JinjaKeyword[] = [
     display: "{% endfilter %}",
     cursorFromEnd: 0,
   },
-  { key: "raw", snippet: "{% raw %}", display: "{% raw %}", cursorFromEnd: 0 },
+  {
+    key: "raw",
+    snippet: "{% raw %}",
+    display: "{% raw %}…{% endraw %}",
+    cursorFromEnd: 0,
+    closing: "{% endraw %}",
+  },
   {
     key: "endraw",
     snippet: "{% endraw %}",
@@ -278,7 +294,8 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
       const cursor = getCursor();
       const prefix = value.slice(0, triggerPos);
       const suffix = value.slice(cursor);
-      const newValue = prefix + keyword.snippet + suffix;
+      const closingPart = keyword.closing ?? "";
+      const newValue = prefix + keyword.snippet + closingPart + suffix;
 
       fireChange(newValue);
       setOpen(false);
