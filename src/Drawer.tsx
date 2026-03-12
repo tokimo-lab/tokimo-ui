@@ -1,5 +1,12 @@
 import { X } from "lucide-react";
-import { type CSSProperties, type ReactNode, useEffect } from "react";
+import {
+  type CSSProperties,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { cn } from "./utils";
 
@@ -43,6 +50,15 @@ export interface DrawerProps {
   children?: ReactNode;
 }
 
+const DURATION = 300;
+
+const slideTransforms: Record<string, { hidden: string; visible: string }> = {
+  left: { hidden: "translateX(-100%)", visible: "translateX(0)" },
+  right: { hidden: "translateX(100%)", visible: "translateX(0)" },
+  top: { hidden: "translateY(-100%)", visible: "translateY(0)" },
+  bottom: { hidden: "translateY(100%)", visible: "translateY(0)" },
+};
+
 export function Drawer({
   open = false,
   title,
@@ -62,6 +78,34 @@ export function Drawer({
   className,
   children,
 }: DrawerProps) {
+  // mounted: whether the DOM is rendered
+  // visible: whether the enter animation is active
+  const [mounted, setMounted] = useState(open);
+  const [visible, setVisible] = useState(false);
+  const rafRef = useRef(0);
+
+  // Open: mount first, then trigger enter animation on next frame
+  useEffect(() => {
+    if (open) {
+      setMounted(true);
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = requestAnimationFrame(() => {
+          setVisible(true);
+        });
+      });
+    } else {
+      setVisible(false);
+    }
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [open]);
+
+  // After exit animation finishes, unmount
+  const handleTransitionEnd = useCallback(() => {
+    if (!open) {
+      setMounted(false);
+    }
+  }, [open]);
+
   useEffect(() => {
     if (!open || !keyboard) return;
     const handler = (e: KeyboardEvent) => {
@@ -81,14 +125,18 @@ export function Drawer({
     }
   }, [open]);
 
-  if (!open && destroyOnClose) return null;
-  if (!open) return null;
+  if (!mounted && destroyOnClose) return null;
+  if (!mounted) return null;
 
   const isHorizontal = placement === "left" || placement === "right";
 
-  const panelStyle: CSSProperties = isHorizontal
-    ? { width, height: "100%" }
-    : { height, width: "100%" };
+  const slide = slideTransforms[placement];
+
+  const panelStyle: CSSProperties = {
+    ...(isHorizontal ? { width, height: "100%" } : { height, width: "100%" }),
+    transform: visible ? slide.visible : slide.hidden,
+    transition: `transform ${DURATION}ms cubic-bezier(0.2, 0, 0, 1)`,
+  };
 
   const positionClass = {
     left: "left-0 top-0",
@@ -102,7 +150,11 @@ export function Drawer({
       {/* Mask */}
       {/* biome-ignore lint/a11y/noStaticElementInteractions: overlay mask click-to-dismiss */}
       <div
-        className="absolute inset-0 bg-black/45 transition-opacity"
+        className="absolute inset-0 bg-black/45"
+        style={{
+          opacity: visible ? 1 : 0,
+          transition: `opacity ${DURATION}ms ease`,
+        }}
         role="presentation"
         onClick={maskClosable ? onClose : undefined}
       />
@@ -117,6 +169,7 @@ export function Drawer({
         style={{ ...panelStyle, ...styles?.wrapper }}
         role="presentation"
         onClick={(e) => e.stopPropagation()}
+        onTransitionEnd={handleTransitionEnd}
       >
         {/* Header */}
         {(title || closable) && (
