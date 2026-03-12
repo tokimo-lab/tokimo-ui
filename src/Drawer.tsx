@@ -78,33 +78,50 @@ export function Drawer({
   className,
   children,
 }: DrawerProps) {
-  // mounted: whether the DOM is rendered
-  // visible: whether the enter animation is active
+  const panelRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(open);
   const [visible, setVisible] = useState(false);
   const rafRef = useRef(0);
 
-  // Open: mount first, then trigger enter animation on next frame
+  // Open → mount the DOM; Close → start exit animation
   useEffect(() => {
     if (open) {
       setMounted(true);
-      rafRef.current = requestAnimationFrame(() => {
-        rafRef.current = requestAnimationFrame(() => {
-          setVisible(true);
-        });
-      });
     } else {
       setVisible(false);
     }
-    return () => cancelAnimationFrame(rafRef.current);
   }, [open]);
 
-  // After exit animation finishes, unmount
-  const handleTransitionEnd = useCallback(() => {
-    if (!open) {
-      setMounted(false);
+  // After mounted + open, trigger enter animation
+  useEffect(() => {
+    if (!mounted || !open) return;
+    // Reset to hidden (handles quick re-open where visible might still be true)
+    setVisible(false);
+    rafRef.current = requestAnimationFrame(() => {
+      // Force reflow so the browser registers the hidden position
+      panelRef.current?.getBoundingClientRect();
+      setVisible(true);
+    });
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [mounted, open]);
+
+  // Unmount after exit transition completes (ignore bubbled events from children)
+  const handleTransitionEnd = useCallback(
+    (e: React.TransitionEvent) => {
+      if (e.target !== e.currentTarget || e.propertyName !== "transform")
+        return;
+      if (!open) setMounted(false);
+    },
+    [open],
+  );
+
+  // Safety: unmount if transitionEnd doesn't fire
+  useEffect(() => {
+    if (!open && mounted && !visible) {
+      const timer = setTimeout(() => setMounted(false), DURATION + 50);
+      return () => clearTimeout(timer);
     }
-  }, [open]);
+  }, [open, mounted, visible]);
 
   useEffect(() => {
     if (!open || !keyboard) return;
@@ -161,6 +178,7 @@ export function Drawer({
       {/* Panel */}
       {/* biome-ignore lint/a11y/noStaticElementInteractions: dialog panel stopPropagation */}
       <div
+        ref={panelRef}
         className={cn(
           "absolute bg-white dark:bg-slate-900 shadow-2xl flex flex-col",
           positionClass,
