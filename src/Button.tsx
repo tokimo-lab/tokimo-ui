@@ -30,7 +30,7 @@ const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
   dashed:
     "bg-white text-slate-700 border-slate-300 border-dashed hover:text-sky-600 hover:border-sky-500 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:text-sky-400 dark:hover:border-sky-400",
   text: "bg-transparent text-slate-700 border-transparent hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700/50 dark:border-transparent",
-  link: "bg-transparent text-sky-600 border-transparent hover:text-sky-500 dark:text-sky-400 dark:hover:text-sky-300 p-0 h-auto",
+  link: "bg-transparent text-sky-600 border-transparent underline hover:text-sky-500 dark:text-sky-400 dark:hover:text-sky-300 p-0 h-auto",
   danger:
     "bg-white text-red-500 border-red-300 hover:text-red-600 hover:border-red-400 dark:bg-slate-800 dark:text-red-400 dark:border-red-500",
 };
@@ -79,6 +79,10 @@ export function Button({
         block && "w-full",
         isDisabled && "opacity-50 !cursor-not-allowed",
         danger &&
+          variant === "link" &&
+          "!text-red-500 hover:!text-red-600 dark:!text-red-400 dark:hover:!text-red-300",
+        danger &&
+          variant !== "link" &&
           "!text-red-500 !border-transparent hover:!text-red-600 hover:!bg-red-50 dark:!text-red-400 dark:hover:!text-red-300 dark:hover:!bg-red-900/20",
         className,
       )}
