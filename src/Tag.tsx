@@ -58,6 +58,8 @@ export interface TagProps
   extends Omit<HTMLAttributes<HTMLSpanElement>, "color"> {
   /** Preset color name or CSS color string */
   color?: string;
+  /** Size */
+  size?: "default" | "small";
   /** Closable tag */
   closable?: boolean;
   /** Close callback */
@@ -70,6 +72,7 @@ export interface TagProps
 
 export function Tag({
   color = "default",
+  size = "default",
   closable = false,
   onClose,
   bordered = true,
@@ -86,7 +89,10 @@ export function Tag({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium whitespace-nowrap",
+        "inline-flex items-center gap-1 rounded font-medium whitespace-nowrap",
+        size === "small"
+          ? "px-1 py-px text-[10px] leading-4"
+          : "px-2 py-0.5 text-xs",
         isPreset ? preset : undefined,
         bordered && isPreset ? "border" : undefined,
         className,

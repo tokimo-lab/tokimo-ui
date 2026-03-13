@@ -5,7 +5,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Visual variant */
   variant?: "primary" | "default" | "dashed" | "text" | "link" | "danger";
   /** Size */
-  size?: "small" | "middle" | "large";
+  size?: "xs" | "small" | "middle" | "large";
   /** Show loading spinner */
   loading?: boolean;
   /** Make the button full width */
@@ -36,6 +36,7 @@ const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
 };
 
 const sizeClasses: Record<NonNullable<ButtonProps["size"]>, string> = {
+  xs: "px-1.5 py-px text-[10px] h-5",
   small: "px-2 py-0.5 text-xs h-6",
   middle: "px-3 py-1 text-sm h-8",
   large: "px-4 py-1.5 text-base h-10",
