@@ -21,6 +21,8 @@ export interface TableColumn<T = Record<string, unknown>> {
   filters?: { text: ReactNode; value: string }[];
   /** Width */
   width?: number | string;
+  /** Min width */
+  minWidth?: number | string;
   /** Alignment */
   align?: "left" | "center" | "right";
   /** Fixed column */
@@ -179,7 +181,7 @@ function renderRows<T>(
                   "sticky right-0 bg-white dark:bg-slate-900 z-10",
                 col.className,
               )}
-              style={{ width: col.width }}
+              style={{ width: col.width, minWidth: col.minWidth }}
             >
               <span
                 className="flex items-center gap-1 w-full"
@@ -410,11 +412,11 @@ export function Table<T = Record<string, unknown>>({
                       bordered &&
                         "border-r border-slate-200 dark:border-slate-700 last:border-r-0",
                       col.fixed === "left" &&
-                        "sticky left-0 bg-slate-50 dark:bg-slate-800/80 z-10",
+                        "sticky left-0 bg-slate-50 dark:bg-slate-800 z-10",
                       col.fixed === "right" &&
-                        "sticky right-0 bg-slate-50 dark:bg-slate-800/80 z-10",
+                        "sticky right-0 bg-slate-50 dark:bg-slate-800 z-10",
                     )}
-                    style={{ width: col.width }}
+                    style={{ width: col.width, minWidth: col.minWidth }}
                   >
                     {col.title}
                   </th>
