@@ -52,6 +52,7 @@ import {
   Menu,
   MinusCircle,
   Moon,
+  Palette,
   PauseCircle,
   Pencil,
   Play,
@@ -200,6 +201,7 @@ export const DashboardOutlined = withDefaultSize(
   "DashboardOutlined",
 );
 export const BarChartOutlined = withDefaultSize(BarChart3, "BarChartOutlined");
+export const PaletteOutlined = withDefaultSize(Palette, "PaletteOutlined");
 
 /* ─── Operation Icons ─── */
 export const BellOutlined = withDefaultSize(Bell, "BellOutlined");
