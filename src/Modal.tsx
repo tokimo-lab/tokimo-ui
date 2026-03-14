@@ -280,7 +280,7 @@ export function Modal({
     <div
       className={cn(
         "fixed inset-0 flex items-start justify-center overflow-y-auto transition-colors duration-200",
-        animClass ? "bg-black/45" : "bg-black/0",
+        animClass ? "bg-black/45 backdrop-blur-sm" : "bg-black/0",
         size === "full" && "items-stretch",
         wrapClassName,
       )}
@@ -304,7 +304,8 @@ export function Modal({
       <div
         ref={contentRef}
         className={cn(
-          "relative bg-white dark:bg-slate-900 rounded-lg shadow-2xl flex flex-col shrink-0 transition-all duration-200",
+          "relative rounded-lg shadow-2xl flex flex-col shrink-0 transition-all duration-200",
+          "bg-white/85 dark:bg-[rgba(15,15,25,0.85)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08]",
           animClass
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 translate-y-4",
@@ -323,9 +324,9 @@ export function Modal({
       >
         {/* Header */}
         {(title || closable) && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700 shrink-0">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-black/[0.06] dark:border-white/[0.08] shrink-0">
             {title ? (
-              <h3 className="text-base font-semibold text-slate-800 dark:text-slate-100 m-0">
+              <h3 className="text-base font-semibold text-[var(--text-primary)] m-0">
                 {title}
               </h3>
             ) : (
@@ -334,7 +335,7 @@ export function Modal({
             {closable ? (
               <button
                 type="button"
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
+                className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors cursor-pointer"
                 onClick={onCancel}
               >
                 <X className="h-5 w-5" />

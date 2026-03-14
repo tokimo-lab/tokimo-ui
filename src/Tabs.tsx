@@ -96,7 +96,7 @@ export function Tabs({
   return (
     <div className={className}>
       {/* Tab Bar */}
-      <div className="flex items-center border-b border-slate-200 dark:border-slate-700">
+      <div className="flex items-center border-b border-black/[0.06] dark:border-white/[0.08]">
         <div
           ref={tabBarRef}
           className={cn(
@@ -117,15 +117,15 @@ export function Tabs({
                 "relative whitespace-nowrap transition-colors font-medium cursor-pointer",
                 sizeClass,
                 type === "card" &&
-                  "border border-b-0 border-slate-200 dark:border-slate-700 rounded-t -mb-px",
+                  "border border-b-0 border-black/[0.06] dark:border-white/[0.08] rounded-t -mb-px",
                 activeKey === item.key
                   ? type === "card"
-                    ? "bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 border-b-white dark:border-b-slate-900"
-                    : "text-sky-600 dark:text-sky-400"
-                  : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200",
+                    ? "bg-white/70 dark:bg-white/[0.03] text-[var(--accent)] border-b-transparent"
+                    : "text-[var(--accent)]"
+                  : "text-[var(--text-muted)] hover:text-[var(--text-primary)]",
                 type === "card" &&
                   activeKey !== item.key &&
-                  "bg-slate-50 dark:bg-slate-800",
+                  "bg-black/[0.02] dark:bg-white/[0.03]",
                 item.disabled && "opacity-50 !cursor-not-allowed",
               )}
               onClick={() => !item.disabled && handleChange(item.key)}
@@ -139,7 +139,7 @@ export function Tabs({
           {/* Animated active indicator for line type */}
           {type === "line" && (
             <span
-              className="absolute bottom-0 h-0.5 bg-sky-500 rounded-t"
+              className="absolute bottom-0 h-0.5 bg-[var(--accent)] rounded-t"
               style={{
                 left: indicatorStyle.left,
                 width: indicatorStyle.width,

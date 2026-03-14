@@ -157,14 +157,14 @@ function ToastItem({
   return (
     <div
       className={cn(
-        "pointer-events-auto flex items-center gap-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg px-4 py-3 text-sm text-slate-700 dark:text-slate-200 animate-[toastIn_0.2s_ease-out]",
+        "pointer-events-auto flex items-center gap-2 rounded-lg bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg px-4 py-3 text-sm text-[var(--text-primary)] animate-[toastIn_0.2s_ease-out]",
       )}
     >
       {iconMap[toast.type]}
       <span>{toast.content}</span>
       <button
         type="button"
-        className="ml-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+        className="ml-1 text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
         onClick={onClose}
       >
         <X className="h-3.5 w-3.5" />

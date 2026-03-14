@@ -108,17 +108,17 @@ export function Popover({
             ref={refs.setFloating}
             style={floatingStyles}
             className={cn(
-              "z-[9999] rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg p-3 max-w-xs",
+              "z-[9999] rounded-lg bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg p-3 max-w-xs",
             )}
             {...getFloatingProps()}
           >
             {title ? (
-              <div className="font-medium text-sm text-slate-800 dark:text-slate-200 mb-2">
+              <div className="font-medium text-sm text-[var(--text-primary)] mb-2">
                 {title}
               </div>
             ) : null}
             {content ? (
-              <div className="text-sm text-slate-600 dark:text-slate-300">
+              <div className="text-sm text-[var(--text-secondary)]">
                 {content}
               </div>
             ) : null}

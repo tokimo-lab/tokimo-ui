@@ -245,16 +245,16 @@ export function Select({
       <div
         ref={refs.setReference}
         className={cn(
-          "inline-flex items-center gap-1 px-2 rounded-md border bg-white cursor-pointer transition-colors dark:bg-slate-900",
+          "inline-flex items-center gap-1 px-2 rounded-md border bg-white/70 dark:bg-white/[0.03] backdrop-blur-sm cursor-pointer transition-colors",
           open
-            ? "border-sky-500 ring-1 ring-sky-500"
+            ? "border-[var(--accent)] ring-1 ring-[var(--accent)]"
             : status === "error"
               ? "border-red-500"
               : status === "warning"
                 ? "border-amber-500"
-                : "border-slate-300 dark:border-slate-600",
+                : "border-black/[0.08] dark:border-white/[0.1]",
           disabled &&
-            "opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-800",
+            "opacity-50 cursor-not-allowed bg-black/[0.02] dark:bg-white/[0.02]",
           sizeMap[size],
           className,
         )}
@@ -268,7 +268,7 @@ export function Select({
                 {selectedValues.map((v) => (
                   <span
                     key={String(v)}
-                    className="inline-flex items-center gap-0.5 bg-slate-100 dark:bg-slate-700 text-xs rounded px-1.5 py-0.5"
+                    className="inline-flex items-center gap-0.5 bg-black/[0.04] dark:bg-white/[0.08] text-xs rounded px-1.5 py-0.5"
                   >
                     {getLabel(v)}
                     <button
@@ -285,16 +285,16 @@ export function Select({
                 ))}
               </div>
             ) : (
-              <span className="text-slate-400 dark:text-slate-500 truncate">
+              <span className="text-[var(--text-muted)] truncate">
                 {placeholder}
               </span>
             )
           ) : hasValue ? (
-            <span className="truncate text-slate-700 dark:text-slate-200">
+            <span className="truncate text-[var(--text-primary)]">
               {getLabel(value as string | number)}
             </span>
           ) : (
-            <span className="text-slate-400 dark:text-slate-500 truncate">
+            <span className="text-[var(--text-muted)] truncate">
               {placeholder}
             </span>
           )}
@@ -302,7 +302,7 @@ export function Select({
         {allowClear && hasValue && !disabled ? (
           <button
             type="button"
-            className="shrink-0 cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+            className="shrink-0 cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
             onClick={handleClear}
           >
             <X className="h-3.5 w-3.5" />
@@ -310,7 +310,7 @@ export function Select({
         ) : null}
         {loading ? (
           <svg
-            className="h-3.5 w-3.5 animate-spin text-slate-400 shrink-0"
+            className="h-3.5 w-3.5 animate-spin text-[var(--text-muted)] shrink-0"
             viewBox="0 0 24 24"
             fill="none"
           >
@@ -331,7 +331,7 @@ export function Select({
         ) : (
           <ChevronDown
             className={cn(
-              "h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform",
+              "h-3.5 w-3.5 shrink-0 text-[var(--text-muted)] transition-transform",
               open && "rotate-180",
             )}
           />
@@ -344,18 +344,18 @@ export function Select({
             ref={refs.setFloating}
             style={floatingStyles}
             className={cn(
-              "z-[9999] rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg overflow-hidden",
+              "z-[9999] rounded-md bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg overflow-hidden",
               popupClassName,
             )}
             {...getFloatingProps()}
           >
             {showSearch ? (
-              <div className="p-2 border-b border-slate-200 dark:border-slate-700">
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-50 dark:bg-slate-800 rounded">
-                  <Search className="h-3.5 w-3.5 text-slate-400" />
+              <div className="p-2 border-b border-black/[0.06] dark:border-white/[0.08]">
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-black/[0.03] dark:bg-white/[0.04] rounded">
+                  <Search className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                   <input
                     ref={inputRef}
-                    className="flex-1 bg-transparent outline-none text-sm placeholder:text-slate-400"
+                    className="flex-1 bg-transparent outline-none text-sm placeholder:text-[var(--text-muted)]"
                     placeholder="搜索..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -368,7 +368,7 @@ export function Select({
               style={{ scrollbarWidth: "thin" }}
             >
               {filtered.length === 0 ? (
-                <div className="px-3 py-4 text-center text-sm text-slate-400">
+                <div className="px-3 py-4 text-center text-sm text-[var(--text-muted)]">
                   {notFoundContent ?? "无匹配选项"}
                 </div>
               ) : (
@@ -381,9 +381,10 @@ export function Select({
                     className={cn(
                       "flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer transition-colors",
                       isSelected(opt.value)
-                        ? "text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/30"
-                        : "text-slate-700 dark:text-slate-200",
-                      activeIndex === i && "bg-slate-100 dark:bg-slate-800",
+                        ? "text-[var(--accent)] bg-[var(--accent-subtle)]"
+                        : "text-[var(--text-primary)]",
+                      activeIndex === i &&
+                        "bg-black/[0.04] dark:bg-white/[0.06]",
                       opt.disabled && "opacity-50 cursor-not-allowed",
                     )}
                     {...getItemProps({

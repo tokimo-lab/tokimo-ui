@@ -91,7 +91,7 @@ export function Tooltip({
               "z-[9999] max-w-xs break-all rounded px-2 py-1 text-xs shadow-lg",
               color
                 ? ""
-                : "bg-slate-800 text-white dark:bg-slate-700 dark:text-slate-100",
+                : "bg-slate-800 text-white dark:bg-white/10 dark:text-slate-100 backdrop-blur-xl",
             )}
             {...getFloatingProps()}
           >

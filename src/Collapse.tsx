@@ -76,7 +76,7 @@ export function Collapse({
       className={cn(
         bordered &&
           !ghost &&
-          "border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden",
+          "border border-black/[0.06] dark:border-white/[0.08] rounded-lg overflow-hidden",
         className,
       )}
     >
@@ -88,7 +88,7 @@ export function Collapse({
             className={cn(
               i > 0 &&
                 bordered &&
-                "border-t border-slate-200 dark:border-slate-700",
+                "border-t border-black/[0.06] dark:border-white/[0.08]",
             )}
           >
             <button
@@ -97,20 +97,20 @@ export function Collapse({
                 "flex w-full items-center gap-2 transition-colors",
                 padClass,
                 ghost
-                  ? "hover:bg-slate-50 dark:hover:bg-slate-800/50"
-                  : "bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700/50",
+                  ? "hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
+                  : "bg-black/[0.02] dark:bg-white/[0.03] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
               )}
               onClick={() => toggle(item.key)}
             >
               {item.showArrow !== false && (
                 <ChevronRight
                   className={cn(
-                    "h-4 w-4 shrink-0 transition-transform duration-200 text-slate-400",
+                    "h-4 w-4 shrink-0 transition-transform duration-200 text-[var(--text-muted)]",
                     isOpen && "rotate-90",
                   )}
                 />
               )}
-              <span className="flex-1 text-left font-medium text-slate-700 dark:text-slate-200">
+              <span className="flex-1 text-left font-medium text-[var(--text-primary)]">
                 {item.label}
               </span>
               {item.extra && <span className="shrink-0">{item.extra}</span>}
@@ -120,8 +120,8 @@ export function Collapse({
                 className={cn(
                   padClass,
                   !isOpen && "hidden",
-                  "text-slate-600 dark:text-slate-300",
-                  !ghost && "bg-white dark:bg-slate-900",
+                  "text-[var(--text-secondary)]",
+                  !ghost && "bg-transparent",
                 )}
               >
                 {item.children}

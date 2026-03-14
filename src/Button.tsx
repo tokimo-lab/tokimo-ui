@@ -24,15 +24,15 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
   primary:
-    "bg-sky-600 text-white hover:bg-sky-500 active:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-400 border-transparent shadow-sm",
+    "bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] active:brightness-90 border-transparent shadow-sm",
   default:
-    "bg-white text-slate-700 border-slate-300 hover:text-sky-600 hover:border-sky-500 active:text-sky-700 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:text-sky-400 dark:hover:border-sky-400",
+    "bg-white/70 dark:bg-white/[0.05] text-[var(--text-primary,#0f172a)] border-black/[0.08] dark:border-white/[0.1] hover:text-[var(--accent)] hover:border-[var(--accent)] backdrop-blur-sm",
   dashed:
-    "bg-white text-slate-700 border-slate-300 border-dashed hover:text-sky-600 hover:border-sky-500 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:text-sky-400 dark:hover:border-sky-400",
-  text: "bg-transparent text-slate-700 border-transparent hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700/50 dark:border-transparent",
-  link: "bg-transparent text-sky-600 border-transparent underline hover:text-sky-500 dark:text-sky-400 dark:hover:text-sky-300 p-0 h-auto",
+    "bg-white/70 dark:bg-white/[0.05] text-[var(--text-primary,#0f172a)] border-black/[0.08] dark:border-white/[0.1] border-dashed hover:text-[var(--accent)] hover:border-[var(--accent)] backdrop-blur-sm",
+  text: "bg-transparent text-[var(--text-primary,#0f172a)] border-transparent hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
+  link: "bg-transparent text-[var(--accent)] border-transparent underline hover:brightness-110 p-0 h-auto",
   danger:
-    "bg-white text-red-500 border-red-300 hover:text-red-600 hover:border-red-400 dark:bg-slate-800 dark:text-red-400 dark:border-red-500",
+    "bg-white/70 dark:bg-white/[0.05] text-red-500 border-red-300 hover:text-red-600 hover:border-red-400 dark:text-red-400 dark:border-red-500",
 };
 
 const sizeClasses: Record<NonNullable<ButtonProps["size"]>, string> = {
@@ -73,7 +73,7 @@ export function Button({
       type={htmlType}
       disabled={isDisabled}
       className={cn(
-        "inline-flex items-center justify-center gap-1.5 border font-medium transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 select-none cursor-pointer",
+        "inline-flex items-center justify-center gap-1.5 border font-medium transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] select-none cursor-pointer",
         variantClasses[variant],
         variant !== "link" && sizeClasses[size],
         shapeClass,

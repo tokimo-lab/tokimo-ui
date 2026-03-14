@@ -37,28 +37,28 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
   ({ size = "middle", prefix, suffix, status, className, ...rest }, ref) => (
     <div
       className={cn(
-        "inline-flex items-center gap-2 rounded-md border bg-white transition-colors focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500 dark:bg-slate-900",
+        "inline-flex items-center gap-2 rounded-md border bg-white/70 dark:bg-white/[0.03] backdrop-blur-sm transition-colors focus-within:border-[var(--accent)] focus-within:ring-1 focus-within:ring-[var(--accent)] dark:focus-within:border-[var(--accent)]",
         status === "error"
           ? "border-red-500"
           : status === "warning"
             ? "border-amber-500"
-            : "border-slate-300 dark:border-slate-600",
+            : "border-black/[0.08] dark:border-white/[0.1]",
         sizeMap[size],
         className,
       )}
     >
       {prefix ? (
-        <span className="text-slate-400 shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
+        <span className="text-[var(--text-muted)] shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
           {prefix}
         </span>
       ) : null}
       <input
         ref={ref}
-        className="w-full min-w-0 bg-transparent outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 text-inherit"
+        className="w-full min-w-0 bg-transparent outline-none placeholder:text-[var(--text-muted)] text-inherit"
         {...rest}
       />
       {suffix ? (
-        <span className="text-slate-400 shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
+        <span className="text-[var(--text-muted)] shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
           {suffix}
         </span>
       ) : null}
@@ -88,7 +88,7 @@ export const Password = forwardRef<HTMLInputElement, PasswordProps>(
           <button
             type="button"
             tabIndex={-1}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 focus:outline-none"
+            className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] focus:outline-none"
             onClick={() => setVisible((v) => !v)}
           >
             {visible ? (
@@ -117,12 +117,12 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     <textarea
       ref={ref}
       className={cn(
-        "w-full rounded-md border bg-white transition-colors focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none placeholder:text-slate-400 dark:bg-slate-900 dark:placeholder:text-slate-500",
+        "w-full rounded-md border bg-white/70 dark:bg-white/[0.03] backdrop-blur-sm transition-colors focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] outline-none placeholder:text-[var(--text-muted)]",
         status === "error"
           ? "border-red-500"
           : status === "warning"
             ? "border-amber-500"
-            : "border-slate-300 dark:border-slate-600",
+            : "border-black/[0.08] dark:border-white/[0.1]",
         size === "small"
           ? "px-2 py-1 text-xs"
           : size === "large"

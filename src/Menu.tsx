@@ -117,13 +117,13 @@ function MenuItemRenderer({
   indent: number;
 }) {
   if (item.type === "divider") {
-    return <li className="my-1 h-px bg-slate-200 dark:bg-slate-700" />;
+    return <li className="my-1 h-px bg-black/[0.06] dark:bg-white/[0.08]" />;
   }
 
   if (item.type === "group") {
     return (
       <li>
-        <div className="px-3 py-1.5 text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+        <div className="px-3 py-1.5 text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
           {!collapsed && item.label}
         </div>
         {item.children?.map((child) => (
@@ -155,8 +155,8 @@ function MenuItemRenderer({
         className={cn(
           "flex items-center gap-2 w-full rounded-md px-3 py-2 text-sm transition-colors cursor-pointer",
           isSelected
-            ? "bg-sky-50 text-sky-600 dark:bg-sky-950/50 dark:text-sky-400 font-medium"
-            : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800",
+            ? "bg-[var(--accent-subtle)] text-[var(--accent)] font-medium border-l-2 border-[var(--accent)]"
+            : "text-[var(--text-secondary,#475569)] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] hover:text-[var(--text-primary)]",
           item.disabled && "opacity-50 !cursor-not-allowed",
           item.danger && "text-red-500 hover:bg-red-50 dark:hover:bg-red-950",
         )}
@@ -180,9 +180,9 @@ function MenuItemRenderer({
         {!collapsed && hasChildren ? (
           <span className="shrink-0">
             {isOpen ? (
-              <ChevronDown className="h-4 w-4 text-slate-400" />
+              <ChevronDown className="h-4 w-4 text-[var(--text-muted)]" />
             ) : (
-              <ChevronRight className="h-4 w-4 text-slate-400" />
+              <ChevronRight className="h-4 w-4 text-[var(--text-muted)]" />
             )}
           </span>
         ) : null}

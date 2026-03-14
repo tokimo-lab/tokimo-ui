@@ -51,9 +51,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
         disabled={disabled || loading}
         className={cn(
           "relative inline-flex shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200",
-          isChecked
-            ? "bg-sky-500 dark:bg-sky-600"
-            : "bg-slate-300 dark:bg-slate-600",
+          isChecked ? "bg-[var(--accent)]" : "bg-slate-300 dark:bg-white/20",
           disabled && "opacity-50 cursor-not-allowed",
           size === "small" ? "h-4 w-7" : "h-6 w-11",
           className,

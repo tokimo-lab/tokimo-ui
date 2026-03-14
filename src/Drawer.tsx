@@ -167,7 +167,7 @@ export function Drawer({
       {/* Mask */}
       {/* biome-ignore lint/a11y/noStaticElementInteractions: overlay mask click-to-dismiss */}
       <div
-        className="absolute inset-0 bg-black/45"
+        className="absolute inset-0 bg-black/45 backdrop-blur-sm"
         style={{
           opacity: visible ? 1 : 0,
           transition: `opacity ${DURATION}ms ease`,
@@ -180,7 +180,8 @@ export function Drawer({
       <div
         ref={panelRef}
         className={cn(
-          "absolute bg-white dark:bg-slate-900 shadow-2xl flex flex-col",
+          "absolute shadow-2xl flex flex-col",
+          "bg-white/85 dark:bg-[rgba(15,15,25,0.85)] backdrop-blur-xl border-black/[0.06] dark:border-white/[0.08]",
           positionClass,
           className,
         )}
@@ -192,10 +193,10 @@ export function Drawer({
         {/* Header */}
         {(title || closable) && (
           <div
-            className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700 shrink-0"
+            className="flex items-center justify-between px-6 py-4 border-b border-black/[0.06] dark:border-white/[0.08] shrink-0"
             style={styles?.header}
           >
-            <h3 className="text-base font-semibold text-slate-800 dark:text-slate-100 m-0">
+            <h3 className="text-base font-semibold text-[var(--text-primary)] m-0">
               {title}
             </h3>
             <div className="flex items-center gap-2">
@@ -203,7 +204,7 @@ export function Drawer({
               {closable ? (
                 <button
                   type="button"
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                  className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
                   onClick={onClose}
                 >
                   <X className="h-5 w-5" />
@@ -226,7 +227,7 @@ export function Drawer({
         </div>
         {/* Footer */}
         {footer ? (
-          <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-700 shrink-0">
+          <div className="px-6 py-4 border-t border-black/[0.06] dark:border-white/[0.08] shrink-0">
             {footer}
           </div>
         ) : null}

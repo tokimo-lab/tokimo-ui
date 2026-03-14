@@ -21,7 +21,7 @@ const sizeMap = {
 function Spinner({ size = "default" }: { size?: SpinProps["size"] }) {
   return (
     <svg
-      className={cn("animate-spin text-sky-500", sizeMap[size])}
+      className={cn("animate-spin text-[var(--accent)]", sizeMap[size])}
       viewBox="0 0 24 24"
       fill="none"
     >
@@ -60,9 +60,7 @@ export function Spin({
       >
         <Spinner size={size} />
         {tip ? (
-          <span className="text-sm text-slate-500 dark:text-slate-400">
-            {tip}
-          </span>
+          <span className="text-sm text-[var(--text-secondary)]">{tip}</span>
         ) : null}
       </div>
     );
@@ -72,12 +70,10 @@ export function Spin({
     <div className={cn("relative", className)}>
       {children}
       {spinning ? (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 dark:bg-slate-900/60 z-10 rounded-md">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 dark:bg-[rgba(10,10,15,0.6)] z-10 rounded-md">
           <Spinner size={size} />
           {tip ? (
-            <span className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              {tip}
-            </span>
+            <span className="text-sm text-[var(--text-secondary)]">{tip}</span>
           ) : null}
         </div>
       ) : null}

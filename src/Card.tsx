@@ -46,9 +46,11 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-lg bg-white dark:bg-slate-900",
+        "rounded-lg",
+        "bg-white/70 dark:bg-white/[0.03]",
+        "backdrop-blur-xl",
         bordered
-          ? "border border-slate-200 dark:border-slate-700"
+          ? "border border-black/[0.06] dark:border-white/[0.08]"
           : "shadow-sm",
         hoverable && "transition-shadow hover:shadow-md cursor-pointer",
         className,
@@ -61,13 +63,13 @@ export function Card({
       {hasHeader ? (
         <div
           className={cn(
-            "flex items-center justify-between border-b border-slate-200 dark:border-slate-700",
+            "flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08]",
             size === "small" ? "px-3 py-2" : "px-6 py-4",
           )}
           style={headStyle}
         >
           {title ? (
-            <div className="font-medium text-slate-800 dark:text-slate-200">
+            <div className="font-medium text-[var(--text-primary,#0f172a)]">
               {title}
             </div>
           ) : null}
@@ -83,21 +85,21 @@ export function Card({
       >
         {loading ? (
           <div className="space-y-3">
-            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
-            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
-            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-5/6" />
+            <div className="h-4 bg-slate-200 dark:bg-white/10 rounded w-3/4" />
+            <div className="h-4 bg-slate-200 dark:bg-white/10 rounded w-1/2" />
+            <div className="h-4 bg-slate-200 dark:bg-white/10 rounded w-5/6" />
           </div>
         ) : (
           children
         )}
       </div>
       {actions?.length ? (
-        <div className="flex border-t border-slate-200 dark:border-slate-700 divide-x divide-slate-200 dark:divide-slate-700">
+        <div className="flex border-t border-black/[0.06] dark:border-white/[0.08] divide-x divide-black/[0.06] dark:divide-white/[0.08]">
           {actions.map((action, i) => (
             <div
               // biome-ignore lint/suspicious/noArrayIndexKey: static action list
               key={i}
-              className="flex-1 flex items-center justify-center py-3 text-slate-500 hover:text-sky-500 cursor-pointer transition-colors"
+              className="flex-1 flex items-center justify-center py-3 text-[var(--text-secondary,#475569)] hover:text-[var(--accent)] cursor-pointer transition-colors"
             >
               {action}
             </div>

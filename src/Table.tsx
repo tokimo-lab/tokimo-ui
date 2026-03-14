@@ -150,7 +150,7 @@ function renderRows<T>(
       <tr
         key={key}
         className={cn(
-          "border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors",
+          "border-b border-black/[0.04] dark:border-white/[0.04] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors",
           rowCls,
         )}
         {...rowProps}
@@ -174,11 +174,11 @@ function renderRows<T>(
                 col.align === "right" && "text-right",
                 col.ellipsis && "truncate max-w-0",
                 bordered &&
-                  "border-r border-slate-200 dark:border-slate-700 last:border-r-0",
+                  "border-r border-black/[0.06] dark:border-white/[0.08] last:border-r-0",
                 col.fixed === "left" &&
-                  "sticky left-0 bg-white dark:bg-slate-900 z-10",
+                  "sticky left-0 bg-white/70 dark:bg-white/[0.03] z-10",
                 col.fixed === "right" &&
-                  "sticky right-0 bg-white dark:bg-slate-900 z-10",
+                  "sticky right-0 bg-white/70 dark:bg-white/[0.03] z-10",
                 col.className,
               )}
               style={{ width: col.width, minWidth: col.minWidth }}
@@ -192,7 +192,7 @@ function renderRows<T>(
                 {ci === 0 && hasKids ? (
                   <button
                     type="button"
-                    className="shrink-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 w-4"
+                    className="shrink-0 text-[var(--text-muted)] hover:text-[var(--text-secondary)] w-4"
                     onClick={() => toggleExpand(key, record, !expanded)}
                   >
                     {expanded ? "▾" : "▸"}
@@ -387,7 +387,7 @@ export function Table<T = Record<string, unknown>>({
       <Spin spinning={loading}>
         <div
           className={cn(
-            "overflow-auto rounded-lg border border-slate-200 dark:border-slate-700",
+            "overflow-auto rounded-lg border border-black/[0.06] dark:border-white/[0.08]",
           )}
           style={{
             maxHeight: scroll?.y,
@@ -400,21 +400,21 @@ export function Table<T = Record<string, unknown>>({
             style={{ minWidth: scroll?.x }}
           >
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-800/80">
+              <tr className="bg-black/[0.02] dark:bg-white/[0.04]">
                 {effectiveColumns.map((col, ci) => (
                   <th
                     key={col.key ?? col.dataIndex ?? ci}
                     className={cn(
                       sizeClass,
-                      "text-left font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap border-b border-slate-200 dark:border-slate-700",
+                      "text-left font-medium text-[var(--text-secondary)] whitespace-nowrap border-b border-black/[0.06] dark:border-white/[0.08]",
                       col.align === "center" && "text-center",
                       col.align === "right" && "text-right",
                       bordered &&
-                        "border-r border-slate-200 dark:border-slate-700 last:border-r-0",
+                        "border-r border-black/[0.06] dark:border-white/[0.08] last:border-r-0",
                       col.fixed === "left" &&
-                        "sticky left-0 bg-slate-50 dark:bg-slate-800 z-10",
+                        "sticky left-0 bg-black/[0.02] dark:bg-white/[0.04] z-10",
                       col.fixed === "right" &&
-                        "sticky right-0 bg-slate-50 dark:bg-slate-800 z-10",
+                        "sticky right-0 bg-black/[0.02] dark:bg-white/[0.04] z-10",
                     )}
                     style={{ width: col.width, minWidth: col.minWidth }}
                   >
@@ -423,7 +423,7 @@ export function Table<T = Record<string, unknown>>({
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-slate-900">
+            <tbody className="bg-transparent">
               {dataSource.length === 0 ? (
                 <tr>
                   <td colSpan={effectiveColumns.length}>

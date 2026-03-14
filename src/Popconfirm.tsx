@@ -117,7 +117,7 @@ export function Popconfirm({
             ref={refs.setFloating}
             style={floatingStyles}
             className={cn(
-              "z-[9999] rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg p-4 max-w-xs",
+              "z-[9999] rounded-lg bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg p-4 max-w-xs",
             )}
             {...getFloatingProps()}
           >
@@ -126,11 +126,11 @@ export function Popconfirm({
                 {icon ?? <AlertCircle className="h-4 w-4" />}
               </span>
               <div>
-                <div className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                <div className="text-sm font-medium text-[var(--text-primary)]">
                   {title}
                 </div>
                 {description ? (
-                  <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  <div className="mt-1 text-xs text-[var(--text-muted)]">
                     {description}
                   </div>
                 ) : null}

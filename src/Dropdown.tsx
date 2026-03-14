@@ -84,7 +84,7 @@ function MenuList({
           return (
             <div
               key={item.key || `d-${i}`}
-              className="my-1 h-px bg-slate-200 dark:bg-slate-600"
+              className="my-1 h-px bg-black/[0.06] dark:bg-white/[0.08]"
             />
           );
         }
@@ -97,7 +97,7 @@ function MenuList({
               "flex w-full items-center gap-2 px-3 py-1.5 text-sm text-left transition-colors cursor-pointer",
               item.danger
                 ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40"
-                : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10",
+                : "text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
               item.disabled && "opacity-50 !cursor-not-allowed",
             )}
             onClick={() => {
@@ -210,9 +210,9 @@ export function Dropdown({
             <div
               style={transitionStyles}
               className={cn(
-                "rounded-lg backdrop-blur-sm border shadow-lg ring-1",
-                "bg-white/95 border-slate-200/80 ring-black/5",
-                "dark:bg-slate-800/95 dark:border-slate-600/50 dark:shadow-slate-950/40 dark:ring-white/5",
+                "rounded-lg backdrop-blur-xl border shadow-lg ring-1",
+                "bg-white/90 border-black/[0.06] ring-black/5",
+                "dark:bg-[rgba(15,15,25,0.9)] dark:border-white/[0.08] dark:shadow-black/40 dark:ring-white/5",
               )}
             >
               {dropdownRender ? dropdownRender(menuContent) : menuContent}
