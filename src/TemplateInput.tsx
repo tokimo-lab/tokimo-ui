@@ -10,6 +10,7 @@ import {
   type ChangeEvent,
   forwardRef,
   type KeyboardEvent,
+  type MutableRefObject,
   useEffect,
   useRef,
   useState,
@@ -141,11 +142,6 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
     const [triggerPos, setTriggerPos] = useState(-1);
     const [mode, setMode] = useState<TriggerMode>("var");
 
-    // Virtual reference element at the trigger cursor position
-    const virtualRef = useRef<{ getBoundingClientRect: () => DOMRect }>({
-      getBoundingClientRect: () => new DOMRect(0, 0, 0, 0),
-    });
-
     const { refs, floatingStyles } = useFloating({
       open,
       onOpenChange: setOpen,
@@ -153,34 +149,6 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
       middleware: [offset(4), flip(), shift({ padding: 8 })],
       whileElementsMounted: autoUpdate,
     });
-
-    function updateVirtualPosition(charIdx: number) {
-      const input = inputRef.current;
-      if (!input) return;
-
-      const mirror = document.createElement("span");
-      const style = getComputedStyle(input);
-      mirror.style.font = style.font;
-      mirror.style.letterSpacing = style.letterSpacing;
-      mirror.style.whiteSpace = "pre";
-      mirror.style.position = "absolute";
-      mirror.style.visibility = "hidden";
-      mirror.textContent = input.value.slice(0, charIdx);
-      document.body.appendChild(mirror);
-
-      const textWidth = mirror.offsetWidth;
-      document.body.removeChild(mirror);
-
-      const inputRect = input.getBoundingClientRect();
-      const paddingLeft = Number.parseFloat(style.paddingLeft) || 0;
-      const left = inputRect.left + paddingLeft + textWidth - input.scrollLeft;
-
-      virtualRef.current = {
-        getBoundingClientRect: () =>
-          new DOMRect(left, inputRect.top, 0, inputRect.height),
-      };
-      refs.setReference(virtualRef.current);
-    }
 
     function getCursor() {
       return inputRef.current?.selectionStart ?? value.length;
@@ -256,7 +224,6 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
           setTriggerPos(result.pos);
           setActiveIdx(0);
           setOpen(true);
-          updateVirtualPosition(result.pos);
           return;
         }
       }
@@ -340,7 +307,11 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
     return (
       <div className="relative w-full">
         <input
-          ref={inputRef}
+          ref={(el) => {
+            (inputRef as MutableRefObject<HTMLInputElement | null>).current =
+              el;
+            refs.setReference(el);
+          }}
           value={value}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
@@ -348,10 +319,10 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
           placeholder={placeholder}
           disabled={disabled}
           className={cn(
-            "w-full rounded-md border bg-white px-3 py-1.5 text-sm h-8 font-mono outline-none transition-colors",
-            "border-slate-300 dark:border-slate-600 dark:bg-slate-900",
-            "focus:border-sky-500 focus:ring-1 focus:ring-sky-500",
-            "placeholder:text-slate-400 dark:placeholder:text-slate-500",
+            "w-full rounded-md border bg-white/70 dark:bg-white/[0.03] backdrop-blur-sm px-3 py-1.5 text-sm h-8 font-mono outline-none transition-colors",
+            "border-black/[0.08] dark:border-white/[0.1]",
+            "focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]",
+            "placeholder:text-[var(--text-muted)]",
             "disabled:cursor-not-allowed disabled:opacity-50",
             className,
           )}
@@ -365,7 +336,7 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
                 scrollbarWidth: "thin",
                 scrollbarColor: "rgb(128 128 128 / 0.35) transparent",
               }}
-              className="z-[9999] rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg py-1 text-sm max-h-60 overflow-auto"
+              className="z-[9999] rounded-md bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg py-1 text-sm max-h-60 overflow-auto"
             >
               <div ref={listRef}>
                 {mode === "var"

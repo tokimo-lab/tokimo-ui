@@ -1,3 +1,4 @@
+import { Select } from "./Select";
 import { cn } from "./utils";
 
 export interface PaginationProps {
@@ -55,16 +56,26 @@ export function Pagination({
     if (p !== current) onChange?.(p, pageSize);
   };
 
-  const btnClass = cn(
-    "inline-flex items-center justify-center border border-slate-300 dark:border-slate-600 rounded transition-colors",
-    size === "small" ? "h-6 min-w-6 text-xs px-1" : "h-8 min-w-8 text-sm px-2",
+  const sizeClass =
+    size === "small" ? "h-6 min-w-6 text-xs px-1" : "h-8 min-w-8 text-sm px-2";
+  const btnBase =
+    "inline-flex items-center justify-center rounded-md border transition-colors select-none backdrop-blur-sm";
+
+  const inactiveClass = cn(
+    "bg-white/70 dark:bg-white/[0.04]",
+    "border-black/[0.08] dark:border-white/[0.1]",
+    "text-[var(--text-primary)]",
     disabled
-      ? "opacity-50 cursor-not-allowed"
-      : "hover:border-sky-500 hover:text-sky-500 cursor-pointer",
+      ? "opacity-40 cursor-not-allowed"
+      : "hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--accent-subtle)] cursor-pointer",
   );
 
-  const activeClass =
-    "border-sky-500 text-sky-600 dark:text-sky-400 dark:border-sky-500 bg-sky-50 dark:bg-sky-950";
+  const activeClass = cn(
+    "border-[var(--accent)] text-white bg-[var(--accent)]",
+    disabled
+      ? "opacity-40 cursor-not-allowed"
+      : "hover:bg-[var(--accent-hover)] cursor-pointer",
+  );
 
   // Page number generation with ellipsis
   const getPages = () => {
@@ -87,9 +98,9 @@ export function Pagination({
   ];
 
   return (
-    <div className={cn("flex items-center gap-2 flex-wrap", className)}>
+    <div className={cn("flex items-center gap-1.5 flex-wrap", className)}>
       {showTotal ? (
-        <span className="text-sm text-slate-500 dark:text-slate-400 mr-2">
+        <span className="text-sm text-[var(--text-muted)] mr-1">
           {showTotal(total, range)}
         </span>
       ) : null}
@@ -98,18 +109,18 @@ export function Pagination({
         <>
           <button
             type="button"
-            className={btnClass}
+            className={cn(btnBase, sizeClass, inactiveClass)}
             disabled={disabled || current <= 1}
             onClick={() => goTo(current - 1)}
           >
             ‹
           </button>
-          <span className="text-sm text-slate-600 dark:text-slate-300">
+          <span className="text-sm text-[var(--text-secondary)] px-1">
             {current} / {totalPages}
           </span>
           <button
             type="button"
-            className={btnClass}
+            className={cn(btnBase, sizeClass, inactiveClass)}
             disabled={disabled || current >= totalPages}
             onClick={() => goTo(current + 1)}
           >
@@ -120,7 +131,7 @@ export function Pagination({
         <>
           <button
             type="button"
-            className={btnClass}
+            className={cn(btnBase, sizeClass, inactiveClass)}
             disabled={disabled || current <= 1}
             onClick={() => goTo(current - 1)}
           >
@@ -128,15 +139,22 @@ export function Pagination({
           </button>
           {getPages().map((p, i) =>
             p === "..." ? (
-              // biome-ignore lint/suspicious/noArrayIndexKey: ellipsis items have no unique key
-              <span key={`e${i}`} className="text-slate-400 px-1">
+              <span
+                // biome-ignore lint/suspicious/noArrayIndexKey: ellipsis items have no unique key
+                key={`e${i}`}
+                className="text-[var(--text-muted)] px-0.5 text-sm"
+              >
                 …
               </span>
             ) : (
               <button
                 key={p}
                 type="button"
-                className={cn(btnClass, current === p && activeClass)}
+                className={cn(
+                  btnBase,
+                  sizeClass,
+                  current === p ? activeClass : inactiveClass,
+                )}
                 onClick={() => goTo(p)}
               >
                 {p}
@@ -145,7 +163,7 @@ export function Pagination({
           )}
           <button
             type="button"
-            className={btnClass}
+            className={cn(btnBase, sizeClass, inactiveClass)}
             disabled={disabled || current >= totalPages}
             onClick={() => goTo(current + 1)}
           >
@@ -155,26 +173,19 @@ export function Pagination({
       )}
 
       {showSizeChanger ? (
-        <select
-          className={cn(
-            "border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-900 text-sm",
-            size === "small" ? "h-6 text-xs" : "h-8",
-            disabled && "opacity-50 cursor-not-allowed",
-          )}
+        <Select
           value={pageSize}
           disabled={disabled}
-          onChange={(e) => {
-            const newSize = Number(e.target.value);
-            onShowSizeChange?.(current, newSize);
-            onChange?.(1, newSize);
+          size={size === "small" ? "small" : "middle"}
+          options={pageSizeOptions.map((opt) => ({
+            label: `${opt} / 页`,
+            value: Number(opt),
+          }))}
+          onChange={(val: number) => {
+            onShowSizeChange?.(current, val);
+            onChange?.(1, val);
           }}
-        >
-          {pageSizeOptions.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt} / 页
-            </option>
-          ))}
-        </select>
+        />
       ) : null}
     </div>
   );

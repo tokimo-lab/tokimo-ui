@@ -212,9 +212,9 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
 
     const borderClass = status
       ? status === "error"
-        ? "border-red-500 focus-within:border-red-500 focus-within:ring-red-500/20"
-        : "border-amber-500 focus-within:border-amber-500 focus-within:ring-amber-500/20"
-      : "border-slate-300 dark:border-slate-600 focus-within:border-sky-500 focus-within:ring-sky-500/20";
+        ? "border-red-500 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500/30"
+        : "border-amber-500 focus-within:border-amber-500 focus-within:ring-1 focus-within:ring-amber-500/30"
+      : "border-black/[0.08] dark:border-white/[0.1] focus-within:border-[var(--accent)] focus-within:ring-1 focus-within:ring-[var(--accent)]";
 
     return (
       <div
@@ -230,14 +230,14 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
             wrapperSizeClass,
             borderClass,
             disabled &&
-              "opacity-50 cursor-not-allowed bg-slate-50 dark:bg-slate-900",
+              "opacity-50 cursor-not-allowed bg-black/[0.03] dark:bg-white/[0.02]",
           )}
         >
           <input
             ref={inputRef}
             type="text"
             className={cn(
-              "flex-1 min-w-0 bg-transparent outline-none text-slate-700 dark:text-slate-200 placeholder-slate-400",
+              "flex-1 min-w-0 bg-transparent outline-none text-[var(--text-primary)] placeholder:text-[var(--text-muted)]",
               sizeClass,
               disabled && "cursor-not-allowed",
             )}
@@ -269,7 +269,7 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
           {allowClear && val ? (
             <button
               type="button"
-              className="mr-2.5 cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              className="mr-2.5 cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => {
                 updateVal("");
@@ -287,7 +287,7 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
               ref={refs.setFloating}
               style={floatingStyles}
               {...getFloatingProps()}
-              className="z-[1050] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 max-h-64 overflow-auto"
+              className="z-[9999] bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] rounded-md shadow-lg py-1 max-h-64 overflow-auto"
             >
               {filtered.map((opt, i) => (
                 <div
@@ -297,8 +297,8 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
                   className={cn(
                     "px-3 py-1.5 text-sm cursor-pointer select-none transition-colors",
                     i === activeIdx
-                      ? "bg-sky-50 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400"
-                      : "text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/60",
+                      ? "bg-black/[0.04] dark:bg-white/[0.06] text-[var(--text-primary)]"
+                      : "text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
                     opt.disabled && "opacity-40 cursor-not-allowed",
                   )}
                   onMouseDown={(e) => e.preventDefault()}
@@ -323,7 +323,7 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
               ref={refs.setFloating}
               style={floatingStyles}
               {...getFloatingProps()}
-              className="z-[1050] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-4 px-3 text-center text-sm text-slate-400"
+              className="z-[9999] bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] rounded-md shadow-lg py-4 px-3 text-center text-sm text-[var(--text-muted)]"
             >
               {notFoundContent}
             </div>

@@ -36,7 +36,7 @@ export interface PopconfirmProps {
   /** OK button type */
   okType?: "primary" | "danger";
   /** Confirm callback */
-  onConfirm?: () => void | Promise<void>;
+  onConfirm?: () => void | Promise<unknown>;
   /** Cancel callback */
   onCancel?: () => void;
   /** Trigger element */

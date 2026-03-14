@@ -506,9 +506,7 @@ Form.Item = function FormItem({
       <div className="[&>:not(button)]:w-full">{child as ReactNode}</div>
       {error ? <div className="mt-1 text-xs text-red-500">{error}</div> : null}
       {extra ? (
-        <div className="mt-1 text-xs text-slate-400 dark:text-slate-500">
-          {extra}
-        </div>
+        <div className="mt-1 text-xs text-[var(--text-muted)]">{extra}</div>
       ) : null}
     </div>
   );

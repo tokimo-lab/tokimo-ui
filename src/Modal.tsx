@@ -433,6 +433,7 @@ Modal.confirm = (config: ConfirmConfig) => {
 
   const ConfirmDialog = () => {
     const [open, setOpen] = useState(true);
+    const [loading, setLoading] = useState(false);
     return (
       <Modal
         open={open}
@@ -440,12 +441,20 @@ Modal.confirm = (config: ConfirmConfig) => {
         okText={config.okText ?? "确定"}
         cancelText={config.cancelText ?? "取消"}
         okButtonProps={config.okButtonProps}
+        confirmLoading={loading}
+        maskClosable={!loading}
         onOk={async () => {
-          await config.onOk?.();
-          setOpen(false);
-          setTimeout(destroy, 300);
+          setLoading(true);
+          try {
+            await config.onOk?.();
+            setOpen(false);
+            setTimeout(destroy, 300);
+          } finally {
+            setLoading(false);
+          }
         }}
         onCancel={() => {
+          if (loading) return;
           config.onCancel?.();
           setOpen(false);
           setTimeout(destroy, 300);
