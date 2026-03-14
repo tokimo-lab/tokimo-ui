@@ -46,9 +46,9 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-lg",
-        "bg-white/70 dark:bg-white/[0.03]",
-        "backdrop-blur-xl",
+        "rounded-2xl relative overflow-hidden",
+        "bg-white/70 dark:bg-white/[0.04]",
+        "backdrop-blur-xl dark:backdrop-saturate-[120%]",
         bordered
           ? "border border-black/[0.06] dark:border-white/[0.08]"
           : "shadow-sm",
@@ -57,6 +57,15 @@ export function Card({
       )}
       {...rest}
     >
+      {/* Accent top line */}
+      <div
+        className="absolute top-0 left-0 right-1/2 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, var(--accent, #10b981), transparent)",
+          opacity: "var(--card-top-line-opacity, 0.4)",
+        }}
+      />
       {cover ? (
         <div className="rounded-t-lg overflow-hidden">{cover}</div>
       ) : null}

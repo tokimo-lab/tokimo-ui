@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   ArrowLeftRight,
   ArrowUp,
+  BarChart3,
   Bell,
   Calendar,
   Check,
@@ -43,6 +44,7 @@ import {
   Hourglass,
   Import,
   Info,
+  LayoutDashboard,
   Lightbulb,
   Loader2,
   Lock,
@@ -193,6 +195,11 @@ export const CloudServerOutlined = withDefaultSize(
   "CloudServerOutlined",
 );
 export const StarOutlined = withDefaultSize(Star, "StarOutlined");
+export const DashboardOutlined = withDefaultSize(
+  LayoutDashboard,
+  "DashboardOutlined",
+);
+export const BarChartOutlined = withDefaultSize(BarChart3, "BarChartOutlined");
 
 /* ─── Operation Icons ─── */
 export const BellOutlined = withDefaultSize(Bell, "BellOutlined");

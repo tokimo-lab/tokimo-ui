@@ -155,7 +155,7 @@ function MenuItemRenderer({
         className={cn(
           "flex items-center gap-2 w-full rounded-md px-3 py-2 text-sm transition-colors cursor-pointer",
           isSelected
-            ? "bg-[var(--accent-subtle)] text-[var(--accent)] font-medium border-l-2 border-[var(--accent)]"
+            ? "bg-gradient-to-r from-[var(--accent-subtle)] to-transparent text-[var(--accent)] font-medium border-l-2 border-[var(--accent)]"
             : "text-[var(--text-secondary,#475569)] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] hover:text-[var(--text-primary)]",
           item.disabled && "opacity-50 !cursor-not-allowed",
           item.danger && "text-red-500 hover:bg-red-50 dark:hover:bg-red-950",
