@@ -4,54 +4,58 @@ import { cn } from "./utils";
 
 const colorMap: Record<string, string> = {
   default:
-    "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700",
-  blue: "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950 dark:text-blue-400 dark:border-blue-800",
+    "bg-slate-100 text-slate-600 border-slate-200 dark:bg-white/[0.06] dark:text-slate-300 dark:border-white/[0.1]",
+  blue: "bg-blue-50 text-blue-600 border-blue-200 dark:bg-sky-500/[0.12] dark:text-sky-300 dark:border-sky-400/[0.15]",
   green:
-    "bg-green-50 text-green-600 border-green-200 dark:bg-green-950 dark:text-green-400 dark:border-green-800",
-  red: "bg-red-50 text-red-600 border-red-200 dark:bg-red-950 dark:text-red-400 dark:border-red-800",
+    "bg-green-50 text-green-600 border-green-200 dark:bg-emerald-500/[0.12] dark:text-emerald-300 dark:border-emerald-400/[0.15]",
+  red: "bg-red-50 text-red-600 border-red-200 dark:bg-red-500/[0.12] dark:text-red-300 dark:border-red-400/[0.15]",
   orange:
-    "bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-950 dark:text-orange-400 dark:border-orange-800",
-  gold: "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950 dark:text-amber-400 dark:border-amber-800",
+    "bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-500/[0.12] dark:text-orange-300 dark:border-orange-400/[0.15]",
+  gold: "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/[0.12] dark:text-amber-300 dark:border-amber-400/[0.15]",
   yellow:
-    "bg-yellow-50 text-yellow-600 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-400 dark:border-yellow-800",
-  cyan: "bg-cyan-50 text-cyan-600 border-cyan-200 dark:bg-cyan-950 dark:text-cyan-400 dark:border-cyan-800",
+    "bg-yellow-50 text-yellow-600 border-yellow-200 dark:bg-yellow-500/[0.12] dark:text-yellow-300 dark:border-yellow-400/[0.15]",
+  cyan: "bg-cyan-50 text-cyan-600 border-cyan-200 dark:bg-cyan-500/[0.12] dark:text-cyan-300 dark:border-cyan-400/[0.15]",
   purple:
-    "bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-950 dark:text-purple-400 dark:border-purple-800",
+    "bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-500/[0.12] dark:text-purple-300 dark:border-purple-400/[0.15]",
   magenta:
-    "bg-pink-50 text-pink-600 border-pink-200 dark:bg-pink-950 dark:text-pink-400 dark:border-pink-800",
+    "bg-pink-50 text-pink-600 border-pink-200 dark:bg-pink-500/[0.12] dark:text-pink-300 dark:border-pink-400/[0.15]",
   volcano:
-    "bg-orange-50 text-orange-700 border-orange-300 dark:bg-orange-950 dark:text-orange-400 dark:border-orange-800",
-  lime: "bg-lime-50 text-lime-600 border-lime-200 dark:bg-lime-950 dark:text-lime-400 dark:border-lime-800",
+    "bg-orange-50 text-orange-700 border-orange-300 dark:bg-orange-500/[0.12] dark:text-orange-300 dark:border-orange-400/[0.15]",
+  lime: "bg-lime-50 text-lime-600 border-lime-200 dark:bg-lime-500/[0.12] dark:text-lime-300 dark:border-lime-400/[0.15]",
   geekblue:
-    "bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-950 dark:text-indigo-400 dark:border-indigo-800",
+    "bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-500/[0.12] dark:text-indigo-300 dark:border-indigo-400/[0.15]",
   success:
-    "bg-green-50 text-green-600 border-green-200 dark:bg-green-950 dark:text-green-400 dark:border-green-800",
+    "bg-green-50 text-green-600 border-green-200 dark:bg-emerald-500/[0.12] dark:text-emerald-300 dark:border-emerald-400/[0.15]",
   processing:
-    "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950 dark:text-blue-400 dark:border-blue-800",
+    "bg-blue-50 text-blue-600 border-blue-200 dark:bg-sky-500/[0.12] dark:text-sky-300 dark:border-sky-400/[0.15]",
   error:
-    "bg-red-50 text-red-600 border-red-200 dark:bg-red-950 dark:text-red-400 dark:border-red-800",
+    "bg-red-50 text-red-600 border-red-200 dark:bg-red-500/[0.12] dark:text-red-300 dark:border-red-400/[0.15]",
   warning:
-    "bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-950 dark:text-orange-400 dark:border-orange-800",
+    "bg-orange-50 text-orange-600 border-orange-200 dark:bg-amber-500/[0.12] dark:text-yellow-200 dark:border-amber-400/[0.15]",
 };
 
 const borderlessColorMap: Record<string, string> = {
-  default: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
-  blue: "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
-  green: "bg-green-50 text-green-600 dark:bg-green-950 dark:text-green-400",
-  red: "bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400",
+  default:
+    "bg-slate-100 text-slate-600 dark:bg-white/[0.06] dark:text-slate-300",
+  blue: "bg-blue-50 text-blue-600 dark:bg-sky-500/[0.12] dark:text-sky-300",
+  green:
+    "bg-green-50 text-green-600 dark:bg-emerald-500/[0.12] dark:text-emerald-300",
+  red: "bg-red-50 text-red-600 dark:bg-red-500/[0.12] dark:text-red-300",
   orange:
-    "bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400",
-  gold: "bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-400",
+    "bg-orange-50 text-orange-600 dark:bg-orange-500/[0.12] dark:text-orange-300",
+  gold: "bg-amber-50 text-amber-600 dark:bg-amber-500/[0.12] dark:text-amber-300",
   geekblue:
-    "bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400",
+    "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/[0.12] dark:text-indigo-300",
   purple:
-    "bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-400",
-  cyan: "bg-cyan-50 text-cyan-600 dark:bg-cyan-950 dark:text-cyan-400",
-  success: "bg-green-50 text-green-600 dark:bg-green-950 dark:text-green-400",
-  processing: "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
-  error: "bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400",
+    "bg-purple-50 text-purple-600 dark:bg-purple-500/[0.12] dark:text-purple-300",
+  cyan: "bg-cyan-50 text-cyan-600 dark:bg-cyan-500/[0.12] dark:text-cyan-300",
+  success:
+    "bg-green-50 text-green-600 dark:bg-emerald-500/[0.12] dark:text-emerald-300",
+  processing:
+    "bg-blue-50 text-blue-600 dark:bg-sky-500/[0.12] dark:text-sky-300",
+  error: "bg-red-50 text-red-600 dark:bg-red-500/[0.12] dark:text-red-300",
   warning:
-    "bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400",
+    "bg-orange-50 text-orange-600 dark:bg-amber-500/[0.12] dark:text-yellow-200",
 };
 
 export interface TagProps
@@ -89,9 +93,9 @@ export function Tag({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded font-medium whitespace-nowrap",
+        "inline-flex items-center gap-1 rounded-lg font-medium whitespace-nowrap dark:backdrop-blur-sm",
         size === "small"
-          ? "px-1 py-px text-[10px] leading-4"
+          ? "px-1.5 py-px text-[10px] leading-4"
           : "px-2 py-0.5 text-xs",
         isPreset ? preset : undefined,
         bordered && isPreset ? "border" : undefined,
