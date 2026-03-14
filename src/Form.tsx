@@ -439,6 +439,15 @@ Form.Item = function FormItem({
     }
   }, [name, form, mergedRules, initialValue]);
 
+  // Unregister when field unmounts (e.g. type switching removes old fields)
+  useEffect(() => {
+    return () => {
+      if (name && form) {
+        form._unregister(name);
+      }
+    };
+  }, [name, form]);
+
   if (hidden) return null;
 
   // shouldUpdate + render function support

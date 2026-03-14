@@ -17,7 +17,8 @@ export type ScaledModalSize =
   | "almost-full"
   | "large"
   | "default"
-  | "inset";
+  | "inset"
+  | "form";
 
 export interface ModalProps {
   /** Whether visible */
@@ -73,6 +74,8 @@ export interface ModalProps {
   /** CSS class for body */
   wrapClassName?: string;
   children?: ReactNode;
+  /** Extra content rendered to the left of the close button in the header */
+  extra?: ReactNode;
   /** Centered vertically */
   centered?: boolean;
   /** After open animation callback */
@@ -161,6 +164,26 @@ const SIZE_CONFIG: Record<ScaledModalSize, SizeConfig> = {
       height: "100%",
     },
   },
+  /** 15% margin top/bottom — 90vw × at-most 70vh, centered; left-right grid forms pass style={{ height: "70vh" }} */
+  form: {
+    width: "90vw",
+    dialogStyle: {
+      maxWidth: "90vw",
+      maxHeight: "70vh",
+    },
+    bodyStyle: {
+      flex: 1,
+      minHeight: 0,
+      overflowY: "auto",
+      overflowX: "hidden",
+      ...THIN_SCROLLBAR,
+    },
+    containerStyle: {
+      display: "flex",
+      flexDirection: "column",
+      height: "100%",
+    },
+  },
   default: {
     width: 520,
     dialogStyle: {},
@@ -177,6 +200,7 @@ export function Modal({
   cancelButtonProps,
   onOk,
   onCancel,
+  extra,
   footer,
   width: widthProp,
   size = "default",
@@ -306,7 +330,7 @@ export function Modal({
     <div
       className={cn(
         "fixed inset-0 flex justify-center transition-colors duration-200",
-        size === "inset"
+        size === "inset" || size === "form" || centered
           ? "items-center overflow-hidden"
           : "items-start overflow-y-auto",
         animClass ? "bg-black/35 backdrop-blur-sm" : "bg-black/0",
@@ -339,13 +363,10 @@ export function Modal({
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 translate-y-4",
           size === "full" && "!rounded-none",
-          centered &&
-            size !== "full" &&
-            size !== "inset" &&
-            "mt-[8vh] mb-[16vh]",
           !centered &&
             size !== "full" &&
             size !== "inset" &&
+            size !== "form" &&
             "mt-[10vh] mb-[10vh]",
           className,
         )}
@@ -367,15 +388,18 @@ export function Modal({
             ) : (
               <span />
             )}
-            {closable ? (
-              <button
-                type="button"
-                className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors cursor-pointer"
-                onClick={onCancel}
-              >
-                <X className="h-5 w-5" />
-              </button>
-            ) : null}
+            <div className="flex items-center gap-1">
+              {extra}
+              {closable ? (
+                <button
+                  type="button"
+                  className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors cursor-pointer"
+                  onClick={onCancel}
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              ) : null}
+            </div>
           </div>
         )}
         {/* Body */}
