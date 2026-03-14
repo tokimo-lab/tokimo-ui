@@ -69,6 +69,7 @@ import {
   Send,
   Server,
   Settings,
+  Shield,
   Square,
   Star,
   Sun,
@@ -230,6 +231,7 @@ export const SaveOutlined = withDefaultSize(Save, "SaveOutlined");
 export const ScanOutlined = withDefaultSize(ScanLine, "ScanOutlined");
 export const SendOutlined = withDefaultSize(Send, "SendOutlined");
 export const ControlOutlined = withDefaultSize(Settings, "ControlOutlined");
+export const ShieldOutlined = withDefaultSize(Shield, "ShieldOutlined");
 export const StopOutlined = withDefaultSize(Square, "StopOutlined");
 export const FieldTimeOutlined = withDefaultSize(Timer, "FieldTimeOutlined");
 export const ThunderboltOutlined = withDefaultSize(Zap, "ThunderboltOutlined");

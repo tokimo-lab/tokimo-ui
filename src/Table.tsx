@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronsUpDown, ChevronUp, Loader2 } from "lucide-react";
 import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
+import { Checkbox } from "./Checkbox";
 import { Empty } from "./Empty";
 import { Pagination, type PaginationProps } from "./Pagination";
 import { cn } from "./utils";
@@ -191,9 +192,15 @@ function renderRows<T>(
             >
               <span
                 className="flex items-center gap-1 w-full"
-                style={
-                  ci === 0 ? { paddingLeft: level * indentSize } : undefined
-                }
+                style={{
+                  paddingLeft: ci === 0 ? level * indentSize : undefined,
+                  justifyContent:
+                    col.align === "center"
+                      ? "center"
+                      : col.align === "right"
+                        ? "flex-end"
+                        : undefined,
+                }}
               >
                 {ci === 0 && hasKids ? (
                   <button
@@ -207,7 +214,11 @@ function renderRows<T>(
                   <span className="w-4 shrink-0" />
                 ) : null}
                 <span
-                  className={cn("min-w-0 flex-1", col.ellipsis && "truncate")}
+                  className={cn(
+                    "min-w-0",
+                    !col.align || col.align === "left" ? "flex-1" : undefined,
+                    col.ellipsis && "truncate",
+                  )}
                 >
                   {rendered}
                 </span>
@@ -412,14 +423,10 @@ export function Table<T = Record<string, unknown>>({
         {
           key: "__selection__",
           title: (
-            <input
-              type="checkbox"
+            <Checkbox
               checked={allSelected}
-              ref={(el) => {
-                if (el) el.indeterminate = someSelected && !allSelected;
-              }}
+              indeterminate={someSelected && !allSelected}
               onChange={toggleAll}
-              className="cursor-pointer"
             />
           ) as unknown as string,
           width: 40,
@@ -429,12 +436,10 @@ export function Table<T = Record<string, unknown>>({
             const key = getKey(record, rowKey, idx);
             const cbProps = rowSelection.getCheckboxProps?.(record);
             return (
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={selectedSet.has(key)}
                 disabled={cbProps?.disabled}
                 onChange={() => toggleRow(key, record)}
-                className="cursor-pointer"
               />
             );
           },
@@ -507,9 +512,27 @@ export function Table<T = Record<string, unknown>>({
                             )
                         : undefined
                     }
-                    style={{ width: col.width, minWidth: col.minWidth }}
+                    style={{
+                      width: col.width,
+                      minWidth: col.minWidth,
+                      textAlign: col.align ?? "left",
+                    }}
                   >
-                    <span className="inline-flex items-center gap-1">
+                    <span
+                      className="inline-flex items-center gap-1"
+                      style={{
+                        justifyContent:
+                          col.align === "center"
+                            ? "center"
+                            : col.align === "right"
+                              ? "flex-end"
+                              : undefined,
+                        width:
+                          col.align && col.align !== "left"
+                            ? "100%"
+                            : undefined,
+                      }}
+                    >
                       {col.title}
                       {isSortable && (
                         <span

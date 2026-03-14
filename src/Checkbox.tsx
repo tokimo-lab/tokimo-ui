@@ -68,23 +68,27 @@ const BaseCheckbox = forwardRef<HTMLInputElement, CheckboxProps>(
             className={cn(
               "flex items-center justify-center h-4 w-4 rounded border transition-colors",
               isChecked || indeterminate
-                ? "bg-sky-500 border-sky-500 text-white dark:bg-sky-600 dark:border-sky-600"
-                : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800",
+                ? "bg-[var(--accent)] border-[var(--accent)] text-white"
+                : "border-black/20 dark:border-white/25 bg-[var(--bg-elevated)]",
               !disabled &&
-                "peer-focus-visible:ring-2 peer-focus-visible:ring-sky-500 peer-focus-visible:ring-offset-1",
+                "peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--accent)] peer-focus-visible:ring-offset-1",
             )}
           >
             {indeterminate ? (
               <span className="h-0.5 w-2 bg-white rounded" />
-            ) : isChecked ? (
-              <Check className="h-3 w-3" strokeWidth={3} />
-            ) : null}
+            ) : (
+              <Check
+                className={cn(
+                  "h-3 w-3 transition-opacity",
+                  isChecked ? "opacity-100" : "opacity-0",
+                )}
+                strokeWidth={3}
+              />
+            )}
           </span>
         </span>
         {children ? (
-          <span className="text-sm text-slate-700 dark:text-slate-300">
-            {children}
-          </span>
+          <span className="text-sm text-[var(--text-primary)]">{children}</span>
         ) : null}
       </label>
     );
@@ -149,18 +153,22 @@ function CheckboxGroup({
               className={cn(
                 "flex items-center justify-center h-4 w-4 rounded border transition-colors",
                 value.includes(opt.value)
-                  ? "bg-sky-500 border-sky-500 text-white dark:bg-sky-600 dark:border-sky-600"
-                  : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800",
+                  ? "bg-[var(--accent)] border-[var(--accent)] text-white"
+                  : "border-black/20 dark:border-white/25 bg-[var(--bg-elevated)]",
                 !(disabled || opt.disabled) &&
-                  "peer-focus-visible:ring-2 peer-focus-visible:ring-sky-500 peer-focus-visible:ring-offset-1",
+                  "peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--accent)] peer-focus-visible:ring-offset-1",
               )}
             >
-              {value.includes(opt.value) ? (
-                <Check className="h-3 w-3" strokeWidth={3} />
-              ) : null}
+              <Check
+                className={cn(
+                  "h-3 w-3 transition-opacity",
+                  value.includes(opt.value) ? "opacity-100" : "opacity-0",
+                )}
+                strokeWidth={3}
+              />
             </span>
           </span>
-          <span className="text-slate-700 dark:text-slate-300">
+          <span className="text-sm text-[var(--text-primary)]">
             {opt.label}
           </span>
         </label>
