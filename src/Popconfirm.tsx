@@ -36,6 +36,7 @@ export interface PopconfirmProps {
   /** OK button type */
   okType?: "primary" | "danger";
   /** Confirm callback */
+  // biome-ignore lint/suspicious/noConfusingVoidType: void in union is intentional for callback compatibility
   onConfirm?: () => void | Promise<unknown>;
   /** Cancel callback */
   onCancel?: () => void;

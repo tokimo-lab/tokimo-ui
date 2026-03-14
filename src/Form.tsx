@@ -10,7 +10,27 @@ import {
   useState,
 } from "react";
 
+import { QuestionCircleOutlined } from "./icons";
+import { Tooltip } from "./Tooltip";
 import { cn } from "./utils";
+
+/* ─── FormItemTooltip ─── */
+/**
+ * 表单标签旁的 ? 问号图标，悬停显示提示内容。
+ * 颜色使用 blue-400，与下方帮助文本（text-muted）区分。
+ */
+export function FormItemTooltip({ content }: { content: ReactNode }) {
+  return (
+    <Tooltip title={content} placement="right">
+      <span className="inline-flex cursor-help">
+        <QuestionCircleOutlined
+          size={13}
+          className="text-[var(--accent-muted)] hover:text-[var(--accent)] transition-colors"
+        />
+      </span>
+    </Tooltip>
+  );
+}
 
 /* ─── Types ─── */
 // biome-ignore lint/suspicious/noExplicitAny: antd compat
@@ -489,19 +509,19 @@ Form.Item = function FormItem({
   return (
     <div className={cn("w-full", className)} style={style}>
       {label ? (
-        <label
-          htmlFor={name}
-          className="block text-sm font-medium text-[var(--text-primary)] mb-1"
-        >
-          {required ||
-          mergedRules.some((r) => typeof r !== "function" && r.required) ? (
-            <span className="text-red-500 mr-0.5">*</span>
-          ) : null}
-          {label}
-          {tooltip ? (
-            <span className="ml-1 text-slate-400 text-xs">{tooltip}</span>
-          ) : null}
-        </label>
+        <div className="flex items-center gap-1 mb-1">
+          <label
+            htmlFor={name}
+            className="text-sm font-medium text-[var(--text-primary)]"
+          >
+            {required ||
+            mergedRules.some((r) => typeof r !== "function" && r.required) ? (
+              <span className="text-red-500 mr-0.5">*</span>
+            ) : null}
+            {label}
+          </label>
+          {tooltip ? <FormItemTooltip content={tooltip} /> : null}
+        </div>
       ) : null}
       <div className="[&>:not(button)]:w-full">{child as ReactNode}</div>
       {error ? <div className="mt-1 text-xs text-red-500">{error}</div> : null}

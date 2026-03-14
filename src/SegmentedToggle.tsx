@@ -29,7 +29,7 @@ export function SegmentedToggle({
   return (
     <div
       className={cn(
-        "relative flex w-full rounded-md bg-gray-100 p-0.5 dark:bg-gray-800",
+        "relative flex w-full rounded-md p-0.5 bg-[var(--accent-subtle)]",
         disabled && "cursor-not-allowed opacity-50",
         className,
       )}
@@ -46,7 +46,7 @@ export function SegmentedToggle({
         disabled={disabled}
         className={cn(
           "relative z-10 flex-1 py-1.5 text-sm font-medium transition-colors duration-200 select-none",
-          isOn ? "text-white" : "text-gray-500 dark:text-gray-400",
+          isOn ? "text-white" : "text-white/40",
         )}
         onClick={() => !disabled && onChange?.(true)}
       >
@@ -57,7 +57,7 @@ export function SegmentedToggle({
         disabled={disabled}
         className={cn(
           "relative z-10 flex-1 py-1.5 text-sm font-medium transition-colors duration-200 select-none",
-          !isOn ? "text-white" : "text-gray-500 dark:text-gray-400",
+          !isOn ? "text-white" : "text-white/40",
         )}
         onClick={() => !disabled && onChange?.(false)}
       >
