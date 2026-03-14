@@ -21,6 +21,8 @@ export type { CheckboxProps } from "./Checkbox";
 export { Checkbox } from "./Checkbox";
 export type { CollapseProps } from "./Collapse";
 export { Collapse } from "./Collapse";
+export type { ContextMenuItem, ContextMenuProps } from "./ContextMenu";
+export { ContextMenu, useContextMenu } from "./ContextMenu";
 export type { DescriptionsProps } from "./Descriptions";
 export { Descriptions } from "./Descriptions";
 export type { DividerProps } from "./Divider";
@@ -59,6 +61,8 @@ export type { PopoverProps } from "./Popover";
 export { Popover } from "./Popover";
 export type { ProgressProps } from "./Progress";
 export { Progress } from "./Progress";
+export type { SegmentedToggleProps } from "./SegmentedToggle";
+export { SegmentedToggle } from "./SegmentedToggle";
 export type { SelectOption, SelectProps } from "./Select";
 // ─── Complex components ───
 export { Select } from "./Select";

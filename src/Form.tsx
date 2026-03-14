@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+
 import { cn } from "./utils";
 
 /* ─── Types ─── */
@@ -276,6 +277,8 @@ export function Form({
   initialValues,
   onFinish,
   onFinishFailed,
+  requiredMark: _requiredMark,
+  size: _size,
   className,
   children,
   ...rest
@@ -283,16 +286,19 @@ export function Form({
   const [internalForm] = useForm(initialValues);
   const form = formProp ?? internalForm;
 
-  // Set initial values if provided and form is external
-  if (initialValues && formProp) {
-    const current = form.getFieldsValue();
-    const needsInit = Object.keys(initialValues).some(
-      (k) => current[k] === undefined,
-    );
-    if (needsInit) {
-      form.setFieldsValue(initialValues);
+  // Set initial values on external form after mount to avoid state updates during render
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional mount-only init
+  useEffect(() => {
+    if (initialValues && formProp) {
+      const current = form.getFieldsValue();
+      const needsInit = Object.keys(initialValues).some(
+        (k) => current[k] === undefined,
+      );
+      if (needsInit) {
+        form.setFieldsValue(initialValues);
+      }
     }
-  }
+  }, []);
 
   return (
     <FormContext.Provider value={form}>

@@ -1,7 +1,7 @@
-import { type ReactNode, useState } from "react";
+import { ChevronDown, ChevronsUpDown, ChevronUp, Loader2 } from "lucide-react";
+import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import { Empty } from "./Empty";
 import { Pagination, type PaginationProps } from "./Pagination";
-import { Spin } from "./Spin";
 import { cn } from "./utils";
 
 /* ─── Types ─── */
@@ -92,6 +92,10 @@ export interface TableProps<T = Record<string, unknown>> {
     /** Row selectable predicate */
     getCheckboxProps?: (record: T) => { disabled?: boolean };
   };
+  /** Virtual scroll — only renders visible rows. Requires scroll.y to be set. */
+  virtual?: boolean;
+  /** Row height (px) estimate for virtual scroll (defaults: small=33, middle=41, large=49). */
+  itemHeight?: number;
 }
 
 /** Get value from a record by dot path */
@@ -146,14 +150,16 @@ function renderRows<T>(
         : rowClassName;
     const rowProps = onRow?.(record, idx) ?? {};
 
+    const { className: rowPropClassName, ...restRowProps } = rowProps;
     rows.push(
       <tr
         key={key}
         className={cn(
           "border-b border-black/[0.04] dark:border-white/[0.04] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors",
           rowCls,
+          rowPropClassName,
         )}
-        {...rowProps}
+        {...restRowProps}
       >
         {columns.map((col, ci) => {
           const dataIndex = col.dataIndex ?? col.key;
@@ -176,9 +182,9 @@ function renderRows<T>(
                 bordered &&
                   "border-r border-black/[0.06] dark:border-white/[0.08] last:border-r-0",
                 col.fixed === "left" &&
-                  "sticky left-0 bg-white/70 dark:bg-white/[0.03] z-10",
+                  "sticky left-0 bg-[rgba(252,252,255,0.96)] dark:bg-[rgba(14,14,24,0.96)] z-10",
                 col.fixed === "right" &&
-                  "sticky right-0 bg-white/70 dark:bg-white/[0.03] z-10",
+                  "sticky right-0 bg-[rgba(252,252,255,0.96)] dark:bg-[rgba(14,14,24,0.96)] z-10",
                 col.className,
               )}
               style={{ width: col.width, minWidth: col.minWidth }}
@@ -256,6 +262,8 @@ export function Table<T = Record<string, unknown>>({
   className,
   style,
   rowSelection,
+  virtual = false,
+  itemHeight,
 }: TableProps<T>) {
   // Expand state
   const [expandedKeysState, setExpandedKeysState] = useState<Set<string>>(
@@ -296,6 +304,60 @@ export function Table<T = Record<string, unknown>>({
     middle: "px-3 py-2 text-sm",
     large: "px-4 py-3 text-base",
   }[size];
+
+  // Sort state
+  const [sortState, setSortState] = useState<{
+    key: string;
+    dir: "asc" | "desc";
+    fn: (a: T, b: T) => number;
+  } | null>(null);
+
+  const handleSortClick = (key: string, fn: (a: T, b: T) => number) => {
+    setSortState((prev) => {
+      if (prev?.key === key) {
+        if (prev.dir === "asc") return { key, dir: "desc", fn };
+        return null;
+      }
+      return { key, dir: "asc", fn };
+    });
+  };
+
+  const sortedData = useMemo(() => {
+    if (!sortState) return dataSource;
+    const arr = [...dataSource].sort(sortState.fn);
+    return sortState.dir === "desc" ? arr.reverse() : arr;
+  }, [dataSource, sortState]);
+
+  // Virtual scroll
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [scrollTop, setScrollTop] = useState(0);
+  const ROW_HEIGHT_MAP = { small: 33, middle: 41, large: 49 } as const;
+  const rowHeight = itemHeight ?? ROW_HEIGHT_MAP[size];
+  const OVERSCAN = 5;
+
+  const handleVirtualScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      setScrollTop(e.currentTarget.scrollTop);
+    },
+    [],
+  );
+
+  const containerH = scrollContainerRef.current?.clientHeight ?? 600;
+  const visibleCount = Math.ceil(containerH / rowHeight);
+  const startIdx = virtual
+    ? Math.max(0, Math.floor(scrollTop / rowHeight) - OVERSCAN)
+    : 0;
+  const endIdx = virtual
+    ? Math.min(sortedData.length - 1, startIdx + visibleCount + OVERSCAN * 2)
+    : sortedData.length - 1;
+  const virtualTopH = startIdx * rowHeight;
+  const virtualBottomH = Math.max(
+    0,
+    (sortedData.length - endIdx - 1) * rowHeight,
+  );
+  const renderData = virtual
+    ? sortedData.slice(startIdx, endIdx + 1)
+    : sortedData;
 
   // Row selection helpers
   const selectedSet = new Set(rowSelection?.selectedRowKeys ?? []);
@@ -384,55 +446,122 @@ export function Table<T = Record<string, unknown>>({
   return (
     <div className={cn("w-full", className)} style={style}>
       {title ? <div className="mb-2">{title()}</div> : null}
-      <Spin spinning={loading}>
-        <div
-          className={cn(
-            "overflow-auto rounded-lg border border-black/[0.06] dark:border-white/[0.08]",
-          )}
-          style={{
-            maxHeight: scroll?.y,
-            scrollbarWidth: "thin",
-            scrollbarColor: "rgba(128,128,128,0.4) transparent",
-          }}
+      <div
+        ref={scrollContainerRef}
+        className={cn(
+          "overflow-auto rounded-lg border border-black/[0.06] dark:border-white/[0.08]",
+        )}
+        style={{
+          ...(virtual && scroll?.y
+            ? { height: scroll.y, overflowY: "scroll" as const }
+            : { maxHeight: scroll?.y }),
+          scrollbarWidth: "thin",
+          scrollbarColor: "rgba(128,128,128,0.4) transparent",
+        }}
+        onScroll={virtual ? handleVirtualScroll : undefined}
+      >
+        <table
+          className="w-full border-collapse"
+          style={{ minWidth: scroll?.x }}
         >
-          <table
-            className="w-full border-collapse"
-            style={{ minWidth: scroll?.x }}
-          >
-            <thead>
-              <tr className="bg-black/[0.02] dark:bg-white/[0.04]">
-                {effectiveColumns.map((col, ci) => (
+          <thead>
+            <tr className="bg-black/[0.02] dark:bg-white/[0.04]">
+              {effectiveColumns.map((col, ci) => {
+                const sortKey = col.key ?? col.dataIndex ?? String(ci);
+                const isSortable = typeof col.sorter === "function";
+                const isActiveSorted = isSortable && sortState?.key === sortKey;
+                return (
                   <th
                     key={col.key ?? col.dataIndex ?? ci}
                     className={cn(
                       sizeClass,
                       "text-left font-medium text-[var(--text-secondary)] whitespace-nowrap border-b border-black/[0.06] dark:border-white/[0.08]",
+                      isSortable &&
+                        "cursor-pointer select-none hover:text-[var(--text-primary)] transition-colors",
+                      isActiveSorted && "!text-[var(--accent)]",
                       col.align === "center" && "text-center",
                       col.align === "right" && "text-right",
+                      virtual &&
+                        "sticky top-0 z-[1] bg-[rgba(252,252,255,0.96)] dark:bg-[rgba(14,14,24,0.96)]",
+                      !virtual &&
+                        col.fixed === "left" &&
+                        "sticky left-0 z-10 bg-black/[0.02] dark:bg-white/[0.04]",
+                      !virtual &&
+                        col.fixed === "right" &&
+                        "sticky right-0 z-10 bg-black/[0.02] dark:bg-white/[0.04]",
+                      virtual &&
+                        col.fixed === "left" &&
+                        "left-0 z-[2] bg-[rgba(252,252,255,0.96)] dark:bg-[rgba(14,14,24,0.96)]",
+                      virtual &&
+                        col.fixed === "right" &&
+                        "right-0 z-[2] bg-[rgba(252,252,255,0.96)] dark:bg-[rgba(14,14,24,0.96)]",
                       bordered &&
                         "border-r border-black/[0.06] dark:border-white/[0.08] last:border-r-0",
-                      col.fixed === "left" &&
-                        "sticky left-0 bg-black/[0.02] dark:bg-white/[0.04] z-10",
-                      col.fixed === "right" &&
-                        "sticky right-0 bg-black/[0.02] dark:bg-white/[0.04] z-10",
                     )}
+                    onClick={
+                      isSortable
+                        ? () =>
+                            handleSortClick(
+                              sortKey,
+                              col.sorter as (a: T, b: T) => number,
+                            )
+                        : undefined
+                    }
                     style={{ width: col.width, minWidth: col.minWidth }}
                   >
-                    {col.title}
+                    <span className="inline-flex items-center gap-1">
+                      {col.title}
+                      {isSortable && (
+                        <span
+                          className={cn(
+                            "inline-flex shrink-0",
+                            isActiveSorted
+                              ? "text-[var(--accent)]"
+                              : "text-[var(--text-muted)] opacity-40",
+                          )}
+                        >
+                          {isActiveSorted && sortState?.dir === "asc" ? (
+                            <ChevronUp className="h-3.5 w-3.5" />
+                          ) : isActiveSorted && sortState?.dir === "desc" ? (
+                            <ChevronDown className="h-3.5 w-3.5" />
+                          ) : (
+                            <ChevronsUpDown className="h-3.5 w-3.5" />
+                          )}
+                        </span>
+                      )}
+                    </span>
                   </th>
-                ))}
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody className="bg-transparent">
+            {loading ? (
+              <tr>
+                <td colSpan={effectiveColumns.length}>
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-[var(--accent)]" />
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody className="bg-transparent">
-              {dataSource.length === 0 ? (
-                <tr>
-                  <td colSpan={effectiveColumns.length}>
-                    {locale?.emptyText ?? <Empty />}
-                  </td>
-                </tr>
-              ) : (
-                renderRows(
-                  dataSource,
+            ) : dataSource.length === 0 ? (
+              <tr>
+                <td colSpan={effectiveColumns.length}>
+                  {locale?.emptyText ?? <Empty />}
+                </td>
+              </tr>
+            ) : (
+              <>
+                {virtual && virtualTopH > 0 && (
+                  <tr style={{ height: virtualTopH }}>
+                    <td
+                      colSpan={effectiveColumns.length}
+                      style={{ padding: 0, borderWidth: 0 }}
+                    />
+                  </tr>
+                )}
+                {renderRows(
+                  renderData,
                   effectiveColumns,
                   rowKey,
                   expandable,
@@ -443,14 +572,23 @@ export function Table<T = Record<string, unknown>>({
                   bordered,
                   rowClassName,
                   onRow,
-                )
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Spin>
+                  virtual ? { v: startIdx } : undefined,
+                )}
+                {virtual && virtualBottomH > 0 && (
+                  <tr style={{ height: virtualBottomH }}>
+                    <td
+                      colSpan={effectiveColumns.length}
+                      style={{ padding: 0, borderWidth: 0 }}
+                    />
+                  </tr>
+                )}
+              </>
+            )}
+          </tbody>
+        </table>
+      </div>
       {summary ? <div className="mt-2">{summary()}</div> : null}
-      {pagination !== false && pagination ? (
+      {!virtual && pagination !== false && pagination ? (
         <div className="mt-4 flex justify-end">
           <Pagination
             {...pagination}

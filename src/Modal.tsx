@@ -12,7 +12,12 @@ import { Button } from "./Button";
 import { cn } from "./utils";
 
 /* ─── ScaledModal size presets ─── */
-export type ScaledModalSize = "full" | "almost-full" | "large" | "default";
+export type ScaledModalSize =
+  | "full"
+  | "almost-full"
+  | "large"
+  | "default"
+  | "inset";
 
 export interface ModalProps {
   /** Whether visible */
@@ -138,6 +143,24 @@ const SIZE_CONFIG: Record<ScaledModalSize, SizeConfig> = {
       ...THIN_SCROLLBAR,
     },
   },
+  /** 5% margin on all sides — 90vw × 90vh, no outer scrollbar */
+  inset: {
+    width: "90vw",
+    dialogStyle: {
+      maxWidth: "90vw",
+      height: "90vh",
+    },
+    bodyStyle: {
+      flex: 1,
+      minHeight: 0,
+      overflow: "hidden",
+    },
+    containerStyle: {
+      display: "flex",
+      flexDirection: "column",
+      height: "100%",
+    },
+  },
   default: {
     width: 520,
     dialogStyle: {},
@@ -252,8 +275,11 @@ export function Modal({
   if (!visible) return null;
 
   const config = SIZE_CONFIG[size];
-  const resolvedWidth =
-    size === "default" ? (widthProp ?? config.width) : config.width;
+  const resolvedWidth = widthProp ?? config.width;
+  const resolvedDialogStyle =
+    widthProp && size !== "default"
+      ? { ...config.dialogStyle, maxWidth: widthProp }
+      : config.dialogStyle;
 
   const isLoading = confirmLoading || okButtonProps?.loading;
 
@@ -279,8 +305,11 @@ export function Modal({
     // biome-ignore lint/a11y/noStaticElementInteractions: overlay mask click-to-dismiss
     <div
       className={cn(
-        "fixed inset-0 flex items-start justify-center overflow-y-auto transition-colors duration-200",
-        animClass ? "bg-black/45 backdrop-blur-sm" : "bg-black/0",
+        "fixed inset-0 flex justify-center transition-colors duration-200",
+        size === "inset"
+          ? "items-center overflow-hidden"
+          : "items-start overflow-y-auto",
+        animClass ? "bg-black/35 backdrop-blur-sm" : "bg-black/0",
         size === "full" && "items-stretch",
         wrapClassName,
       )}
@@ -305,19 +334,25 @@ export function Modal({
         ref={contentRef}
         className={cn(
           "relative rounded-lg shadow-2xl flex flex-col shrink-0 transition-all duration-200",
-          "bg-white/85 dark:bg-[rgba(15,15,25,0.85)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08]",
+          "bg-white/62 dark:bg-[rgba(20,20,35,0.55)] backdrop-blur-2xl border border-white/[0.12] dark:border-white/[0.12] shadow-[0_8px_32px_rgba(0,0,0,0.3)]",
           animClass
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 translate-y-4",
           size === "full" && "!rounded-none",
-          centered && size !== "full" && "mt-[8vh] mb-[16vh]",
-          !centered && size !== "full" && "mt-[10vh] mb-[10vh]",
+          centered &&
+            size !== "full" &&
+            size !== "inset" &&
+            "mt-[8vh] mb-[16vh]",
+          !centered &&
+            size !== "full" &&
+            size !== "inset" &&
+            "mt-[10vh] mb-[10vh]",
           className,
         )}
         style={{
           width: resolvedWidth,
           maxWidth: size === "default" ? "calc(100vw - 32px)" : undefined,
-          ...config.dialogStyle,
+          ...resolvedDialogStyle,
           ...style,
         }}
         role="presentation"

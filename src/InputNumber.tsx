@@ -97,12 +97,12 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
     return (
       <div
         className={cn(
-          "inline-flex items-center rounded-md border bg-white transition-colors focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500 dark:bg-slate-900",
+          "inline-flex items-center rounded-md border bg-white/70 dark:bg-white/[0.03] backdrop-blur-sm transition-colors focus-within:border-[var(--accent)] focus-within:ring-1 focus-within:ring-[var(--accent)] dark:focus-within:border-[var(--accent)]",
           status === "error"
             ? "border-red-500"
             : status === "warning"
               ? "border-amber-500"
-              : "border-slate-300 dark:border-slate-600",
+              : "border-black/[0.08] dark:border-white/[0.1]",
           disabled && "opacity-50 cursor-not-allowed",
           sizeMap[size],
           className,
@@ -110,7 +110,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
         style={style}
       >
         {addonBefore ? (
-          <span className="px-2 text-slate-500 border-r border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 h-full flex items-center rounded-l-md text-sm">
+          <span className="px-2 text-[var(--text-muted)] border-r border-black/[0.08] dark:border-white/[0.1] bg-black/[0.03] dark:bg-white/[0.05] h-full flex items-center rounded-l-md text-sm">
             {addonBefore}
           </span>
         ) : null}
@@ -125,12 +125,12 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
           {...rest}
         />
         {controls ? (
-          <div className="flex flex-col border-l border-slate-300 dark:border-slate-600 shrink-0">
+          <div className="flex flex-col border-l border-black/[0.08] dark:border-white/[0.1] shrink-0">
             <button
               type="button"
               tabIndex={-1}
               disabled={disabled || (max !== undefined && (value ?? 0) >= max)}
-              className="px-1 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 flex-1"
+              className="px-1 hover:bg-black/[0.05] dark:hover:bg-white/[0.07] disabled:opacity-30 flex-1"
               onClick={increment}
             >
               <ChevronUp className="h-2.5 w-2.5" />
@@ -139,7 +139,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
               type="button"
               tabIndex={-1}
               disabled={disabled || (min !== undefined && (value ?? 0) <= min)}
-              className="px-1 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 flex-1 border-t border-slate-300 dark:border-slate-600"
+              className="px-1 hover:bg-black/[0.05] dark:hover:bg-white/[0.07] disabled:opacity-30 flex-1 border-t border-black/[0.08] dark:border-white/[0.1]"
               onClick={decrement}
             >
               <ChevronDown className="h-2.5 w-2.5" />
@@ -147,7 +147,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
           </div>
         ) : null}
         {addonAfter ? (
-          <span className="px-2 text-slate-500 border-l border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 h-full flex items-center rounded-r-md text-sm whitespace-nowrap">
+          <span className="px-2 text-[var(--text-muted)] border-l border-black/[0.08] dark:border-white/[0.1] bg-black/[0.03] dark:bg-white/[0.05] h-full flex items-center rounded-r-md text-sm whitespace-nowrap">
             {addonAfter}
           </span>
         ) : null}
