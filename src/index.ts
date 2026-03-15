@@ -45,6 +45,8 @@ export {
   useFormContext,
   useWatch,
 } from "./Form";
+export type { HorizontalScrollProps } from "./HorizontalScroll";
+export { HorizontalScroll } from "./HorizontalScroll";
 export type { ImageProps } from "./Image";
 export { Image } from "./Image";
 export { Input, Password, SearchInput, TextArea } from "./Input";
