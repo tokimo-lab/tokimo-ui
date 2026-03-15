@@ -28,7 +28,7 @@ export interface DropdownMenuItem {
   icon?: ReactNode;
   disabled?: boolean;
   danger?: boolean;
-  type?: "divider" | "group";
+  type?: "divider" | "group" | "label";
   children?: DropdownMenuItem[];
   onClick?: () => void;
 }
@@ -86,6 +86,13 @@ function MenuList({
               key={item.key || `d-${i}`}
               className="my-1 h-px bg-black/[0.06] dark:bg-white/[0.08]"
             />
+          );
+        }
+        if (item.type === "label") {
+          return (
+            <div key={item.key ?? `label-${i}`} className="px-1">
+              {item.label}
+            </div>
           );
         }
         return (
