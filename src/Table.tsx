@@ -457,7 +457,7 @@ export function Table<T = Record<string, unknown>>({
         width: 40,
         render: (_: unknown, __: T, idx: number) => (
           <DragHandle
-            disabled={sortDisabled}
+            disabled={sortDisabled || dnd.isPending}
             isDragging={dnd.isDragging}
             {...dnd.getHandleProps(idx)}
           />

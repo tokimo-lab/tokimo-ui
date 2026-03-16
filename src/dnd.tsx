@@ -58,6 +58,8 @@ export interface UseDndReturn {
   isDragging: boolean;
   /** Index of the item being dragged, or -1 */
   activeIndex: number;
+  /** True from drop until disabled is cleared by consumer */
+  isPending: boolean;
 }
 
 /**
@@ -76,6 +78,15 @@ export function useDnd({
   const dragOverRef = useRef(-1);
   const itemHeightRef = useRef(0);
   const containerTopRef = useRef(0);
+  /** Internal lock — stays true from drop until the consumer re-enables */
+  const pendingRef = useRef(false);
+
+  // Keep disabled in a ref so closures always see the latest value
+  const disabledRef = useRef(disabled);
+  disabledRef.current = disabled;
+
+  // When the consumer clears disabled (mutation settled), also clear lock
+  if (!disabled) pendingRef.current = false;
 
   const [dragRender, setDragRender] = useState<{
     from: number;
@@ -83,7 +94,7 @@ export function useDnd({
   } | null>(null);
 
   const handlePointerDown = (idx: number, e: React.PointerEvent) => {
-    if (disabled) return;
+    if (disabledRef.current || pendingRef.current) return;
     e.preventDefault();
 
     const item = (e.target as HTMLElement).closest(
@@ -127,7 +138,8 @@ export function useDnd({
       dragOverRef.current = -1;
       setDragRender(null);
 
-      if (from !== to && from >= 0 && !disabled) {
+      if (from !== to && from >= 0 && !disabledRef.current) {
+        pendingRef.current = true;
         onReorder?.(from, to);
       }
     };
@@ -174,5 +186,7 @@ export function useDnd({
     }),
     isDragging: dragRender !== null,
     activeIndex: dragFromRef.current,
+    /** True from drop until disabled is cleared by consumer */
+    isPending: pendingRef.current,
   };
 }
