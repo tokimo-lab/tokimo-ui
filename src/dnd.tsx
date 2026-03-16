@@ -1,10 +1,11 @@
+import type { LucideProps } from "lucide-react";
 import { type CSSProperties, useRef, useState } from "react";
 import { HolderOutlined } from "./icons";
 import { cn } from "./utils";
 
 /* ─── DragHandle ─── */
 
-export interface DragHandleProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface DragHandleProps extends LucideProps {
   /** Render as disabled (not-allowed cursor, dimmed) */
   disabled?: boolean;
   /** Whether a drag is currently in progress (shows grabbing cursor) */
