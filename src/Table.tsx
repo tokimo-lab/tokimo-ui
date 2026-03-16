@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronsUpDown, ChevronUp, Loader2 } from "lucide-react";
 import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import { Checkbox } from "./Checkbox";
+import { DragHandle, useDnd } from "./dnd";
 import { Empty } from "./Empty";
 import { Pagination, type PaginationProps } from "./Pagination";
 import { cn } from "./utils";
@@ -97,6 +98,10 @@ export interface TableProps<T = Record<string, unknown>> {
   virtual?: boolean;
   /** Row height (px) estimate for virtual scroll (defaults: small=33, middle=41, large=49). */
   itemHeight?: number;
+  /** Called with reordered array after drag-sort. Enables a drag-handle column. */
+  onReorder?: (reordered: T[]) => void;
+  /** Disable drag sorting (e.g. during a pending mutation) */
+  sortDisabled?: boolean;
 }
 
 /** Get value from a record by dot path */
@@ -275,6 +280,8 @@ export function Table<T = Record<string, unknown>>({
   rowSelection,
   virtual = false,
   itemHeight,
+  onReorder,
+  sortDisabled,
 }: TableProps<T>) {
   // Expand state
   const [expandedKeysState, setExpandedKeysState] = useState<Set<string>>(
@@ -417,36 +424,79 @@ export function Table<T = Record<string, unknown>>({
     }
   };
 
-  // Effective columns (prepend selection column if needed)
-  const effectiveColumns: TableColumn<T>[] = rowSelection
-    ? [
-        {
-          key: "__selection__",
-          title: (
-            <Checkbox
-              checked={allSelected}
-              indeterminate={someSelected && !allSelected}
-              onChange={toggleAll}
-            />
-          ) as unknown as string,
-          width: 40,
-          align: "center" as const,
-          // biome-ignore lint/suspicious/noExplicitAny: antd table render signature compat
-          render: (_: any, record: T, idx: number) => {
-            const key = getKey(record, rowKey, idx);
-            const cbProps = rowSelection.getCheckboxProps?.(record);
-            return (
+  // ── Drag-to-reorder (via useDnd) ──
+  const dnd = useDnd({
+    count: dataSource.length,
+    onReorder: onReorder
+      ? (from, to) => {
+          const arr = [...dataSource];
+          const [moved] = arr.splice(from, 1);
+          arr.splice(to, 0, moved);
+          onReorder(arr);
+        }
+      : undefined,
+    disabled: sortDisabled || !onReorder,
+  });
+
+  const dndMergedOnRow = onReorder
+    ? (record: T, index: number) => {
+        const userProps = onRow?.(record, index) ?? {};
+        return {
+          ...userProps,
+          ...dnd.getItemProps(index),
+          style: { ...userProps.style, ...dnd.getItemStyle(index) },
+        };
+      }
+    : onRow;
+
+  // Effective columns (prepend drag + selection columns as needed)
+  const dragColumn: TableColumn<T> | null = onReorder
+    ? {
+        key: "__dnd_drag__",
+        title: "",
+        width: 40,
+        render: (_: unknown, __: T, idx: number) => (
+          <DragHandle
+            disabled={sortDisabled}
+            isDragging={dnd.isDragging}
+            {...dnd.getHandleProps(idx)}
+          />
+        ),
+      }
+    : null;
+
+  const effectiveColumns: TableColumn<T>[] = [
+    ...(dragColumn ? [dragColumn] : []),
+    ...(rowSelection
+      ? [
+          {
+            key: "__selection__" as const,
+            title: (
               <Checkbox
-                checked={selectedSet.has(key)}
-                disabled={cbProps?.disabled}
-                onChange={() => toggleRow(key, record)}
+                checked={allSelected}
+                indeterminate={someSelected && !allSelected}
+                onChange={toggleAll}
               />
-            );
+            ) as unknown as string,
+            width: 40,
+            align: "center" as const,
+            // biome-ignore lint/suspicious/noExplicitAny: antd table render signature compat
+            render: (_: any, record: T, idx: number) => {
+              const key = getKey(record, rowKey, idx);
+              const cbProps = rowSelection.getCheckboxProps?.(record);
+              return (
+                <Checkbox
+                  checked={selectedSet.has(key)}
+                  disabled={cbProps?.disabled}
+                  onChange={() => toggleRow(key, record)}
+                />
+              );
+            },
           },
-        },
-        ...columns,
-      ]
-    : columns;
+        ]
+      : []),
+    ...columns,
+  ];
 
   return (
     <div className={cn("w-full", className)} style={style}>
@@ -594,7 +644,7 @@ export function Table<T = Record<string, unknown>>({
                   sizeClass,
                   bordered,
                   rowClassName,
-                  onRow,
+                  dndMergedOnRow ?? onRow,
                   virtual ? { v: startIdx } : undefined,
                 )}
                 {virtual && virtualBottomH > 0 && (

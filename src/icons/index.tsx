@@ -38,6 +38,7 @@ import {
   Folder,
   FolderOpen,
   Globe,
+  GripVertical,
   HardDrive,
   HelpCircle,
   History,
@@ -162,6 +163,7 @@ export const SwapOutlined = withDefaultSize(ArrowLeftRight, "SwapOutlined");
 export const DownOutlined = withDefaultSize(ChevronDown, "DownOutlined");
 export const RightOutlined = withDefaultSize(ChevronRight, "RightOutlined");
 export const MenuOutlined = withDefaultSize(Menu, "MenuOutlined");
+export const HolderOutlined = withDefaultSize(GripVertical, "HolderOutlined");
 export const CloseOutlined = withDefaultSize(X, "CloseOutlined");
 export const SearchOutlined = withDefaultSize(Search, "SearchOutlined");
 
