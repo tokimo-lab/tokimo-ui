@@ -47,6 +47,7 @@ import {
   Info,
   LayoutDashboard,
   Lightbulb,
+  ListTodo,
   Loader2,
   Lock,
   LogOut,
@@ -204,6 +205,7 @@ export const DashboardOutlined = withDefaultSize(
   "DashboardOutlined",
 );
 export const BarChartOutlined = withDefaultSize(BarChart3, "BarChartOutlined");
+export const ListTodoOutlined = withDefaultSize(ListTodo, "ListTodoOutlined");
 export const PaletteOutlined = withDefaultSize(Palette, "PaletteOutlined");
 
 /* ─── Operation Icons ─── */
