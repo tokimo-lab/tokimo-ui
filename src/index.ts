@@ -35,6 +35,8 @@ export type {
   DropdownProps,
 } from "./Dropdown";
 export { Dropdown } from "./Dropdown";
+export type { DragHandleProps, UseDndOptions, UseDndReturn } from "./dnd";
+export { DragHandle, useDnd } from "./dnd";
 export type { EmojiPickerProps } from "./EmojiPicker";
 export { EmojiPicker } from "./EmojiPicker";
 export type { EmptyProps } from "./Empty";
