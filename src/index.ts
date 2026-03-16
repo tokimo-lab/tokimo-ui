@@ -35,6 +35,8 @@ export type {
   DropdownProps,
 } from "./Dropdown";
 export { Dropdown } from "./Dropdown";
+export type { EmojiPickerProps } from "./EmojiPicker";
+export { EmojiPicker } from "./EmojiPicker";
 export type { EmptyProps } from "./Empty";
 export { Empty } from "./Empty";
 export type { FieldValues as FormFieldValues, FormInstance } from "./Form";
