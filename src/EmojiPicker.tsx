@@ -13,7 +13,7 @@ import {
   useInteractions,
 } from "@floating-ui/react";
 import { Smile } from "lucide-react";
-import { type MouseEvent, useState } from "react";
+import React, { type MouseEvent, useState } from "react";
 import { cn } from "./utils";
 
 export interface EmojiPickerProps {
@@ -44,6 +44,12 @@ export interface EmojiPickerProps {
    * "icon" — bare icon only, no border/bg, for use inside menu icon slots.
    */
   variant?: "default" | "icon";
+  /**
+   * Override the HTML element used for the trigger.
+   * Use "span" when the picker is nested inside another interactive element
+   * (e.g. a <button>) to avoid invalid nested-button HTML.
+   */
+  triggerAs?: "button" | "span";
 }
 
 export function EmojiPicker({
@@ -59,6 +65,7 @@ export function EmojiPicker({
   stopPropagation = false,
   clearLabel = "清除",
   variant = "default",
+  triggerAs = "button",
 }: EmojiPickerProps) {
   const [open, setOpen] = useState(false);
 
@@ -79,35 +86,66 @@ export function EmojiPicker({
 
   const referenceProps = getReferenceProps();
 
-  const handleTriggerClick = (e: MouseEvent<HTMLButtonElement>) => {
+  const handleTriggerClick = (e: MouseEvent<HTMLElement>) => {
     if (stopPropagation) e.stopPropagation();
     if (typeof referenceProps.onClick === "function") {
       referenceProps.onClick(e);
     }
   };
 
+  const handleTriggerKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      if (!disabled) setOpen((prev) => !prev);
+    }
+  };
+
+  const iconTriggerClass = cn(
+    "inline-flex items-center justify-center appearance-none bg-transparent border-0 p-1 aspect-square rounded cursor-pointer transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
+    disabled && "cursor-not-allowed opacity-50",
+    className,
+  );
+
+  const iconTriggerContent = value ? (
+    <span className="text-[1em] leading-none">{value}</span>
+  ) : (
+    <Smile className="w-[1em] h-[1em] text-[var(--text-muted)]" />
+  );
+
   if (variant === "icon") {
-    return (
-      <>
+    const TriggerIcon =
+      triggerAs === "span" ? (
+        // biome-ignore lint/a11y/useSemanticElements: nested inside a <button>; cannot use <button> here
+        <span
+          ref={refs.setReference as React.Ref<HTMLSpanElement>}
+          role="button"
+          tabIndex={disabled ? undefined : 0}
+          title={title}
+          aria-disabled={disabled}
+          className={iconTriggerClass}
+          {...referenceProps}
+          onClick={handleTriggerClick}
+          onKeyDown={handleTriggerKeyDown}
+        >
+          {iconTriggerContent}
+        </span>
+      ) : (
         <button
           type="button"
           ref={refs.setReference}
           title={title}
           disabled={disabled}
-          className={cn(
-            "inline-flex items-center justify-center appearance-none bg-transparent border-0 p-1 aspect-square rounded cursor-pointer transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
-            disabled && "cursor-not-allowed opacity-50",
-            className,
-          )}
+          className={iconTriggerClass}
           {...referenceProps}
           onClick={handleTriggerClick}
         >
-          {value ? (
-            <span className="text-[1em] leading-none">{value}</span>
-          ) : (
-            <Smile className="w-[1em] h-[1em] text-[var(--text-muted)]" />
-          )}
+          {iconTriggerContent}
         </button>
+      );
+
+    return (
+      <>
+        {TriggerIcon}
         {open && (
           <FloatingPortal>
             <div
