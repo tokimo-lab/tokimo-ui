@@ -5,6 +5,7 @@ import {
   type ReactNode,
   useContext,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -410,6 +411,8 @@ Form.Item = function FormItem({
 }: FormItemProps) {
   const form = useFormContext();
   const [, rerender] = useState(0);
+  const generatedId = useId();
+  const controlWrapperRef = useRef<HTMLDivElement>(null);
 
   // Merge required into rules if not already
   const mergedRules = useMemo(() => {
@@ -462,6 +465,7 @@ Form.Item = function FormItem({
 
   // Clone child with value and onChange
   let child = children;
+  let fieldId = name ?? generatedId;
   if (
     name &&
     form &&
@@ -471,6 +475,8 @@ Form.Item = function FormItem({
   ) {
     const childEl = children as React.ReactElement;
     if (childEl && typeof childEl === "object" && "type" in childEl) {
+      const childProps = childEl.props as { id?: string };
+      fieldId = childProps.id ?? name;
       const injectedProps: Record<string, unknown> = {
         [valuePropName]:
           value !== undefined
@@ -505,7 +511,7 @@ Form.Item = function FormItem({
             originalHandler(...args);
           }
         },
-        id: name,
+        id: fieldId,
       };
       if (error) {
         injectedProps.status = "error";
@@ -515,13 +521,28 @@ Form.Item = function FormItem({
     }
   }
 
+  const focusFieldControl = () => {
+    const target =
+      (typeof document !== "undefined"
+        ? document.getElementById(fieldId)
+        : null) ??
+      controlWrapperRef.current?.querySelector<HTMLElement>(
+        'input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ) ??
+      null;
+    target?.focus();
+  };
+
   return (
     <div className={cn("w-full", className)} style={style}>
       {label ? (
-        <div className="flex items-center gap-1 mb-1">
+        <div className="mb-2 flex items-center gap-1.5">
           <label
-            htmlFor={name}
+            htmlFor={fieldId}
             className="text-sm font-medium text-[var(--text-primary)]"
+            onMouseDown={() => {
+              focusFieldControl();
+            }}
           >
             {required ||
             mergedRules.some((r) => typeof r !== "function" && r.required) ? (
@@ -532,7 +553,9 @@ Form.Item = function FormItem({
           {tooltip ? <FormItemTooltip content={tooltip} /> : null}
         </div>
       ) : null}
-      <div className="[&>:not(button)]:w-full">{child as ReactNode}</div>
+      <div ref={controlWrapperRef} className="[&>:not(button)]:w-full">
+        {child as ReactNode}
+      </div>
       {error ? <div className="mt-1 text-xs text-red-500">{error}</div> : null}
       {extra ? (
         <div className="mt-1 text-xs text-[var(--text-muted)]">{extra}</div>

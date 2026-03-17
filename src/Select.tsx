@@ -462,33 +462,36 @@ export function Select({
                   {notFoundContent ?? "无匹配选项"}
                 </div>
               ) : (
-                filtered.map((opt, i) => (
-                  <div
-                    key={String(opt.value)}
-                    ref={(node) => {
-                      listRef.current[i] = node;
-                    }}
-                    className={cn(
-                      "flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer transition-colors",
-                      isSelected(opt.value)
-                        ? "text-[var(--accent)] bg-[var(--accent-subtle)]"
-                        : "text-[var(--text-primary)]",
-                      activeIndex === i &&
-                        "bg-black/[0.04] dark:bg-white/[0.06]",
-                      opt.disabled && "opacity-50 cursor-not-allowed",
-                    )}
-                    {...getItemProps({
-                      onClick: () => {
-                        if (!opt.disabled) handleSelect(opt.value);
-                      },
-                    })}
-                  >
-                    <span className="flex-1">{opt.label}</span>
-                    {isSelected(opt.value) ? (
-                      <Check className="h-4 w-4 shrink-0" />
-                    ) : null}
-                  </div>
-                ))
+                filtered.map((opt, i) => {
+                  const selected = isSelected(opt.value);
+
+                  return (
+                    <div
+                      key={String(opt.value)}
+                      ref={(node) => {
+                        listRef.current[i] = node;
+                      }}
+                      className={cn(
+                        "flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer transition-colors",
+                        selected
+                          ? "text-[var(--accent)] bg-[var(--accent-subtle)]"
+                          : "text-[var(--text-primary)]",
+                        !selected &&
+                          activeIndex === i &&
+                          "bg-black/[0.04] dark:bg-white/[0.06]",
+                        opt.disabled && "opacity-50 cursor-not-allowed",
+                      )}
+                      {...getItemProps({
+                        onClick: () => {
+                          if (!opt.disabled) handleSelect(opt.value);
+                        },
+                      })}
+                    >
+                      <span className="flex-1">{opt.label}</span>
+                      {selected ? <Check className="h-4 w-4 shrink-0" /> : null}
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>
