@@ -240,6 +240,16 @@ export function Select({
   };
 
   const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Backspace" && isMultiple && search.length === 0) {
+      const lastValue = selectedValues[selectedValues.length - 1];
+      if (lastValue !== undefined) {
+        event.preventDefault();
+        event.stopPropagation();
+        handleSelect(lastValue);
+      }
+      return;
+    }
+
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       event.stopPropagation();
