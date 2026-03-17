@@ -14,6 +14,7 @@ import {
 } from "@floating-ui/react";
 import { Check, ChevronDown, Search, X } from "lucide-react";
 import React, {
+  type KeyboardEvent,
   type ReactNode,
   useEffect,
   useMemo,
@@ -196,6 +197,26 @@ export function Select({
   const isSelected = (optValue: string | number) =>
     isMultiple ? selectedValues.includes(optValue) : singleValue === optValue;
 
+  const findNextEnabledIndex = (
+    startIndex: number,
+    direction: 1 | -1,
+  ): number | null => {
+    if (filtered.length === 0) {
+      return null;
+    }
+
+    for (let step = 1; step <= filtered.length; step += 1) {
+      const index =
+        (startIndex + direction * step + filtered.length) % filtered.length;
+      const option = filtered[index];
+      if (option && !option.disabled) {
+        return index;
+      }
+    }
+
+    return null;
+  };
+
   const handleSelect = (optValue: string | number) => {
     if (isMultiple) {
       const current = [...selectedValues];
@@ -207,11 +228,42 @@ export function Select({
       }
       if (valueProp === undefined) setInternalValue(current);
       onChange?.(current);
+      setSearch("");
+      setActiveIndex(null);
     } else {
       if (valueProp === undefined) setInternalValue(optValue);
       onChange?.(optValue);
       setOpen(false);
       setSearch("");
+      setActiveIndex(null);
+    }
+  };
+
+  const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!open) {
+        setOpen(true);
+      }
+      const direction = event.key === "ArrowDown" ? 1 : -1;
+      const nextIndex =
+        activeIndex === null
+          ? findNextEnabledIndex(direction === 1 ? -1 : 0, direction)
+          : findNextEnabledIndex(activeIndex, direction);
+      setActiveIndex(nextIndex);
+      return;
+    }
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      event.stopPropagation();
+      const candidate =
+        (activeIndex !== null ? filtered[activeIndex] : undefined) ??
+        (filtered.length === 1 ? filtered[0] : undefined);
+      if (candidate && !candidate.disabled) {
+        handleSelect(candidate.value);
+      }
     }
   };
 
@@ -240,6 +292,15 @@ export function Select({
     }
   }, [open, showSearch]);
 
+  useEffect(() => {
+    setActiveIndex((current) => {
+      if (current === null) {
+        return null;
+      }
+      return filtered[current] ? current : null;
+    });
+  }, [filtered]);
+
   return (
     <>
       <div
@@ -263,32 +324,50 @@ export function Select({
       >
         <div className="flex-1 flex items-center gap-1 overflow-hidden min-w-0">
           {isMultiple ? (
-            selectedValues.length > 0 ? (
-              <div className="flex flex-wrap gap-1">
-                {selectedValues.map((v) => (
-                  <span
-                    key={String(v)}
-                    className="inline-flex items-center gap-0.5 bg-black/[0.04] dark:bg-white/[0.08] text-xs rounded px-1.5 py-0.5"
+            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
+              {selectedValues.map((v) => (
+                <span
+                  key={String(v)}
+                  className="inline-flex items-center gap-0.5 bg-black/[0.04] dark:bg-white/[0.08] text-xs rounded px-1.5 py-0.5"
+                >
+                  {getLabel(v)}
+                  <button
+                    type="button"
+                    className="cursor-pointer hover:text-red-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSelect(v);
+                    }}
                   >
-                    {getLabel(v)}
-                    <button
-                      type="button"
-                      className="cursor-pointer hover:text-red-500"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSelect(v);
-                      }}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <span className="text-[var(--text-muted)] truncate">
-                {placeholder}
-              </span>
-            )
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+              {showSearch ? (
+                <input
+                  ref={inputRef}
+                  className="min-w-16 flex-1 bg-transparent py-0.5 text-sm outline-none placeholder:text-[var(--text-muted)]"
+                  placeholder={
+                    selectedValues.length === 0 ? placeholder : undefined
+                  }
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    if (!open) setOpen(true);
+                  }}
+                  onKeyDown={handleSearchKeyDown}
+                  onClick={(e) => e.stopPropagation()}
+                  onFocus={() => {
+                    if (!open) setOpen(true);
+                  }}
+                  disabled={disabled}
+                />
+              ) : selectedValues.length === 0 ? (
+                <span className="text-[var(--text-muted)] truncate">
+                  {placeholder}
+                </span>
+              ) : null}
+            </div>
           ) : hasValue ? (
             <span className="truncate text-[var(--text-primary)]">
               {getLabel(value as string | number)}
@@ -349,7 +428,7 @@ export function Select({
             )}
             {...getFloatingProps()}
           >
-            {showSearch ? (
+            {showSearch && !isMultiple ? (
               <div className="p-2 border-b border-black/[0.06] dark:border-white/[0.08]">
                 <div className="flex items-center gap-1.5 px-2 py-1 bg-black/[0.03] dark:bg-white/[0.04] rounded">
                   <Search className="h-3.5 w-3.5 text-[var(--text-muted)]" />
@@ -359,6 +438,7 @@ export function Select({
                     placeholder="搜索..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={handleSearchKeyDown}
                   />
                 </div>
               </div>
