@@ -170,6 +170,7 @@ export function Select({
       if (disabled) return;
       setOpen(v);
       if (!v) setSearch("");
+      if (v && virtual) setScrollTop(0);
     },
     placement: "bottom-start",
     middleware: [
