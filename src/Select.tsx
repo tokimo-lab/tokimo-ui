@@ -16,6 +16,7 @@ import { Check, ChevronDown, Search, X } from "lucide-react";
 import React, {
   type KeyboardEvent,
   type ReactNode,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -68,6 +69,8 @@ export interface SelectProps {
   optionFilterProp?: string;
   /** Field names customization */
   fieldNames?: { label?: string; value?: string };
+  /** Enable virtual scrolling for large option lists */
+  virtual?: boolean;
   /** Children (Select.Option pattern) */
   children?: ReactNode;
 }
@@ -96,6 +99,7 @@ export function Select({
   style,
   className,
   popupClassName,
+  virtual = false,
   children,
 }: SelectProps) {
   const isMultiple = mode === "multiple" || mode === "tags";
@@ -109,6 +113,32 @@ export function Select({
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [scrollTop, setScrollTop] = useState(0);
+
+  // Virtual scroll constants
+  const ITEM_HEIGHT = 32;
+  const MAX_HEIGHT = 240; // max-h-60
+  const OVERSCAN = 5;
+
+  const handleVirtualScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      if (virtual) setScrollTop(e.currentTarget.scrollTop);
+    },
+    [virtual],
+  );
+
+  // Scroll active item into view (for keyboard navigation)
+  useEffect(() => {
+    if (!virtual || activeIndex === null || !scrollContainerRef.current) return;
+    const top = activeIndex * ITEM_HEIGHT;
+    const container = scrollContainerRef.current;
+    if (top < container.scrollTop) {
+      container.scrollTop = top;
+    } else if (top + ITEM_HEIGHT > container.scrollTop + MAX_HEIGHT) {
+      container.scrollTop = top + ITEM_HEIGHT - MAX_HEIGHT;
+    }
+  }, [activeIndex, virtual]);
 
   const childOptions = useMemo(() => {
     if (options.length > 0) return options;
@@ -309,7 +339,11 @@ export function Select({
       }
       return filtered[current] ? current : null;
     });
-  }, [filtered]);
+    if (virtual && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+      setScrollTop(0);
+    }
+  }, [filtered, virtual]);
 
   return (
     <>
@@ -454,13 +488,28 @@ export function Select({
               </div>
             ) : null}
             <div
+              ref={scrollContainerRef}
               className="max-h-60 overflow-y-auto py-1"
               style={{ scrollbarWidth: "thin" }}
+              onScroll={handleVirtualScroll}
             >
               {filtered.length === 0 ? (
                 <div className="px-3 py-4 text-center text-sm text-[var(--text-muted)]">
                   {notFoundContent ?? "无匹配选项"}
                 </div>
+              ) : virtual ? (
+                <VirtualList
+                  items={filtered}
+                  scrollTop={scrollTop}
+                  itemHeight={ITEM_HEIGHT}
+                  maxHeight={MAX_HEIGHT}
+                  overscan={OVERSCAN}
+                  listRef={listRef}
+                  activeIndex={activeIndex}
+                  isSelected={isSelected}
+                  getItemProps={getItemProps}
+                  handleSelect={handleSelect}
+                />
               ) : (
                 filtered.map((opt, i) => {
                   const selected = isSelected(opt.value);
@@ -498,6 +547,75 @@ export function Select({
         </FloatingPortal>
       ) : null}
     </>
+  );
+}
+
+function VirtualList({
+  items,
+  scrollTop,
+  itemHeight,
+  maxHeight,
+  overscan,
+  listRef,
+  activeIndex,
+  isSelected,
+  getItemProps,
+  handleSelect,
+}: {
+  items: SelectOption[];
+  scrollTop: number;
+  itemHeight: number;
+  maxHeight: number;
+  overscan: number;
+  listRef: React.MutableRefObject<Array<HTMLElement | null>>;
+  activeIndex: number | null;
+  isSelected: (v: string | number) => boolean;
+  // biome-ignore lint/suspicious/noExplicitAny: floating-ui compat
+  getItemProps: (props?: any) => Record<string, unknown>;
+  handleSelect: (v: string | number) => void;
+}) {
+  const totalHeight = items.length * itemHeight;
+  const visibleCount = Math.ceil(maxHeight / itemHeight);
+  const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
+  const endIndex = Math.min(
+    items.length,
+    startIndex + visibleCount + 2 * overscan,
+  );
+
+  return (
+    <div style={{ height: totalHeight, position: "relative" }}>
+      {items.slice(startIndex, endIndex).map((opt, localIdx) => {
+        const i = startIndex + localIdx;
+        const selected = isSelected(opt.value);
+        return (
+          <div
+            key={String(opt.value)}
+            ref={(node) => {
+              listRef.current[i] = node;
+            }}
+            className={cn(
+              "flex items-center gap-2 px-3 text-sm cursor-pointer transition-colors absolute inset-x-0",
+              selected
+                ? "text-[var(--accent)] bg-[var(--accent-subtle)]"
+                : "text-[var(--text-primary)]",
+              !selected &&
+                activeIndex === i &&
+                "bg-black/[0.04] dark:bg-white/[0.06]",
+              opt.disabled && "opacity-50 cursor-not-allowed",
+            )}
+            style={{ height: itemHeight, top: i * itemHeight }}
+            {...getItemProps({
+              onClick: () => {
+                if (!opt.disabled) handleSelect(opt.value);
+              },
+            })}
+          >
+            <span className="flex-1 truncate">{opt.label}</span>
+            {selected ? <Check className="h-4 w-4 shrink-0" /> : null}
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
