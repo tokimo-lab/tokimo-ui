@@ -28,6 +28,8 @@ export interface SelectOption {
   label: ReactNode;
   value: string | number;
   disabled?: boolean;
+  /** Label shown in selected tags. Falls back to `label` if not set. */
+  tagLabel?: ReactNode;
 }
 
 export interface SelectProps {
@@ -319,8 +321,14 @@ export function Select({
   };
 
   // Display
-  const getLabel = (v: string | number) =>
-    childOptions.find((o) => o.value === v)?.label ?? v;
+  const getLabel = (v: string | number) => {
+    const opt = childOptions.find((o) => o.value === v);
+    return opt?.label ?? v;
+  };
+  const getTagLabel = (v: string | number) => {
+    const opt = childOptions.find((o) => o.value === v);
+    return opt?.tagLabel ?? opt?.label ?? v;
+  };
 
   const hasValue = isMultiple
     ? selectedValues.length > 0
@@ -374,7 +382,7 @@ export function Select({
                   key={String(v)}
                   className="inline-flex items-center gap-0.5 bg-black/[0.04] dark:bg-white/[0.08] text-xs rounded px-1.5 py-0.5"
                 >
-                  {getLabel(v)}
+                  {getTagLabel(v)}
                   <button
                     type="button"
                     className="cursor-pointer hover:text-red-500"
