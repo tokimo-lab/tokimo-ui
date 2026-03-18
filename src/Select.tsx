@@ -16,7 +16,6 @@ import { Check, ChevronDown, Search, X } from "lucide-react";
 import React, {
   type KeyboardEvent,
   type ReactNode,
-  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -116,19 +115,11 @@ export function Select({
   const listRef = useRef<Array<HTMLElement | null>>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [scrollTop, setScrollTop] = useState(0);
 
   // Virtual scroll constants
   const ITEM_HEIGHT = 32;
   const MAX_HEIGHT = 240; // max-h-60
   const OVERSCAN = 5;
-
-  const handleVirtualScroll = useCallback(
-    (e: React.UIEvent<HTMLDivElement>) => {
-      if (virtual) setScrollTop(e.currentTarget.scrollTop);
-    },
-    [virtual],
-  );
 
   // Scroll active item into view (for keyboard navigation)
   useEffect(() => {
@@ -170,7 +161,6 @@ export function Select({
       if (disabled) return;
       setOpen(v);
       if (!v) setSearch("");
-      if (v && virtual) setScrollTop(0);
     },
     placement: "bottom-start",
     middleware: [
@@ -350,7 +340,6 @@ export function Select({
     });
     if (virtual && scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = 0;
-      setScrollTop(0);
     }
   }, [filtered, virtual]);
 
@@ -500,7 +489,6 @@ export function Select({
               ref={scrollContainerRef}
               className="max-h-60 overflow-y-auto py-1"
               style={{ scrollbarWidth: "thin" }}
-              onScroll={handleVirtualScroll}
             >
               {filtered.length === 0 ? (
                 <div className="px-3 py-4 text-center text-sm text-[var(--text-muted)]">
@@ -509,7 +497,7 @@ export function Select({
               ) : virtual ? (
                 <VirtualList
                   items={filtered}
-                  scrollTop={scrollTop}
+                  scrollContainerRef={scrollContainerRef}
                   itemHeight={ITEM_HEIGHT}
                   maxHeight={MAX_HEIGHT}
                   overscan={OVERSCAN}
@@ -561,7 +549,7 @@ export function Select({
 
 function VirtualList({
   items,
-  scrollTop,
+  scrollContainerRef,
   itemHeight,
   maxHeight,
   overscan,
@@ -572,7 +560,7 @@ function VirtualList({
   handleSelect,
 }: {
   items: SelectOption[];
-  scrollTop: number;
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   itemHeight: number;
   maxHeight: number;
   overscan: number;
@@ -583,6 +571,18 @@ function VirtualList({
   getItemProps: (props?: any) => Record<string, unknown>;
   handleSelect: (v: string | number) => void;
 }) {
+  const [scrollTop, setScrollTop] = useState(0);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    // Read initial DOM scrollTop (0 for fresh mount)
+    setScrollTop(container.scrollTop);
+    const onScroll = () => setScrollTop(container.scrollTop);
+    container.addEventListener("scroll", onScroll, { passive: true });
+    return () => container.removeEventListener("scroll", onScroll);
+  }, [scrollContainerRef]);
+
   const totalHeight = items.length * itemHeight;
   const visibleCount = Math.ceil(maxHeight / itemHeight);
   const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
