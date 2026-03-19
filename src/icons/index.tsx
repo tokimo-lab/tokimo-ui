@@ -54,6 +54,7 @@ import {
   Menu,
   MinusCircle,
   Moon,
+  Music,
   Palette,
   PauseCircle,
   Pencil,
@@ -226,6 +227,7 @@ export const BulbOutlined = withDefaultSize(Lightbulb, "BulbOutlined");
 export const LockOutlined = withDefaultSize(Lock, "LockOutlined");
 export const LogoutOutlined = withDefaultSize(LogOut, "LogoutOutlined");
 export const MoonOutlined = withDefaultSize(Moon, "MoonOutlined");
+export const MusicOutlined = withDefaultSize(Music, "MusicOutlined");
 export const SunOutlined = withDefaultSize(Sun, "SunOutlined");
 export const ApiOutlined = withDefaultSize(Plug, "ApiOutlined");
 export const PlusOutlined = withDefaultSize(Plus, "PlusOutlined");
