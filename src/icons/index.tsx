@@ -47,6 +47,7 @@ import {
   Info,
   LayoutDashboard,
   Lightbulb,
+  ListMusic,
   ListTodo,
   Loader2,
   Lock,
@@ -207,6 +208,10 @@ export const DashboardOutlined = withDefaultSize(
 );
 export const BarChartOutlined = withDefaultSize(BarChart3, "BarChartOutlined");
 export const ListTodoOutlined = withDefaultSize(ListTodo, "ListTodoOutlined");
+export const ListMusicOutlined = withDefaultSize(
+  ListMusic,
+  "ListMusicOutlined",
+);
 export const PaletteOutlined = withDefaultSize(Palette, "PaletteOutlined");
 
 /* ─── Operation Icons ─── */
