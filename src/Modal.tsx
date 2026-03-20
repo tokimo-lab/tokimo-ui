@@ -9,6 +9,7 @@ import {
 import { createPortal } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { Button } from "./Button";
+import { pushEscapeHandler, removeEscapeHandler } from "./escape-stack";
 import { cn } from "./utils";
 
 /* ─── ScaledModal size presets ─── */
@@ -274,14 +275,12 @@ export function Modal({
     }
   }, [visible, animClass]);
 
-  // Keyboard handler
+  // Keyboard handler — uses global escape stack so only the topmost overlay closes
   useEffect(() => {
     if (!visible || !keyboard) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCancel?.();
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    const handler = () => onCancel?.();
+    pushEscapeHandler(handler);
+    return () => removeEscapeHandler(handler);
   }, [visible, keyboard, onCancel]);
 
   // Body scroll lock

@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { pushEscapeHandler, removeEscapeHandler } from "./escape-stack";
 import { cn } from "./utils";
 
 export interface DrawerProps {
@@ -123,13 +124,12 @@ export function Drawer({
     }
   }, [open, mounted, visible]);
 
+  // Uses global escape stack so only the topmost overlay closes
   useEffect(() => {
     if (!open || !keyboard) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose?.();
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    const handler = () => onClose?.();
+    pushEscapeHandler(handler);
+    return () => removeEscapeHandler(handler);
   }, [open, keyboard, onClose]);
 
   useEffect(() => {
