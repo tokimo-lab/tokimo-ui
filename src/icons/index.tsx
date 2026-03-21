@@ -4,9 +4,9 @@
  * matching antd icon behavior. Explicit size/className props can still override.
  *
  * Usage:
- *   import { DeleteOutlined, EditOutlined } from "@acme/components/icons";
+ *   import { DeleteOutlined, EditOutlined } from "@tokiomo/components/icons";
  *   // or
- *   import { DeleteOutlined } from "@acme/components";
+ *   import { DeleteOutlined } from "@tokiomo/components";
  */
 
 import {

@@ -1,5 +1,5 @@
 /**
- * @acme/components - 通用 UI 组件库
+ * @tokiomo/components - 通用 UI 组件库
  *
  * 此包包含与业务逻辑无关的通用 UI 组件，可在多个应用间复用。
  */
