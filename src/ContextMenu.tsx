@@ -2,6 +2,7 @@ import {
   type ReactNode,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -53,28 +54,26 @@ function MenuPanel({
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Adjust position to keep inside viewport
+  // Adjust position to keep inside viewport (sync before paint to avoid flash)
   const [pos, setPos] = useState({ x, y });
 
-  useEffect(() => {
-    if (!panelRef.current || !visible) return;
-    const el = panelRef.current;
-    const rect = el.getBoundingClientRect();
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
+  useLayoutEffect(() => {
     let nx = x;
     let ny = y;
-    if (nx + rect.width > vw - 8) nx = vw - rect.width - 8;
-    if (ny + rect.height > vh - 8) ny = vh - rect.height - 8;
-    if (nx < 8) nx = 8;
-    if (ny < 8) ny = 8;
+    if (panelRef.current && visible) {
+      const rect = panelRef.current.getBoundingClientRect();
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      if (nx + rect.width > vw - 8) nx = vw - rect.width - 8;
+      if (ny + rect.height > vh - 8) ny = vh - rect.height - 8;
+      if (nx < 8) nx = 8;
+      if (ny < 8) ny = 8;
+    }
     setPos({ x: nx, y: ny });
   }, [x, y, visible]);
 
-  // Sync position when x/y changes (new right-click)
-  useEffect(() => {
-    setPos({ x, y });
-  }, [x, y]);
+  const originX = pos.x < x ? "right" : "left";
+  const originY = pos.y < y ? "bottom" : "top";
 
   // Dismiss on outside click / scroll / escape
   useEffect(() => {
@@ -104,7 +103,11 @@ function MenuPanel({
       style={{ position: "fixed", top: pos.y, left: pos.x, zIndex: 9999 }}
       className={cn(
         "min-w-[160px] rounded-xl border shadow-2xl overflow-hidden",
-        "transition-[opacity,transform] duration-150 ease-out origin-top-left",
+        "transition-[opacity,transform] duration-150 ease-out",
+        originY === "top" && originX === "left" && "origin-top-left",
+        originY === "top" && originX === "right" && "origin-top-right",
+        originY === "bottom" && originX === "left" && "origin-bottom-left",
+        originY === "bottom" && originX === "right" && "origin-bottom-right",
         visible
           ? "opacity-100 scale-100"
           : "opacity-0 scale-95 pointer-events-none",

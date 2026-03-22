@@ -75,6 +75,12 @@ export type { PopoverProps } from "./Popover";
 export { Popover } from "./Popover";
 export type { ProgressProps } from "./Progress";
 export { Progress } from "./Progress";
+export type {
+  ScrollNavItem,
+  ScrollNavProps,
+  ScrollNavSectionProps,
+} from "./ScrollNav";
+export { ScrollNav } from "./ScrollNav";
 export type { SegmentedToggleProps } from "./SegmentedToggle";
 export { SegmentedToggle } from "./SegmentedToggle";
 export type { SelectOption, SelectProps } from "./Select";
