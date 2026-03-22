@@ -27,18 +27,18 @@
   "dependencies": {
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
-    "@floating-ui/react": "^0.27.6",
-    "lucide-react": "^0.511.0",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "@floating-ui/react": "^0.27.19",
+    "lucide-react": "^0.577.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
-    "@types/react": "^19.2.3",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "typescript": "^5.6.2"
+    "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   }
 }
