@@ -73,6 +73,8 @@ export type { PopconfirmProps } from "./Popconfirm";
 export { Popconfirm } from "./Popconfirm";
 export type { PopoverProps } from "./Popover";
 export { Popover } from "./Popover";
+export type { PosterCardProps } from "./PosterCard";
+export { PosterCard } from "./PosterCard";
 export type { ProgressProps } from "./Progress";
 export { Progress } from "./Progress";
 export type {
