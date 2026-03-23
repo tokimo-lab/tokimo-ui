@@ -69,6 +69,8 @@ export type { ConfirmConfig, ModalProps, ScaledModalSize } from "./Modal";
 export { Modal } from "./Modal";
 export type { PaginationProps } from "./Pagination";
 export { Pagination } from "./Pagination";
+export type { PathBarProps } from "./PathBar";
+export { PathBar } from "./PathBar";
 export type { PopconfirmProps } from "./Popconfirm";
 export { Popconfirm } from "./Popconfirm";
 export type { PopoverProps } from "./Popover";
