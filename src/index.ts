@@ -66,7 +66,7 @@ export type { MenuItem as MenuItemType, MenuProps } from "./Menu";
 export { Menu } from "./Menu";
 export type { ConfirmConfig, ModalProps, ScaledModalSize } from "./Modal";
 // ─── Feedback / Navigation ───
-export { Modal } from "./Modal";
+export { Modal, ModalContainerContext } from "./Modal";
 export type { PaginationProps } from "./Pagination";
 export { Pagination } from "./Pagination";
 export type { PathBarProps } from "./PathBar";
@@ -90,6 +90,8 @@ export { SegmentedToggle } from "./SegmentedToggle";
 export type { SelectOption, SelectProps } from "./Select";
 // ─── Complex components ───
 export { Select } from "./Select";
+export type { SettingsMenuItem, SettingsMenuProps } from "./SettingsMenu";
+export { SettingsMenu } from "./SettingsMenu";
 export type { SkeletonProps } from "./Skeleton";
 export { Skeleton } from "./Skeleton";
 export type { SpinProps } from "./Spin";

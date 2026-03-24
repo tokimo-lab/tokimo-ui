@@ -217,7 +217,7 @@ export function Dropdown({
             <div
               style={transitionStyles}
               className={cn(
-                "rounded-lg backdrop-blur-xl border shadow-lg ring-1",
+                "rounded-lg backdrop-blur-xl border shadow-lg ring-1 select-none",
                 "bg-white/90 border-black/[0.06] ring-black/5",
                 "dark:bg-[rgba(15,15,25,0.9)] dark:border-white/[0.08] dark:shadow-black/40 dark:ring-white/5",
               )}

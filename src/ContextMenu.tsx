@@ -45,12 +45,15 @@ function MenuPanel({
   y,
   onClose,
   visible,
+  bottomAnchor,
 }: {
   items: ContextMenuItem[];
   x: number;
   y: number;
   onClose: () => void;
   visible: boolean;
+  /** When true, y is the bottom edge — menu grows upward */
+  bottomAnchor?: boolean;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -64,13 +67,14 @@ function MenuPanel({
       const rect = panelRef.current.getBoundingClientRect();
       const vw = window.innerWidth;
       const vh = window.innerHeight;
+      if (bottomAnchor) ny = y - rect.height;
       if (nx + rect.width > vw - 8) nx = vw - rect.width - 8;
       if (ny + rect.height > vh - 8) ny = vh - rect.height - 8;
       if (nx < 8) nx = 8;
       if (ny < 8) ny = 8;
     }
     setPos({ x: nx, y: ny });
-  }, [x, y, visible]);
+  }, [x, y, visible, bottomAnchor]);
 
   const originX = pos.x < x ? "right" : "left";
   const originY = pos.y < y ? "bottom" : "top";
@@ -100,9 +104,15 @@ function MenuPanel({
   return createPortal(
     <div
       ref={panelRef}
-      style={{ position: "fixed", top: pos.y, left: pos.x, zIndex: 9999 }}
+      style={{
+        position: "fixed",
+        top: pos.y,
+        left: pos.x,
+        zIndex: 9999,
+        borderRadius: "var(--window-radius, 12px)",
+      }}
       className={cn(
-        "min-w-[160px] rounded-xl border shadow-2xl overflow-hidden",
+        "min-w-[160px] border shadow-2xl overflow-hidden",
         "transition-[opacity,transform] duration-150 ease-out",
         originY === "top" && originX === "left" && "origin-top-left",
         originY === "top" && originX === "right" && "origin-top-right",
@@ -167,7 +177,7 @@ function MenuPanel({
         })}
       </div>
     </div>,
-    document.body,
+    document.fullscreenElement ?? document.body,
   );
 }
 
@@ -210,12 +220,24 @@ export function ContextMenu({ items, children, className }: ContextMenuProps) {
 
 /* ─── Hook variant for imperative / table-row usage ─── */
 
+interface OpenAtOptions {
+  /** When true, y is treated as the bottom edge — menu grows upward */
+  bottomAnchor?: boolean;
+}
+
 interface ContextMenuTrigger {
   /**
    * Call from onContextMenu handler.
    * Pass items dynamically so each row can have its own menu.
    */
   open: (e: React.MouseEvent, items: ContextMenuItem[]) => void;
+  /** Open at explicit coordinates (e.g. anchored to an element). */
+  openAt: (
+    x: number,
+    y: number,
+    items: ContextMenuItem[],
+    options?: OpenAtOptions,
+  ) => void;
   /** Menu portal — render this once near the root of your component */
   contextMenu: ReactNode;
 }
@@ -227,6 +249,7 @@ export function useContextMenu(): ContextMenuTrigger {
     y: 0,
   });
   const [items, setItems] = useState<ContextMenuItem[]>([]);
+  const [bottomAnchor, setBottomAnchor] = useState(false);
 
   const close = useCallback(() => {
     setState((s) => ({ ...s, visible: false }));
@@ -237,7 +260,22 @@ export function useContextMenu(): ContextMenuTrigger {
       e.preventDefault();
       e.stopPropagation();
       setItems(nextItems);
+      setBottomAnchor(false);
       setState({ visible: true, x: e.clientX, y: e.clientY });
+    },
+    [],
+  );
+
+  const openAt = useCallback(
+    (
+      x: number,
+      y: number,
+      nextItems: ContextMenuItem[],
+      options?: OpenAtOptions,
+    ) => {
+      setItems(nextItems);
+      setBottomAnchor(options?.bottomAnchor ?? false);
+      setState({ visible: true, x, y });
     },
     [],
   );
@@ -249,8 +287,9 @@ export function useContextMenu(): ContextMenuTrigger {
       y={state.y}
       visible={state.visible}
       onClose={close}
+      bottomAnchor={bottomAnchor}
     />
   );
 
-  return { open, contextMenu };
+  return { open, openAt, contextMenu };
 }

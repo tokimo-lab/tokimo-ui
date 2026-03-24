@@ -1,7 +1,10 @@
 import { X } from "lucide-react";
 import {
   type CSSProperties,
+  createContext,
   type ReactNode,
+  type RefObject,
+  useContext,
   useEffect,
   useRef,
   useState,
@@ -11,6 +14,11 @@ import { createRoot } from "react-dom/client";
 import { Button } from "./Button";
 import { pushEscapeHandler, removeEscapeHandler } from "./escape-stack";
 import { cn } from "./utils";
+
+/* ─── Modal container context ─── */
+/** When set, Modal portals into this element with absolute positioning instead of fullscreen. */
+export const ModalContainerContext =
+  createContext<RefObject<HTMLElement | null> | null>(null);
 
 /* ─── ScaledModal size presets ─── */
 export type ScaledModalSize =
@@ -81,6 +89,8 @@ export interface ModalProps {
   centered?: boolean;
   /** After open animation callback */
   afterOpenChange?: (open: boolean) => void;
+  /** Portal target — when provided the modal renders inside this element with absolute positioning instead of fullscreen */
+  container?: RefObject<HTMLElement | null>;
 }
 
 const THIN_SCROLLBAR: CSSProperties = {
@@ -97,13 +107,13 @@ interface SizeConfig {
 
 const SIZE_CONFIG: Record<ScaledModalSize, SizeConfig> = {
   full: {
-    width: "100vw",
+    width: "100%",
     dialogStyle: {
-      maxWidth: "100vw",
+      maxWidth: "100%",
       margin: 0,
       padding: 0,
       borderRadius: 0,
-      height: "100vh",
+      height: "100%",
     },
     bodyStyle: {
       flex: 1,
@@ -119,10 +129,10 @@ const SIZE_CONFIG: Record<ScaledModalSize, SizeConfig> = {
     },
   },
   "almost-full": {
-    width: "calc(100vw - 48px)",
+    width: "calc(100% - 48px)",
     dialogStyle: {
-      maxWidth: "calc(100vw - 48px)",
-      height: "calc(100vh - 48px)",
+      maxWidth: "calc(100% - 48px)",
+      height: "calc(100% - 48px)",
     },
     bodyStyle: {
       flex: 1,
@@ -138,21 +148,21 @@ const SIZE_CONFIG: Record<ScaledModalSize, SizeConfig> = {
     },
   },
   large: {
-    width: "90vw",
+    width: "90%",
     dialogStyle: { maxWidth: 1400 },
     bodyStyle: {
-      maxHeight: "calc(100vh - 200px)",
+      maxHeight: "calc(100% - 200px)",
       overflowY: "auto",
       overflowX: "hidden",
       ...THIN_SCROLLBAR,
     },
   },
-  /** 5% margin on all sides — 90vw × 90vh, no outer scrollbar */
+  /** 5% margin on all sides — 90% × 90%, no outer scrollbar */
   inset: {
-    width: "90vw",
+    width: "90%",
     dialogStyle: {
-      maxWidth: "90vw",
-      height: "90vh",
+      maxWidth: "90%",
+      height: "90%",
     },
     bodyStyle: {
       flex: 1,
@@ -165,12 +175,12 @@ const SIZE_CONFIG: Record<ScaledModalSize, SizeConfig> = {
       height: "100%",
     },
   },
-  /** 15% margin top/bottom — 90vw × at-most 70vh, centered; left-right grid forms pass style={{ height: "70vh" }} */
+  /** 15% margin top/bottom — 90% × at-most 70%, centered; left-right grid forms pass style={{ height: "70%" }} */
   form: {
-    width: "90vw",
+    width: "90%",
     dialogStyle: {
-      maxWidth: "90vw",
-      maxHeight: "70vh",
+      maxWidth: "90%",
+      maxHeight: "70%",
     },
     bodyStyle: {
       flex: 1,
@@ -219,10 +229,13 @@ export function Modal({
   wrapClassName,
   centered = false,
   afterOpenChange,
+  container,
   children,
 }: ModalProps) {
   const destroyOnClose = destroyOnCloseProp ?? destroyOnHidden ?? false;
   const contentRef = useRef<HTMLDivElement>(null);
+  const ctxContainer = useContext(ModalContainerContext);
+  const resolvedContainer = container ?? ctxContainer;
 
   /* Track whether mousedown started on the mask itself (not on dialog content) */
   const mouseDownOnMask = useRef(false);
@@ -283,16 +296,16 @@ export function Modal({
     return () => removeEscapeHandler(handler);
   }, [visible, keyboard, onCancel]);
 
-  // Body scroll lock
+  // Body scroll lock — skip when rendering inside a container
   useEffect(() => {
-    if (visible) {
+    if (visible && !resolvedContainer?.current) {
       const prev = document.body.style.overflow;
       document.body.style.overflow = "hidden";
       return () => {
         document.body.style.overflow = prev;
       };
     }
-  }, [visible]);
+  }, [visible, resolvedContainer]);
 
   if (!visible && destroyOnClose) return null;
   if (!visible) return null;
@@ -324,14 +337,21 @@ export function Modal({
 
   const renderedFooter = footer === null ? null : (footer ?? defaultFooter);
 
+  const isInline = !!resolvedContainer?.current;
+  const portalTarget = resolvedContainer?.current ?? document.body;
+
   return createPortal(
     // biome-ignore lint/a11y/noStaticElementInteractions: overlay mask click-to-dismiss
     <div
       className={cn(
-        "fixed inset-0 flex justify-center transition-colors duration-200",
-        size === "inset" || size === "form" || centered
-          ? "items-center overflow-hidden"
-          : "items-start overflow-y-auto",
+        isInline
+          ? "absolute inset-0 flex justify-center transition-colors duration-200"
+          : "fixed inset-0 flex justify-center transition-colors duration-200",
+        isInline
+          ? "items-start overflow-y-auto"
+          : size === "inset" || size === "form" || centered
+            ? "items-center overflow-hidden"
+            : "items-start overflow-y-auto",
         animClass ? "bg-black/35 backdrop-blur-sm" : "bg-black/0",
         size === "full" && "items-stretch",
         wrapClassName,
@@ -362,16 +382,23 @@ export function Modal({
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 translate-y-4",
           size === "full" && "!rounded-none",
-          !centered &&
-            size !== "full" &&
-            size !== "inset" &&
-            size !== "form" &&
-            "mt-[10vh] mb-[10vh]",
+          isInline
+            ? size !== "full" && "mt-[5%] mb-[5%]"
+            : !centered &&
+                size !== "full" &&
+                size !== "inset" &&
+                size !== "form" &&
+                "mt-[10vh] mb-[10vh]",
           className,
         )}
         style={{
           width: resolvedWidth,
-          maxWidth: size === "default" ? "calc(100vw - 32px)" : undefined,
+          maxWidth:
+            size === "default"
+              ? isInline
+                ? "calc(100% - 32px)"
+                : "calc(100vw - 32px)"
+              : undefined,
           ...resolvedDialogStyle,
           ...style,
         }}
@@ -419,7 +446,7 @@ export function Modal({
         ) : null}
       </div>
     </div>,
-    document.body,
+    portalTarget,
   );
 }
 
