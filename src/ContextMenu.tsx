@@ -110,6 +110,8 @@ function MenuPanel({
         left: pos.x,
         zIndex: 9999,
         borderRadius: "var(--window-radius, 12px)",
+        backdropFilter: "blur(var(--window-blur, 24px))",
+        WebkitBackdropFilter: "blur(var(--window-blur, 24px))",
       }}
       className={cn(
         "min-w-[160px] border shadow-2xl overflow-hidden",
@@ -122,9 +124,9 @@ function MenuPanel({
           ? "opacity-100 scale-100"
           : "opacity-0 scale-95 pointer-events-none",
         // glass morphism — light
-        "bg-white/85 backdrop-blur-2xl border-black/[0.07] ring-1 ring-black/5",
+        "bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] border-black/[0.07] ring-1 ring-black/5",
         // dark
-        "dark:bg-[rgba(18,18,28,0.88)] dark:border-white/[0.09] dark:ring-white/[0.06] dark:shadow-black/60",
+        "dark:bg-[rgba(18,18,28,calc(var(--window-opacity,85)/100))] dark:border-white/[0.09] dark:ring-white/[0.06] dark:shadow-black/60",
       )}
     >
       <div className="py-1.5">
