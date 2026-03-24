@@ -83,6 +83,8 @@ export interface FormInstance<T extends FieldValues = FieldValues> {
   _rerender: () => void;
   _watchers: Map<string, Set<(v: unknown) => void>>;
   _notifyWatchers: (name: string, value: unknown) => void;
+  /** Internal — onValuesChange callback set by Form component */
+  _onValuesChange?: (changedField: string, allValues: T) => void;
 }
 
 export function useForm<T extends FieldValues = FieldValues>(
@@ -285,6 +287,8 @@ export interface FormProps
   }) => void;
   /** Required mark display */
   requiredMark?: boolean;
+  /** Called when any field value changes */
+  onValuesChange?: (changedField: string, allValues: FieldValues) => void;
   /** Form size */
   size?: "small" | "middle" | "large";
   children?: ReactNode;
@@ -299,6 +303,7 @@ export function Form({
   onFinish,
   onFinishFailed,
   requiredMark: _requiredMark,
+  onValuesChange,
   size: _size,
   className,
   children,
@@ -320,6 +325,9 @@ export function Form({
       }
     }
   }, []);
+
+  // Sync onValuesChange callback to form instance
+  form._onValuesChange = onValuesChange;
 
   return (
     <FormContext.Provider value={form}>
@@ -502,6 +510,7 @@ Form.Item = function FormItem({
           (form._values.current as Record<string, unknown>)[name] = newValue;
           form._touched.add(name);
           form._notifyWatchers(name, newValue);
+          form._onValuesChange?.(name, { ...form._values.current });
           form._rerender();
           // Call original handler
           const originalHandler = (childEl.props as Record<string, unknown>)[
