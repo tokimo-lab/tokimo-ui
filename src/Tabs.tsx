@@ -96,7 +96,7 @@ export function Tabs({
   return (
     <div className={className}>
       {/* Tab Bar */}
-      <div className="flex items-center border-b border-black/[0.06] dark:border-white/[0.08]">
+      <div className="flex items-center border-b border-black/[0.06] dark:border-white/[0.08] select-none">
         <div
           ref={tabBarRef}
           className={cn(

@@ -77,7 +77,7 @@ export function Menu({
   };
 
   return (
-    <nav className={cn("w-full", className)} style={style}>
+    <nav className={cn("w-full select-none", className)} style={style}>
       <ul className="list-none p-0 m-0">
         {items.map((item) => (
           <MenuItemRenderer

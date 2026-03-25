@@ -97,7 +97,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
     return (
       <div
         className={cn(
-          "inline-flex items-center rounded-md border bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(18,18,28,calc(var(--window-opacity,85)/100))] transition-colors focus-within:border-[var(--accent)] focus-within:ring-1 focus-within:ring-[var(--accent)] dark:focus-within:border-[var(--accent)]",
+          "inline-flex items-center rounded-md border bg-[var(--input-bg)] transition-colors focus-within:border-[var(--accent)] focus-within:ring-1 focus-within:ring-[var(--accent)] dark:focus-within:border-[var(--accent)]",
           status === "error"
             ? "border-red-500"
             : status === "warning"
@@ -107,11 +107,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
           sizeMap[size],
           className,
         )}
-        style={{
-          backdropFilter: "blur(var(--window-blur, 8px))",
-          WebkitBackdropFilter: "blur(var(--window-blur, 8px))",
-          ...style,
-        }}
+        style={style}
       >
         {addonBefore ? (
           <span className="px-2 text-[var(--text-muted)] border-r border-black/[0.08] dark:border-white/[0.1] bg-black/[0.03] dark:bg-white/[0.05] h-full flex items-center rounded-l-md text-sm">

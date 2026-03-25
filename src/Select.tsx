@@ -348,7 +348,7 @@ export function Select({
       <div
         ref={refs.setReference}
         className={cn(
-          "inline-flex items-center gap-1 px-2 rounded-md border bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(18,18,28,calc(var(--window-opacity,85)/100))] cursor-pointer transition-colors",
+          "inline-flex items-center gap-1 px-2 rounded-md border bg-[var(--input-bg)] cursor-pointer transition-colors",
           open
             ? "border-[var(--accent)] ring-1 ring-[var(--accent)]"
             : status === "error"
@@ -362,8 +362,6 @@ export function Select({
           className,
         )}
         style={{
-          backdropFilter: "blur(var(--window-blur, 8px))",
-          WebkitBackdropFilter: "blur(var(--window-blur, 8px))",
           ...style,
         }}
         {...getReferenceProps()}

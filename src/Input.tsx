@@ -37,7 +37,7 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
   ({ size = "middle", prefix, suffix, status, className, ...rest }, ref) => (
     <div
       className={cn(
-        "inline-flex items-center gap-2 rounded-md border bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(18,18,28,calc(var(--window-opacity,85)/100))] transition-colors focus-within:border-[var(--accent)] focus-within:ring-1 focus-within:ring-[var(--accent)] dark:focus-within:border-[var(--accent)]",
+        "inline-flex items-center gap-2 rounded-md border bg-[var(--input-bg)] transition-colors focus-within:border-[var(--accent)] focus-within:ring-1 focus-within:ring-[var(--accent)] dark:focus-within:border-[var(--accent)]",
         status === "error"
           ? "border-red-500"
           : status === "warning"
@@ -46,10 +46,6 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
         sizeMap[size],
         className,
       )}
-      style={{
-        backdropFilter: "blur(var(--window-blur, 8px))",
-        WebkitBackdropFilter: "blur(var(--window-blur, 8px))",
-      }}
     >
       {prefix ? (
         <span className="text-[var(--text-muted)] shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
@@ -121,7 +117,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     <textarea
       ref={ref}
       className={cn(
-        "w-full rounded-md border bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(18,18,28,calc(var(--window-opacity,85)/100))] transition-colors focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] outline-none placeholder:text-[var(--text-muted)]",
+        "w-full rounded-md border bg-[var(--input-bg)] transition-colors focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] outline-none placeholder:text-[var(--text-muted)]",
         status === "error"
           ? "border-red-500"
           : status === "warning"
@@ -134,11 +130,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
             : "px-3 py-1.5 text-sm",
         className,
       )}
-      style={{
-        backdropFilter: "blur(var(--window-blur, 8px))",
-        WebkitBackdropFilter: "blur(var(--window-blur, 8px))",
-        ...style,
-      }}
+      style={style}
       {...rest}
     />
   ),

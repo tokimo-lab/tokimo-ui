@@ -245,7 +245,7 @@ function MenuList({
   onBack: () => void;
 }) {
   return (
-    <div>
+    <div className="select-none">
       {backPath !== null && (
         <button
           type="button"

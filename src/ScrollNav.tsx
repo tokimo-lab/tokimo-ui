@@ -119,7 +119,7 @@ function ScrollNavRoot({
   return (
     <div className={cn("flex", className)}>
       {/* Left nav rail */}
-      <nav className="shrink-0" style={{ width: navWidth }}>
+      <nav className="shrink-0 select-none" style={{ width: navWidth }}>
         <div className="flex flex-col gap-1 sticky top-0">
           {items.map((item) => {
             const Icon = item.icon;

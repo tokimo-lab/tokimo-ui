@@ -105,7 +105,7 @@ export function PathBar({
       <div
         ref={scrollRef}
         className={cn(
-          "flex items-center gap-0.5 min-w-0 overflow-x-auto text-sm",
+          "flex items-center gap-0.5 min-w-0 overflow-x-auto text-sm select-none",
           className,
         )}
         style={{ scrollbarWidth: "none" }}
@@ -131,7 +131,7 @@ export function PathBar({
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={submitEdit}
-          className="flex-1 min-w-0 h-full px-1 py-0.5 bg-transparent outline-none text-inherit font-mono text-sm"
+          className="flex-1 min-w-0 h-full px-1 py-0.5 bg-transparent outline-none text-inherit font-mono text-sm select-text"
         />
 
         {/* Suffix — always visible */}
@@ -146,7 +146,7 @@ export function PathBar({
     <div
       ref={scrollRef}
       className={cn(
-        "flex items-center gap-0.5 min-w-0 overflow-x-auto text-sm",
+        "flex items-center gap-0.5 min-w-0 overflow-x-auto text-sm select-none",
         className,
       )}
       style={{ scrollbarWidth: "none" }}
