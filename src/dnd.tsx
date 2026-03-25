@@ -22,12 +22,12 @@ export function DragHandle({
   return (
     <HolderOutlined
       className={cn(
-        "text-gray-400 touch-none",
+        "text-zinc-600 dark:text-zinc-400 touch-none",
         disabled
           ? "cursor-not-allowed opacity-30"
           : isDragging
             ? "cursor-grabbing"
-            : "cursor-grab hover:text-gray-600 dark:hover:text-gray-300",
+            : "cursor-grab hover:text-gray-600 dark:hover:text-zinc-300",
         className,
       )}
       {...props}

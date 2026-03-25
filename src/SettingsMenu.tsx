@@ -293,7 +293,7 @@ function MenuItem({
       )}
     >
       {item.icon && (
-        <span className="text-base text-gray-500 dark:text-gray-400 shrink-0">
+        <span className="text-base text-gray-500 dark:text-zinc-400 shrink-0">
           {item.icon}
         </span>
       )}
@@ -302,7 +302,7 @@ function MenuItem({
           {item.label}
         </div>
         {item.desc && (
-          <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-tight">
+          <div className="text-xs text-zinc-600 dark:text-gray-500 mt-0.5 leading-tight">
             {item.desc}
           </div>
         )}
@@ -310,7 +310,7 @@ function MenuItem({
       {(item.items || item.content !== undefined) && (
         <ChevronRight
           size={14}
-          className="shrink-0 text-gray-300 dark:text-gray-600 group-hover:text-gray-400 dark:group-hover:text-gray-500 transition-colors"
+          className="shrink-0 text-zinc-700 dark:text-gray-600 group-hover:text-zinc-600 dark:group-hover:text-gray-500 transition-colors"
         />
       )}
     </button>

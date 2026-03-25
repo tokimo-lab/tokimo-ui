@@ -348,7 +348,7 @@ export function Select({
       <div
         ref={refs.setReference}
         className={cn(
-          "inline-flex items-center gap-1 px-2 rounded-md border bg-white/70 dark:bg-white/[0.03] backdrop-blur-sm cursor-pointer transition-colors",
+          "inline-flex items-center gap-1 px-2 rounded-md border bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(18,18,28,calc(var(--window-opacity,85)/100))] cursor-pointer transition-colors",
           open
             ? "border-[var(--accent)] ring-1 ring-[var(--accent)]"
             : status === "error"
@@ -361,7 +361,11 @@ export function Select({
           sizeMap[size],
           className,
         )}
-        style={style}
+        style={{
+          backdropFilter: "blur(var(--window-blur, 8px))",
+          WebkitBackdropFilter: "blur(var(--window-blur, 8px))",
+          ...style,
+        }}
         {...getReferenceProps()}
       >
         <div className="flex-1 flex items-center gap-1 overflow-hidden min-w-0">
@@ -463,9 +467,14 @@ export function Select({
         <FloatingPortal>
           <div
             ref={refs.setFloating}
-            style={floatingStyles}
+            style={{
+              ...floatingStyles,
+              backdropFilter: "blur(var(--window-blur, 24px))",
+              WebkitBackdropFilter: "blur(var(--window-blur, 24px))",
+              borderRadius: "var(--window-radius, 8px)",
+            }}
             className={cn(
-              "z-[9999] rounded-md bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg overflow-hidden",
+              "z-[9999] bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(15,15,25,calc(var(--window-opacity,85)/100))] border border-black/[0.06] dark:border-white/[0.08] shadow-lg overflow-hidden",
               popupClassName,
             )}
             {...getFloatingProps()}

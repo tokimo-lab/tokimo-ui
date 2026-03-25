@@ -52,7 +52,7 @@ export const PosterCard = memo(function PosterCard({
           />
         ) : (
           (fallback ?? (
-            <div className="flex h-full items-center justify-center text-gray-400">
+            <div className="flex h-full items-center justify-center text-zinc-600 dark:text-zinc-400">
               <span className="text-3xl">🎬</span>
             </div>
           ))

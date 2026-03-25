@@ -106,9 +106,14 @@ export function Popover({
         <FloatingPortal>
           <div
             ref={refs.setFloating}
-            style={floatingStyles}
+            style={{
+              ...floatingStyles,
+              backdropFilter: "blur(var(--window-blur, 24px))",
+              WebkitBackdropFilter: "blur(var(--window-blur, 24px))",
+              borderRadius: "var(--window-radius, 10px)",
+            }}
             className={cn(
-              "z-[9999] rounded-lg bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg p-3 max-w-xs",
+              "z-[9999] bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(15,15,25,calc(var(--window-opacity,85)/100))] border border-black/[0.06] dark:border-white/[0.08] shadow-lg p-3 max-w-xs",
             )}
             {...getFloatingProps()}
           >
