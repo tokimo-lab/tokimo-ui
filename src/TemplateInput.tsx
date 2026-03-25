@@ -5,12 +5,12 @@ import {
   offset,
   shift,
   useFloating,
+  useMergeRefs,
 } from "@floating-ui/react";
 import {
   type ChangeEvent,
   forwardRef,
   type KeyboardEvent,
-  type MutableRefObject,
   useEffect,
   useRef,
   useState,
@@ -307,11 +307,7 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
     return (
       <div className="relative w-full">
         <input
-          ref={(el) => {
-            (inputRef as MutableRefObject<HTMLInputElement | null>).current =
-              el;
-            refs.setReference(el);
-          }}
+          ref={useMergeRefs([inputRef, refs.setReference])}
           value={value}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
