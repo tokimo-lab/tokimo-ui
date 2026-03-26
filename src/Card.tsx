@@ -46,41 +46,26 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-2xl relative overflow-hidden",
-        "bg-white/70 dark:bg-white/[0.04]",
-        "backdrop-blur-xl dark:backdrop-saturate-[120%]",
-        bordered
-          ? "border border-black/[0.06] dark:border-white/[0.08]"
-          : "shadow-sm",
+        "rounded-2xl overflow-hidden bg-surface-glass backdrop-blur-xl",
+        bordered ? "border border-border-glass" : "shadow-sm",
         hoverable && "transition-shadow hover:shadow-md cursor-pointer",
         className,
       )}
       {...rest}
     >
-      {/* Accent top line */}
-      <div
-        className="absolute top-0 left-0 right-1/2 h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, var(--accent, #10b981), transparent)",
-          opacity: "var(--card-top-line-opacity, 0.4)",
-        }}
-      />
       {cover ? (
         <div className="rounded-t-lg overflow-hidden">{cover}</div>
       ) : null}
       {hasHeader ? (
         <div
           className={cn(
-            "flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08]",
+            "flex items-center justify-between border-b border-border-glass",
             size === "small" ? "px-3 py-2" : "px-6 py-4",
           )}
           style={headStyle}
         >
           {title ? (
-            <div className="font-medium text-[var(--text-primary,#0f172a)]">
-              {title}
-            </div>
+            <div className="font-medium text-fg-primary">{title}</div>
           ) : null}
           {extra ? <div className="ml-auto">{extra}</div> : null}
         </div>
@@ -94,21 +79,21 @@ export function Card({
       >
         {loading ? (
           <div className="space-y-3">
-            <div className="h-4 bg-slate-200 dark:bg-white/10 rounded w-3/4" />
-            <div className="h-4 bg-slate-200 dark:bg-white/10 rounded w-1/2" />
-            <div className="h-4 bg-slate-200 dark:bg-white/10 rounded w-5/6" />
+            <div className="h-4 bg-[var(--bg-skeleton)] rounded w-3/4" />
+            <div className="h-4 bg-[var(--bg-skeleton)] rounded w-1/2" />
+            <div className="h-4 bg-[var(--bg-skeleton)] rounded w-5/6" />
           </div>
         ) : (
           children
         )}
       </div>
       {actions?.length ? (
-        <div className="flex border-t border-black/[0.06] dark:border-white/[0.08] divide-x divide-black/[0.06] dark:divide-white/[0.08]">
+        <div className="flex border-t border-border-glass divide-x divide-border-glass">
           {actions.map((action, i) => (
             <div
               // biome-ignore lint/suspicious/noArrayIndexKey: static action list
               key={i}
-              className="flex-1 flex items-center justify-center py-3 text-[var(--text-secondary,#475569)] hover:text-[var(--accent)] cursor-pointer transition-colors"
+              className="flex-1 flex items-center justify-center py-3 text-fg-secondary hover:text-accent cursor-pointer transition-colors"
             >
               {action}
             </div>

@@ -1,5 +1,12 @@
 import { ChevronDown, ChevronsUpDown, ChevronUp, Loader2 } from "lucide-react";
-import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Checkbox } from "./Checkbox";
 import { DragHandle, useDnd } from "./dnd";
 import { Empty } from "./Empty";
@@ -349,9 +356,21 @@ export function Table<T = Record<string, unknown>>({
   // Virtual scroll
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
+  const [containerH, setContainerH] = useState(0);
   const ROW_HEIGHT_MAP = { small: 33, middle: 41, large: 49 } as const;
   const rowHeight = itemHeight ?? ROW_HEIGHT_MAP[size];
   const OVERSCAN = 5;
+
+  // Measure container height after mount and on resize
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el || !virtual) return;
+    const update = () => setContainerH(el.clientHeight);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [virtual]);
 
   const handleVirtualScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
@@ -360,8 +379,8 @@ export function Table<T = Record<string, unknown>>({
     [],
   );
 
-  const containerH = scrollContainerRef.current?.clientHeight ?? 600;
-  const visibleCount = Math.ceil(containerH / rowHeight);
+  const effectiveContainerH = containerH || 600;
+  const visibleCount = Math.ceil(effectiveContainerH / rowHeight);
   const startIdx = virtual
     ? Math.max(0, Math.floor(scrollTop / rowHeight) - OVERSCAN)
     : 0;
