@@ -69,11 +69,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         if (normalized.key) {
           const existing = prev.find((t) => t.key === normalized.key);
           if (existing) {
-            // Clear old timer
-            const oldTimer = timers.current.get(existing.id);
-            if (oldTimer) clearTimeout(oldTimer);
-            timers.current.delete(existing.id);
-
             return prev.map((t) =>
               t.key === normalized.key
                 ? { ...t, id, type, content: normalized.content, duration }
@@ -93,7 +88,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         ];
       });
 
-      if (duration > 0) {
+      // Only set a timer if one isn't already running for this id.
+      // This prevents rapid duplicate errors from indefinitely extending
+      // the toast lifetime by repeatedly resetting the countdown.
+      if (duration > 0 && !timers.current.has(id)) {
         const timer = setTimeout(() => remove(id), duration * 1000);
         timers.current.set(id, timer);
       }

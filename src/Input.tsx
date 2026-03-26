@@ -34,7 +34,18 @@ const sizeMap = {
 };
 
 const BaseInput = forwardRef<HTMLInputElement, InputProps>(
-  ({ size = "middle", prefix, suffix, status, className, ...rest }, ref) => (
+  (
+    {
+      size = "middle",
+      prefix,
+      suffix,
+      status,
+      className,
+      autoComplete = "off",
+      ...rest
+    },
+    ref,
+  ) => (
     <div
       className={cn(
         "inline-flex items-center gap-2 rounded-md border bg-[var(--input-bg)] transition-colors focus-within:border-[var(--accent)] focus-within:ring-1 focus-within:ring-[var(--accent)] dark:focus-within:border-[var(--accent)]",
@@ -54,6 +65,7 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
       ) : null}
       <input
         ref={ref}
+        autoComplete={autoComplete}
         className="w-full min-w-0 bg-transparent outline-none placeholder:text-[var(--text-muted)] text-inherit"
         {...rest}
       />
@@ -78,11 +90,12 @@ export interface PasswordProps extends Omit<InputProps, "type" | "suffix"> {
 }
 
 export const Password = forwardRef<HTMLInputElement, PasswordProps>(
-  (props, ref) => {
+  ({ autoComplete = "new-password", ...props }, ref) => {
     const [visible, setVisible] = useState(false);
     return (
       <BaseInput
         ref={ref}
+        autoComplete={autoComplete}
         type={visible ? "text" : "password"}
         suffix={
           <button
