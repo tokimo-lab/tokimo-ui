@@ -4,6 +4,7 @@ import {
   createContext,
   type ReactNode,
   type RefObject,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -19,6 +20,16 @@ import { cn } from "./utils";
 /** When set, Modal portals into this element with absolute positioning instead of fullscreen. */
 export const ModalContainerContext =
   createContext<RefObject<HTMLElement | null> | null>(null);
+
+/* ─── Active window container tracking (for Modal.confirm) ─── */
+let activeModalContainerRef: RefObject<HTMLElement | null> | null = null;
+
+/** Called by FloatingWindow on pointer-down so that Modal.confirm renders inside the active window. */
+export function setActiveModalContainer(
+  ref: RefObject<HTMLElement | null> | null,
+) {
+  activeModalContainerRef = ref;
+}
 
 /* ─── ScaledModal size presets ─── */
 export type ScaledModalSize =
@@ -469,8 +480,12 @@ export interface ConfirmConfig {
 /**
  * Imperative confirm dialog.
  * Creates a temporary React root and renders a Modal.
+ * Automatically renders inside the active FloatingWindow when available.
  */
 Modal.confirm = (config: ConfirmConfig) => {
+  // Capture the active window container at call time
+  const containerRef = activeModalContainerRef;
+
   const container = document.createElement("div");
   document.body.appendChild(container);
 
@@ -485,35 +500,95 @@ Modal.confirm = (config: ConfirmConfig) => {
     const [open, setOpen] = useState(true);
     const [loading, setLoading] = useState(false);
     return (
-      <Modal
-        open={open}
-        title={config.title}
-        okText={config.okText ?? "确定"}
-        cancelText={config.cancelText ?? "取消"}
-        okButtonProps={config.okButtonProps}
-        confirmLoading={loading}
-        maskClosable={!loading}
-        onOk={async () => {
-          setLoading(true);
-          try {
-            await config.onOk?.();
+      <ModalContainerContext value={containerRef}>
+        <Modal
+          open={open}
+          title={config.title}
+          okText={config.okText ?? "确定"}
+          cancelText={config.cancelText ?? "取消"}
+          okButtonProps={config.okButtonProps}
+          confirmLoading={loading}
+          maskClosable={!loading}
+          onOk={async () => {
+            setLoading(true);
+            try {
+              await config.onOk?.();
+              setOpen(false);
+              setTimeout(destroy, 300);
+            } finally {
+              setLoading(false);
+            }
+          }}
+          onCancel={() => {
+            if (loading) return;
+            config.onCancel?.();
             setOpen(false);
             setTimeout(destroy, 300);
-          } finally {
-            setLoading(false);
-          }
-        }}
-        onCancel={() => {
-          if (loading) return;
-          config.onCancel?.();
-          setOpen(false);
-          setTimeout(destroy, 300);
-        }}
-      >
-        {config.content}
-      </Modal>
+          }}
+        >
+          {config.content}
+        </Modal>
+      </ModalContainerContext>
     );
   };
 
   root.render(<ConfirmDialog />);
 };
+
+/**
+ * Hook-based confirm dialog that inherits ModalContainerContext.
+ * Unlike Modal.confirm(), the dialog renders inside the current React tree
+ * so it appears within FloatingWindow when used in a window context.
+ *
+ * Usage:
+ *   const [confirmHolder, confirm] = useConfirm();
+ *   confirm({ title: "Delete?", onOk: () => ... });
+ *   return <>{confirmHolder}<div>...</div></>;
+ */
+export function useConfirm(): [ReactNode, (config: ConfirmConfig) => void] {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const configRef = useRef<ConfirmConfig | null>(null);
+  const loadingRef = useRef(false);
+  const [, forceUpdate] = useState(0);
+
+  const confirm = useCallback((config: ConfirmConfig) => {
+    configRef.current = config;
+    loadingRef.current = false;
+    setLoading(false);
+    setOpen(true);
+    forceUpdate((n) => n + 1);
+  }, []);
+
+  const contextHolder = (
+    <Modal
+      open={open}
+      title={configRef.current?.title}
+      okText={configRef.current?.okText ?? "确定"}
+      cancelText={configRef.current?.cancelText ?? "取消"}
+      okButtonProps={configRef.current?.okButtonProps}
+      confirmLoading={loading}
+      maskClosable={!loading}
+      onOk={async () => {
+        loadingRef.current = true;
+        setLoading(true);
+        try {
+          await configRef.current?.onOk?.();
+          setOpen(false);
+        } finally {
+          loadingRef.current = false;
+          setLoading(false);
+        }
+      }}
+      onCancel={() => {
+        if (loadingRef.current) return;
+        configRef.current?.onCancel?.();
+        setOpen(false);
+      }}
+    >
+      {configRef.current?.content}
+    </Modal>
+  );
+
+  return [contextHolder, confirm];
+}

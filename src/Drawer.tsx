@@ -2,13 +2,16 @@ import { X } from "lucide-react";
 import {
   type CSSProperties,
   type ReactNode,
+  type RefObject,
   useCallback,
+  useContext,
   useEffect,
   useRef,
   useState,
 } from "react";
 import { createPortal } from "react-dom";
 import { pushEscapeHandler, removeEscapeHandler } from "./escape-stack";
+import { ModalContainerContext } from "./Modal";
 import { cn } from "./utils";
 
 export interface DrawerProps {
@@ -47,6 +50,8 @@ export interface DrawerProps {
   };
   /** Destroy on close */
   destroyOnClose?: boolean;
+  /** Explicit container — overrides ModalContainerContext */
+  container?: RefObject<HTMLElement | null>;
   className?: string;
   children?: ReactNode;
 }
@@ -76,10 +81,13 @@ export function Drawer({
   bodyStyle,
   styles,
   destroyOnClose = false,
+  container,
   className,
   children,
 }: DrawerProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const ctxContainer = useContext(ModalContainerContext);
+  const resolvedContainer = container ?? ctxContainer;
   const [mounted, setMounted] = useState(open);
   const [visible, setVisible] = useState(false);
   const rafRef = useRef(0);
@@ -132,15 +140,16 @@ export function Drawer({
     return () => removeEscapeHandler(handler);
   }, [open, keyboard, onClose]);
 
+  // Body scroll lock — skip when rendering inside a container
   useEffect(() => {
-    if (open) {
+    if (open && !resolvedContainer?.current) {
       const prev = document.body.style.overflow;
       document.body.style.overflow = "hidden";
       return () => {
         document.body.style.overflow = prev;
       };
     }
-  }, [open]);
+  }, [open, resolvedContainer]);
 
   if (!mounted && destroyOnClose) return null;
   if (!mounted) return null;
@@ -162,8 +171,14 @@ export function Drawer({
     bottom: "bottom-0 left-0",
   }[placement];
 
+  const isInline = !!resolvedContainer?.current;
+  const portalTarget = resolvedContainer?.current ?? document.body;
+
   return createPortal(
-    <div className="fixed inset-0" style={{ zIndex }}>
+    <div
+      className={isInline ? "absolute inset-0" : "fixed inset-0"}
+      style={{ zIndex }}
+    >
       {/* Mask */}
       {/* biome-ignore lint/a11y/noStaticElementInteractions: overlay mask click-to-dismiss */}
       <div
@@ -233,6 +248,6 @@ export function Drawer({
         ) : null}
       </div>
     </div>,
-    document.body,
+    portalTarget,
   );
 }

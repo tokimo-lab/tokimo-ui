@@ -66,7 +66,12 @@ export type { MenuItem as MenuItemType, MenuProps } from "./Menu";
 export { Menu } from "./Menu";
 export type { ConfirmConfig, ModalProps, ScaledModalSize } from "./Modal";
 // ─── Feedback / Navigation ───
-export { Modal, ModalContainerContext } from "./Modal";
+export {
+  Modal,
+  ModalContainerContext,
+  setActiveModalContainer,
+  useConfirm,
+} from "./Modal";
 export type { PaginationProps } from "./Pagination";
 export { Pagination } from "./Pagination";
 export type { PathBarProps } from "./PathBar";

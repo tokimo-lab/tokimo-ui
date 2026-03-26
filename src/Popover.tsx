@@ -43,6 +43,10 @@ export interface PopoverProps {
   open?: boolean;
   /** Open change callback */
   onOpenChange?: (open: boolean) => void;
+  /** Override the floating panel className (replaces default styling) */
+  popupClassName?: string;
+  /** Override the content wrapper className */
+  contentClassName?: string;
 }
 
 export function Popover({
@@ -53,6 +57,8 @@ export function Popover({
   children,
   open: openProp,
   onOpenChange,
+  popupClassName,
+  contentClassName,
 }: PopoverProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const open = openProp ?? uncontrolledOpen;
@@ -112,9 +118,12 @@ export function Popover({
               WebkitBackdropFilter: "blur(var(--window-blur, 24px))",
               borderRadius: "var(--window-radius, 10px)",
             }}
-            className={cn(
-              "z-[9999] bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(15,15,25,calc(var(--window-opacity,85)/100))] border border-black/[0.06] dark:border-white/[0.08] shadow-lg p-3 max-w-xs",
-            )}
+            className={
+              popupClassName ??
+              cn(
+                "z-[9999] bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(15,15,25,calc(var(--window-opacity,85)/100))] border border-black/[0.06] dark:border-white/[0.08] shadow-lg p-3 max-w-xs",
+              )
+            }
             {...getFloatingProps()}
           >
             {title ? (
@@ -123,7 +132,11 @@ export function Popover({
               </div>
             ) : null}
             {content ? (
-              <div className="text-sm text-[var(--text-secondary)]">
+              <div
+                className={
+                  contentClassName ?? "text-sm text-[var(--text-secondary)]"
+                }
+              >
                 {content}
               </div>
             ) : null}
