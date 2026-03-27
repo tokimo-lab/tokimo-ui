@@ -323,7 +323,9 @@ export function Select({
 
   const hasValue = isMultiple
     ? selectedValues.length > 0
-    : value !== undefined && value !== null && value !== "";
+    : value !== undefined &&
+      value !== null &&
+      (value !== "" || childOptions.some((opt) => opt.value === ""));
 
   useEffect(() => {
     if (open && showSearch) {
