@@ -83,6 +83,8 @@ export interface FormInstance<T extends FieldValues = FieldValues> {
   _rerender: () => void;
   _watchers: Map<string, Set<(v: unknown) => void>>;
   _notifyWatchers: (name: string, value: unknown) => void;
+  /** Internal — clear a single field's error on user input */
+  _clearFieldError: (name: string) => void;
   /** Internal — onValuesChange callback set by Form component */
   _onValuesChange?: (changedField: string, allValues: T) => void;
 }
@@ -191,6 +193,14 @@ export function useForm<T extends FieldValues = FieldValues>(
       _rules: rulesRef.current,
       _initialValues: init,
       _rerender: () => forceUpdate((n) => n + 1),
+      _clearFieldError: (name: string) => {
+        if (errorsRef.current[name]) {
+          const next = { ...errorsRef.current };
+          delete next[name];
+          errorsRef.current = next;
+          setErrors(next);
+        }
+      },
       _watchers: watchersRef.current,
       _notifyWatchers: _notifyWatchers,
     };
@@ -509,6 +519,7 @@ Form.Item = function FormItem({
           }
           (form._values.current as Record<string, unknown>)[name] = newValue;
           form._touched.add(name);
+          form._clearFieldError(name);
           form._notifyWatchers(name, newValue);
           form._onValuesChange?.(name, { ...form._values.current });
           form._rerender();
