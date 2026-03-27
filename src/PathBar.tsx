@@ -131,7 +131,7 @@ export function PathBar({
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={submitEdit}
-          className="flex-1 min-w-0 h-full px-1 py-0.5 bg-transparent outline-none text-inherit font-mono text-sm select-text"
+          className="flex-1 min-w-0 min-h-[24px] px-1 py-0.5 bg-transparent outline-none text-inherit font-mono text-sm select-text"
         />
 
         {/* Suffix — always visible */}
