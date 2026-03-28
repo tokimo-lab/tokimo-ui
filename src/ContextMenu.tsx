@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { FloatingVibrancy } from "./FloatingVibrancy";
 import { cn } from "./utils";
 
 /* ─── Types ─── */
@@ -129,7 +130,8 @@ function MenuPanel({
         "dark:bg-[rgba(18,18,28,calc(var(--window-opacity,85)/100))] dark:border-white/[0.09] dark:ring-white/[0.06] dark:shadow-black/60",
       )}
     >
-      <div className="py-1.5">
+      <FloatingVibrancy />
+      <div className="relative py-1.5">
         {items.map((item, i) => {
           if (item.type === "divider") {
             return (

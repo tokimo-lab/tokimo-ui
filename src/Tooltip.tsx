@@ -19,6 +19,7 @@ import {
   type ReactNode,
   useState,
 } from "react";
+import { FloatingVibrancy } from "./FloatingVibrancy";
 import { cn } from "./utils";
 
 export interface TooltipProps {
@@ -88,14 +89,15 @@ export function Tooltip({
             ref={refs.setFloating}
             style={floatingStyles}
             className={cn(
-              "z-[9999] max-w-xs break-all rounded px-2 py-1 text-xs shadow-lg",
+              "z-[9999] max-w-xs overflow-hidden break-all rounded px-2 py-1 text-xs shadow-lg",
               color
                 ? color
-                : "bg-slate-800 text-white dark:bg-white/10 dark:text-slate-100 backdrop-blur-xl",
+                : "bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(15,15,25,calc(var(--window-opacity,85)/100))] text-[var(--text-primary)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08]",
             )}
             {...getFloatingProps()}
           >
-            {title}
+            <FloatingVibrancy />
+            <span className="relative">{title}</span>
           </div>
         </FloatingPortal>
       ) : null}

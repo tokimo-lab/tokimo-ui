@@ -21,6 +21,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { FloatingVibrancy } from "./FloatingVibrancy";
 import { cn } from "./utils";
 
 export interface SelectOption {
@@ -479,8 +480,9 @@ export function Select({
             )}
             {...getFloatingProps()}
           >
+            <FloatingVibrancy />
             {showSearch && !isMultiple ? (
-              <div className="p-2 border-b border-black/[0.06] dark:border-white/[0.08]">
+              <div className="relative p-2 border-b border-black/[0.06] dark:border-white/[0.08]">
                 <div className="flex items-center gap-1.5 px-2 py-1 bg-black/[0.03] dark:bg-white/[0.04] rounded">
                   <Search className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                   <input
@@ -496,7 +498,7 @@ export function Select({
             ) : null}
             <div
               ref={scrollContainerRef}
-              className="max-h-60 overflow-y-auto py-1"
+              className="relative max-h-60 overflow-y-auto py-1"
               style={{ scrollbarWidth: "thin" }}
             >
               {filtered.length === 0 ? (

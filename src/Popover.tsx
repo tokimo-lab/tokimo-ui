@@ -19,6 +19,7 @@ import {
   type ReactNode,
   useState,
 } from "react";
+import { FloatingVibrancy } from "./FloatingVibrancy";
 import { cn } from "./utils";
 
 export interface PopoverProps {
@@ -121,20 +122,23 @@ export function Popover({
             className={
               popupClassName ??
               cn(
-                "z-[9999] bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(15,15,25,calc(var(--window-opacity,85)/100))] border border-black/[0.06] dark:border-white/[0.08] shadow-lg p-3 max-w-xs",
+                "z-[9999] overflow-hidden bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(15,15,25,calc(var(--window-opacity,85)/100))] border border-black/[0.06] dark:border-white/[0.08] shadow-lg p-3 max-w-xs",
               )
             }
             {...getFloatingProps()}
           >
+            <FloatingVibrancy />
             {title ? (
-              <div className="font-medium text-sm text-[var(--text-primary)] mb-2">
+              <div className="relative font-medium text-sm text-[var(--text-primary)] mb-2">
                 {title}
               </div>
             ) : null}
             {content ? (
               <div
                 className={
-                  contentClassName ?? "text-sm text-[var(--text-secondary)]"
+                  contentClassName != null
+                    ? cn("relative", contentClassName)
+                    : "relative text-sm text-[var(--text-secondary)]"
                 }
               >
                 {content}

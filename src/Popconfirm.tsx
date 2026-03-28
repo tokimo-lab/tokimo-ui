@@ -20,6 +20,7 @@ import {
   useState,
 } from "react";
 import { Button } from "./Button";
+import { FloatingVibrancy } from "./FloatingVibrancy";
 import { cn } from "./utils";
 
 export interface PopconfirmProps {
@@ -118,11 +119,12 @@ export function Popconfirm({
             ref={refs.setFloating}
             style={floatingStyles}
             className={cn(
-              "z-[9999] rounded-lg bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg p-4 max-w-xs",
+              "z-[9999] rounded-lg overflow-hidden bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg p-4 max-w-xs",
             )}
             {...getFloatingProps()}
           >
-            <div className="flex items-start gap-2 mb-3">
+            <FloatingVibrancy />
+            <div className="relative flex items-start gap-2 mb-3">
               <span className="shrink-0 mt-0.5 text-amber-500 [&>svg]:w-4 [&>svg]:h-4">
                 {icon ?? <AlertCircle className="h-4 w-4" />}
               </span>
@@ -137,7 +139,7 @@ export function Popconfirm({
                 ) : null}
               </div>
             </div>
-            <div className="flex justify-end gap-2">
+            <div className="relative flex justify-end gap-2">
               <Button
                 size="small"
                 onClick={() => {

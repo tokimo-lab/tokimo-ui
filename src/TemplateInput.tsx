@@ -15,6 +15,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { FloatingVibrancy } from "./FloatingVibrancy";
 import { cn } from "./utils";
 
 export interface TemplateVariable {
@@ -332,9 +333,10 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
                 scrollbarWidth: "thin",
                 scrollbarColor: "rgb(128 128 128 / 0.35) transparent",
               }}
-              className="z-[9999] rounded-md bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg py-1 text-sm max-h-60 overflow-auto"
+              className="z-[9999] rounded-md overflow-hidden bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg py-1 text-sm max-h-60 overflow-auto"
             >
-              <div ref={listRef}>
+              <FloatingVibrancy />
+              <div ref={listRef} className="relative">
                 {mode === "var"
                   ? filteredVars.map((item, idx) => (
                       <div

@@ -118,6 +118,9 @@ export { ToastProvider, useToast } from "./Toast";
 export type { TooltipProps } from "./Tooltip";
 // ─── Overlay / Floating ───
 export { Tooltip } from "./Tooltip";
+// ─── Context ───
+export type { UIContextValue } from "./UIContext";
+export { UIContext, useUIContext } from "./UIContext";
 export type { UploadChangeInfo, UploadFile, UploadProps } from "./Upload";
 export { Dragger, Upload } from "./Upload";
 // ─── Utilities ───
