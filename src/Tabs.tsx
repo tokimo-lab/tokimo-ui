@@ -27,15 +27,21 @@ export interface TabsProps {
   onChange?: (key: string) => void;
   /** Tab bar extra content */
   tabBarExtraContent?: ReactNode;
+  /** Content rendered above tab list (useful for tabPosition="left") */
+  tabBarHeader?: ReactNode;
   /** Size */
   size?: "small" | "middle" | "large";
   /** Type */
-  type?: "line" | "card";
+  type?: "line" | "card" | "pill" | "segment";
+  /** Tab bar position */
+  tabPosition?: "top" | "left";
   /** Centered tabs */
   centered?: boolean;
   /** Destroys inactive panes */
   destroyInactiveTabPane?: boolean;
   className?: string;
+  /** Custom class for content area (tabPosition="left" only) */
+  contentClassName?: string;
 }
 
 export function Tabs({
@@ -44,11 +50,14 @@ export function Tabs({
   defaultActiveKey,
   onChange,
   tabBarExtraContent,
+  tabBarHeader,
   size = "middle",
   type = "line",
+  tabPosition = "top",
   centered = false,
   destroyInactiveTabPane = false,
   className,
+  contentClassName,
 }: TabsProps) {
   const [internalKey, setInternalKey] = useState(
     defaultActiveKey ?? items[0]?.key ?? "",
@@ -60,6 +69,134 @@ export function Tabs({
     onChange?.(key);
   };
 
+  const hasChildren = items.some((i) => i.children !== undefined);
+
+  if (tabPosition === "left") {
+    return (
+      <LeftTabs
+        {...{
+          items,
+          activeKey,
+          handleChange,
+          tabBarExtraContent,
+          tabBarHeader,
+          size,
+          destroyInactiveTabPane,
+          hasChildren,
+          className,
+          contentClassName,
+        }}
+      />
+    );
+  }
+
+  if (type === "pill") {
+    return (
+      <PillTabs
+        {...{
+          items,
+          activeKey,
+          handleChange,
+          tabBarExtraContent,
+          size,
+          centered,
+          destroyInactiveTabPane,
+          hasChildren,
+          className,
+        }}
+      />
+    );
+  }
+
+  if (type === "segment") {
+    return (
+      <SegmentTabs
+        {...{
+          items,
+          activeKey,
+          handleChange,
+          size,
+          destroyInactiveTabPane,
+          hasChildren,
+          className,
+        }}
+      />
+    );
+  }
+
+  return (
+    <LineTabs
+      {...{
+        items,
+        activeKey,
+        handleChange,
+        tabBarExtraContent,
+        size,
+        type,
+        centered,
+        destroyInactiveTabPane,
+        hasChildren,
+        className,
+      }}
+    />
+  );
+}
+
+// ── Tab Panels (shared) ──
+
+function TabPanels({
+  items,
+  activeKey,
+  destroyInactiveTabPane,
+}: {
+  items: TabItem[];
+  activeKey: string;
+  destroyInactiveTabPane: boolean;
+}) {
+  return (
+    <>
+      {items.map((item) => {
+        const isActive = activeKey === item.key;
+        if (destroyInactiveTabPane && !isActive) return null;
+        return (
+          <div
+            key={item.key}
+            className={cn(!isActive && "hidden")}
+            role="tabpanel"
+          >
+            {item.children}
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+// ── Line / Card Tabs (original) ──
+
+function LineTabs({
+  items,
+  activeKey,
+  handleChange,
+  tabBarExtraContent,
+  size,
+  type,
+  centered,
+  destroyInactiveTabPane,
+  hasChildren,
+  className,
+}: {
+  items: TabItem[];
+  activeKey: string;
+  handleChange: (key: string) => void;
+  tabBarExtraContent?: ReactNode;
+  size: "small" | "middle" | "large";
+  type: "line" | "card" | "pill" | "segment";
+  centered: boolean;
+  destroyInactiveTabPane: boolean;
+  hasChildren: boolean;
+  className?: string;
+}) {
   const sizeClass = {
     small: "text-xs px-2 py-1",
     middle: "text-sm px-3 py-2",
@@ -86,7 +223,6 @@ export function Tabs({
   useLayoutEffect(() => {
     updateIndicator();
     if (!hasInitRef.current) {
-      // Skip transition on first render
       requestAnimationFrame(() => {
         hasInitRef.current = true;
       });
@@ -95,7 +231,6 @@ export function Tabs({
 
   return (
     <div className={className}>
-      {/* Tab Bar */}
       <div className="flex items-center border-b border-black/[0.06] dark:border-white/[0.08] select-none">
         <div
           ref={tabBarRef}
@@ -136,7 +271,6 @@ export function Tabs({
               </span>
             </button>
           ))}
-          {/* Animated active indicator for line type */}
           {type === "line" && (
             <span
               className="absolute bottom-0 h-0.5 bg-[var(--accent)] rounded-t"
@@ -154,20 +288,223 @@ export function Tabs({
           <div className="shrink-0 ml-auto pl-2">{tabBarExtraContent}</div>
         ) : null}
       </div>
-      {/* Tab Panels */}
-      {items.map((item) => {
-        const isActive = activeKey === item.key;
-        if (destroyInactiveTabPane && !isActive) return null;
-        return (
-          <div
+      {hasChildren && (
+        <TabPanels
+          items={items}
+          activeKey={activeKey}
+          destroyInactiveTabPane={destroyInactiveTabPane}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Pill Tabs ──
+
+function PillTabs({
+  items,
+  activeKey,
+  handleChange,
+  tabBarExtraContent,
+  size,
+  centered,
+  destroyInactiveTabPane,
+  hasChildren,
+  className,
+}: {
+  items: TabItem[];
+  activeKey: string;
+  handleChange: (key: string) => void;
+  tabBarExtraContent?: ReactNode;
+  size: "small" | "middle" | "large";
+  centered: boolean;
+  destroyInactiveTabPane: boolean;
+  hasChildren: boolean;
+  className?: string;
+}) {
+  const sizeClass = {
+    small: "px-3 py-1 text-xs",
+    middle: "px-4 py-1.5 text-sm",
+    large: "px-5 py-2 text-base",
+  }[size];
+
+  return (
+    <div className={className}>
+      <div
+        className={cn("flex gap-2 select-none", centered && "justify-center")}
+      >
+        {items.map((item) => (
+          <button
             key={item.key}
-            className={cn(!isActive && "hidden")}
-            role="tabpanel"
+            type="button"
+            disabled={item.disabled}
+            className={cn(
+              "rounded-full font-medium transition-colors cursor-pointer",
+              sizeClass,
+              activeKey === item.key
+                ? "bg-[var(--accent)] text-white"
+                : "bg-[var(--fill-tertiary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
+              item.disabled && "opacity-50 !cursor-not-allowed",
+            )}
+            onClick={() => !item.disabled && handleChange(item.key)}
           >
-            {item.children}
+            <span className="flex items-center gap-1.5 [&>svg]:w-[1em] [&>svg]:h-[1em]">
+              {item.icon}
+              {item.label}
+            </span>
+          </button>
+        ))}
+        {tabBarExtraContent ? (
+          <div className="shrink-0 ml-auto">{tabBarExtraContent}</div>
+        ) : null}
+      </div>
+      {hasChildren && (
+        <TabPanels
+          items={items}
+          activeKey={activeKey}
+          destroyInactiveTabPane={destroyInactiveTabPane}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Segment Tabs ──
+
+function SegmentTabs({
+  items,
+  activeKey,
+  handleChange,
+  size,
+  destroyInactiveTabPane,
+  hasChildren,
+  className,
+}: {
+  items: TabItem[];
+  activeKey: string;
+  handleChange: (key: string) => void;
+  size: "small" | "middle" | "large";
+  destroyInactiveTabPane: boolean;
+  hasChildren: boolean;
+  className?: string;
+}) {
+  const sizeClass = {
+    small: "px-3 py-1 text-xs",
+    middle: "px-4 py-2 text-sm",
+    large: "px-5 py-2.5 text-base",
+  }[size];
+
+  return (
+    <div className={className}>
+      <div className="flex gap-1 rounded-lg bg-gray-100 p-1 dark:bg-white/[0.06] select-none">
+        {items.map((item) => (
+          <button
+            key={item.key}
+            type="button"
+            disabled={item.disabled}
+            className={cn(
+              "flex flex-1 items-center justify-center gap-2 rounded-md font-medium transition-all cursor-pointer",
+              sizeClass,
+              activeKey === item.key
+                ? "bg-white text-gray-900 shadow-sm dark:bg-white/[0.1] dark:text-gray-100"
+                : "text-gray-500 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-gray-200",
+              item.disabled && "opacity-50 !cursor-not-allowed",
+            )}
+            onClick={() => !item.disabled && handleChange(item.key)}
+          >
+            {item.icon}
+            {item.label}
+          </button>
+        ))}
+      </div>
+      {hasChildren && (
+        <TabPanels
+          items={items}
+          activeKey={activeKey}
+          destroyInactiveTabPane={destroyInactiveTabPane}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Left (Vertical) Tabs ──
+
+function LeftTabs({
+  items,
+  activeKey,
+  handleChange,
+  tabBarExtraContent,
+  tabBarHeader,
+  size,
+  destroyInactiveTabPane,
+  hasChildren,
+  className,
+  contentClassName,
+}: {
+  items: TabItem[];
+  activeKey: string;
+  handleChange: (key: string) => void;
+  tabBarExtraContent?: ReactNode;
+  tabBarHeader?: ReactNode;
+  size: "small" | "middle" | "large";
+  destroyInactiveTabPane: boolean;
+  hasChildren: boolean;
+  className?: string;
+  contentClassName?: string;
+}) {
+  const sizeClass = {
+    small: "px-2.5 py-2 text-xs",
+    middle: "px-3 py-2.5 text-sm",
+    large: "px-4 py-3 text-base",
+  }[size];
+
+  return (
+    <div
+      className={cn("grid h-full overflow-hidden", className)}
+      style={{ gridTemplateColumns: "188px 1fr" }}
+    >
+      {/* Left: nav sidebar */}
+      <div className="border-r border-[var(--border-base)] bg-[var(--sidebar-bg)] flex flex-col overflow-hidden select-none">
+        {tabBarHeader}
+        <div className="px-2 pt-3 overflow-y-auto flex-1">
+          {items.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              disabled={item.disabled}
+              onClick={() => !item.disabled && handleChange(item.key)}
+              className={cn(
+                "w-full flex items-center gap-2.5 rounded-lg mb-0.5 text-left transition-colors cursor-pointer",
+                sizeClass,
+                activeKey === item.key
+                  ? "bg-[var(--accent-subtle)] text-[var(--accent)] font-semibold hover:bg-[var(--accent-subtle-hover)]"
+                  : "text-gray-600 dark:text-zinc-300 hover:bg-black/[0.08] dark:hover:bg-white/[0.08]",
+                item.disabled && "opacity-50 !cursor-not-allowed",
+              )}
+            >
+              {item.icon && <span className="shrink-0">{item.icon}</span>}
+              <span className="leading-tight">{item.label}</span>
+            </button>
+          ))}
+          {tabBarExtraContent}
+        </div>
+      </div>
+      {/* Right: content */}
+      {hasChildren && (
+        <div className="flex flex-col min-h-0">
+          <div
+            className={cn("flex-1 overflow-y-auto px-6 py-5", contentClassName)}
+            style={{ scrollbarWidth: "thin" }}
+          >
+            <TabPanels
+              items={items}
+              activeKey={activeKey}
+              destroyInactiveTabPane={destroyInactiveTabPane}
+            />
           </div>
-        );
-      })}
+        </div>
+      )}
     </div>
   );
 }

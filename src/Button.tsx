@@ -3,7 +3,14 @@ import { cn } from "./utils";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Visual variant */
-  variant?: "primary" | "default" | "dashed" | "text" | "link" | "danger";
+  variant?:
+    | "primary"
+    | "default"
+    | "dashed"
+    | "text"
+    | "link"
+    | "danger"
+    | "unstyled";
   /** Size */
   size?: "xs" | "small" | "middle" | "large";
   /** Show loading spinner */
@@ -33,6 +40,7 @@ const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
   link: "bg-transparent text-[var(--accent)] border-transparent underline hover:brightness-110 p-0 h-auto",
   danger:
     "bg-white/70 dark:bg-white/[0.05] text-red-500 border-red-300 hover:text-red-600 hover:border-red-400 dark:text-red-400 dark:border-red-500",
+  unstyled: "",
 };
 
 const sizeClasses: Record<NonNullable<ButtonProps["size"]>, string> = {
