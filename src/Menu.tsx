@@ -126,19 +126,21 @@ function MenuItemRenderer({
         <div className="px-3 py-1.5 text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
           {!collapsed && item.label}
         </div>
-        {item.children?.map((child) => (
-          <MenuItemRenderer
-            key={child.key}
-            item={child}
-            level={level}
-            selectedKeys={selectedKeys}
-            openKeys={openKeys}
-            onSelect={onSelect}
-            onToggleOpen={onToggleOpen}
-            collapsed={collapsed}
-            indent={indent}
-          />
-        ))}
+        <ul className="list-none p-0 m-0">
+          {item.children?.map((child) => (
+            <MenuItemRenderer
+              key={child.key}
+              item={child}
+              level={level}
+              selectedKeys={selectedKeys}
+              openKeys={openKeys}
+              onSelect={onSelect}
+              onToggleOpen={onToggleOpen}
+              collapsed={collapsed}
+              indent={indent}
+            />
+          ))}
+        </ul>
       </li>
     );
   }
