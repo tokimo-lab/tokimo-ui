@@ -256,7 +256,7 @@ function MenuList({
           {backLabel && <span>{backLabel}</span>}
         </button>
       )}
-      <div className="space-y-1">
+      <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.03] overflow-hidden divide-y divide-black/[0.04] dark:divide-white/[0.06]">
         {items.map((item, i) => (
           <MenuItem key={item.key} item={item} index={i} onSelect={onSelect} />
         ))}
@@ -286,9 +286,9 @@ function MenuItem({
       type="button"
       onClick={() => onSelect(item.key)}
       className={cn(
-        "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left",
+        "w-full flex items-center gap-3 px-4 py-3.5 text-left",
         "transition-all duration-200 ease-out cursor-pointer",
-        "hover:bg-black/[0.08] dark:hover:bg-white/[0.08] group",
+        "hover:bg-black/[0.04] dark:hover:bg-white/[0.04] group",
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1",
       )}
     >
@@ -339,7 +339,9 @@ function LeafView({
         <ArrowLeft size={14} />
         {backLabel && <span>{backLabel}</span>}
       </button>
-      {content}
+      <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.03] p-5">
+        {content}
+      </div>
     </div>
   );
 }
