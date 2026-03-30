@@ -19,7 +19,7 @@ export type { CardProps } from "./Card";
 export { Card } from "./Card";
 export type { CheckboxProps } from "./Checkbox";
 export { Checkbox } from "./Checkbox";
-export type { CollapseProps } from "./Collapse";
+export type { CollapseItem, CollapseProps } from "./Collapse";
 export { Collapse } from "./Collapse";
 export type { ContextMenuItem, ContextMenuProps } from "./ContextMenu";
 export { ContextMenu, useContextMenu } from "./ContextMenu";
