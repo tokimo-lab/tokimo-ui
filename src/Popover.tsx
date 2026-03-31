@@ -5,6 +5,7 @@ import {
   offset,
   type Placement,
   shift,
+  size,
   useClick,
   useDismiss,
   useFloating,
@@ -48,6 +49,8 @@ export interface PopoverProps {
   popupClassName?: string;
   /** Override the content wrapper className */
   contentClassName?: string;
+  /** Constrain height to fit within the viewport */
+  fitViewport?: boolean;
 }
 
 export function Popover({
@@ -60,6 +63,7 @@ export function Popover({
   onOpenChange,
   popupClassName,
   contentClassName,
+  fitViewport,
 }: PopoverProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const open = openProp ?? uncontrolledOpen;
@@ -78,11 +82,26 @@ export function Popover({
   };
   const placement = (placementMap[placementProp] ?? placementProp) as Placement;
 
+  const middleware = [offset(6), flip(), shift({ padding: 5 })];
+  if (fitViewport) {
+    middleware.push(
+      size({
+        padding: 16,
+        apply({ availableHeight, elements }) {
+          Object.assign(elements.floating.style, {
+            maxHeight: `${availableHeight}px`,
+            overflowY: "auto",
+          });
+        },
+      }),
+    );
+  }
+
   const { refs, floatingStyles, context } = useFloating({
     open,
     onOpenChange: setOpen,
     placement,
-    middleware: [offset(6), flip(), shift({ padding: 5 })],
+    middleware,
     whileElementsMounted: autoUpdate,
   });
 

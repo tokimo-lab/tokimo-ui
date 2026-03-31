@@ -76,6 +76,14 @@ export type { PaginationProps } from "./Pagination";
 export { Pagination } from "./Pagination";
 export type { PathBarProps } from "./PathBar";
 export { PathBar } from "./PathBar";
+export type {
+  PillTab,
+  PillTabBarProps,
+  PillTabFilter,
+  PillTabSort,
+  PillTabSortOption,
+} from "./PillTabBar";
+export { PillTabBar } from "./PillTabBar";
 export type { PopconfirmProps } from "./Popconfirm";
 export { Popconfirm } from "./Popconfirm";
 export type { PopoverProps } from "./Popover";
