@@ -21,8 +21,16 @@ export type { CheckboxProps } from "./Checkbox";
 export { Checkbox } from "./Checkbox";
 export type { CollapseItem, CollapseProps } from "./Collapse";
 export { Collapse } from "./Collapse";
-export type { ContextMenuItem, ContextMenuProps } from "./ContextMenu";
-export { ContextMenu, useContextMenu } from "./ContextMenu";
+export type {
+  ActiveDescendantControls,
+  ContextMenuItem,
+  ContextMenuProps,
+} from "./ContextMenu";
+export {
+  ActiveDescendantContext,
+  ContextMenu,
+  useContextMenu,
+} from "./ContextMenu";
 export type { DescriptionsItem, DescriptionsProps } from "./Descriptions";
 export { Descriptions } from "./Descriptions";
 export type { DividerProps } from "./Divider";

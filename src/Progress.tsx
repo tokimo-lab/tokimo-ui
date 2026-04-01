@@ -109,11 +109,12 @@ export function Progress({
 
   // Line progress
   const h = strokeWidth ?? (size === "small" ? 4 : 8);
+  const showInner = showInfo && h >= 14;
 
   return (
     <div className={cn("flex items-center gap-2 w-full", className)}>
       <div
-        className="flex-1 rounded-full overflow-hidden"
+        className="relative flex-1 rounded-full overflow-hidden"
         style={{
           height: h,
           backgroundColor: trailColor,
@@ -138,8 +139,18 @@ export function Progress({
             }}
           />
         </div>
+        {showInner ? (
+          <span
+            className="absolute inset-0 flex items-center justify-center text-[10px] font-medium leading-none text-white"
+            style={{
+              textShadow: "0 1px 3px rgba(0,0,0,0.8), 0 0 6px rgba(0,0,0,0.6)",
+            }}
+          >
+            {`${Math.round(clampedPercent)}%`}
+          </span>
+        ) : null}
       </div>
-      {showInfo ? (
+      {showInfo && !showInner ? (
         <span
           className={cn(
             "text-xs shrink-0 min-w-[2em] text-right",
