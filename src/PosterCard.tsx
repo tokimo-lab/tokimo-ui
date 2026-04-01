@@ -14,6 +14,8 @@ export interface PosterCardProps {
   children: ReactNode;
   onClick?: () => void;
   className?: string;
+  /** Use 16:9 landscape aspect ratio instead of the default 2:3 portrait */
+  landscape?: boolean;
 }
 
 /**
@@ -31,18 +33,27 @@ export const PosterCard = memo(function PosterCard({
   children,
   onClick,
   className,
+  landscape,
 }: PosterCardProps) {
   return (
     <button
       type="button"
-      style={{ contentVisibility: "auto", containIntrinsicSize: "auto 350px" }}
+      style={{
+        contentVisibility: "auto",
+        containIntrinsicSize: landscape ? "auto 200px" : "auto 350px",
+      }}
       className={cn(
         "group w-full cursor-pointer overflow-hidden rounded-lg border border-[var(--glass-border)] bg-white text-left transition-shadow hover:shadow-md dark:bg-gray-800/50",
         className,
       )}
       onClick={onClick}
     >
-      <div className="relative aspect-[2/3] overflow-hidden bg-[var(--bg-skeleton)]">
+      <div
+        className={cn(
+          "relative overflow-hidden bg-[var(--bg-skeleton)]",
+          landscape ? "aspect-video" : "aspect-[2/3]",
+        )}
+      >
         {src ? (
           <img
             src={src}
