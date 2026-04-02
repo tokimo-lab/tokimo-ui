@@ -113,7 +113,7 @@ export function List<T = Record<string, unknown>>({
       ) : null}
       {children ??
         (isEmpty ? (
-          <div className="py-8 text-center text-sm text-slate-400">
+          <div className="py-8 text-center text-sm text-fg-muted">
             {locale?.emptyText ?? "暂无数据"}
           </div>
         ) : grid ? (
@@ -190,9 +190,7 @@ function ListItemMetaComponent({
           </div>
         ) : null}
         {description ? (
-          <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            {description}
-          </div>
+          <div className="mt-2 text-sm text-fg-muted">{description}</div>
         ) : null}
       </div>
     </div>

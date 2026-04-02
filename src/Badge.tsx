@@ -56,9 +56,7 @@ export function Badge({
           style={color ? { backgroundColor: color } : undefined}
         />
         {text ? (
-          <span className="text-sm text-slate-600 dark:text-slate-300">
-            {text}
-          </span>
+          <span className="text-sm text-fg-secondary">{text}</span>
         ) : null}
       </span>
     );

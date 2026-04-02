@@ -37,11 +37,7 @@ export function Statistic({
 
   return (
     <div className={cn("text-left", className)}>
-      {title ? (
-        <div className="text-sm text-slate-500 dark:text-slate-400 mb-2">
-          {title}
-        </div>
-      ) : null}
+      {title ? <div className="text-sm text-fg-muted mb-2">{title}</div> : null}
       {loading ? (
         <div className="h-8 w-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
       ) : (
@@ -56,7 +52,7 @@ export function Statistic({
           ) : null}
           <span>{displayValue}</span>
           {suffix ? (
-            <span className="text-base font-normal text-slate-500 dark:text-slate-400">
+            <span className="text-base font-normal text-fg-muted">
               {suffix}
             </span>
           ) : null}

@@ -94,7 +94,7 @@ export function Descriptions({
                     <th
                       className={cn(
                         padClass,
-                        "text-left font-normal text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 whitespace-nowrap",
+                        "text-left font-normal text-fg-muted bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 whitespace-nowrap",
                       )}
                       style={labelStyle}
                     >
@@ -144,10 +144,7 @@ export function Descriptions({
             key={item.key ?? i}
             style={item.span ? { gridColumn: `span ${item.span}` } : undefined}
           >
-            <div
-              className="text-sm text-slate-500 dark:text-slate-400 mb-0.5"
-              style={labelStyle}
-            >
+            <div className="text-sm text-fg-muted mb-0.5" style={labelStyle}>
               {item.label}
             </div>
             <div

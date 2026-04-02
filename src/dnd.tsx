@@ -22,7 +22,7 @@ export function DragHandle({
   return (
     <HolderOutlined
       className={cn(
-        "text-zinc-600 dark:text-zinc-400 touch-none",
+        "text-fg-muted touch-none",
         disabled
           ? "cursor-not-allowed opacity-30"
           : isDragging

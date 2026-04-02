@@ -407,7 +407,7 @@ function SegmentTabs({
               sizeClass,
               activeKey === item.key
                 ? "bg-white text-gray-900 shadow-sm dark:bg-white/[0.1] dark:text-gray-100"
-                : "text-gray-500 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-gray-200",
+                : "text-fg-muted hover:text-gray-700 dark:text-zinc-400 dark:hover:text-gray-200",
               item.disabled && "opacity-50 !cursor-not-allowed",
             )}
             onClick={() => !item.disabled && handleChange(item.key)}
@@ -479,7 +479,7 @@ function LeftTabs({
                 sizeClass,
                 activeKey === item.key
                   ? "bg-[var(--accent-subtle)] text-[var(--accent)] font-semibold hover:bg-[var(--accent-subtle-hover)]"
-                  : "text-gray-600 dark:text-zinc-300 hover:bg-black/[0.08] dark:hover:bg-white/[0.08]",
+                  : "text-fg-secondary hover:bg-black/[0.08] dark:hover:bg-white/[0.08]",
                 item.disabled && "opacity-50 !cursor-not-allowed",
               )}
             >

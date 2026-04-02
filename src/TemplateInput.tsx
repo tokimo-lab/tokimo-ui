@@ -359,7 +359,7 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
                         <code className="text-sky-600 dark:text-sky-400 text-xs">
                           {`{{${item.key}}}`}
                         </code>
-                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                        <span className="text-xs text-fg-muted">
                           {item.label}
                         </span>
                       </div>
@@ -385,7 +385,7 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
                         <code className="text-violet-600 dark:text-violet-400 text-xs">
                           {kw.key}
                         </code>
-                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                        <span className="text-xs text-fg-muted">
                           {kw.display}
                         </span>
                       </div>

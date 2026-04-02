@@ -40,7 +40,7 @@ export function Divider({
     return (
       <div
         className={cn(
-          "flex items-center gap-3 my-4 text-sm text-slate-500 dark:text-slate-400",
+          "flex items-center gap-3 my-4 text-sm text-fg-muted",
           className,
         )}
         style={style}

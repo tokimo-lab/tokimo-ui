@@ -203,7 +203,7 @@ const BaseUpload = forwardRef<HTMLDivElement, UploadProps>(function BaseUpload(
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <FileIcon className="w-6 h-6 text-slate-400" />
+                  <FileIcon className="w-6 h-6 text-fg-muted" />
                 )}
                 <button
                   type="button"
@@ -223,7 +223,7 @@ const BaseUpload = forwardRef<HTMLDivElement, UploadProps>(function BaseUpload(
               onClick={trigger}
               disabled={disabled}
               className={cn(
-                "w-[104px] h-[104px] rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center gap-1 text-slate-400 hover:border-sky-400 hover:text-sky-500 transition-colors",
+                "w-[104px] h-[104px] rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center gap-1 text-fg-muted hover:border-sky-400 hover:text-sky-500 transition-colors",
                 disabled && "opacity-50 cursor-not-allowed",
               )}
             >
@@ -273,9 +273,9 @@ const BaseUpload = forwardRef<HTMLDivElement, UploadProps>(function BaseUpload(
                   className="w-8 h-8 object-cover rounded"
                 />
               ) : (
-                <FileIcon className="w-4 h-4 text-slate-400 shrink-0" />
+                <FileIcon className="w-4 h-4 text-fg-muted shrink-0" />
               )}
-              <span className="flex-1 min-w-0 truncate text-slate-600 dark:text-slate-300">
+              <span className="flex-1 min-w-0 truncate text-fg-secondary">
                 {f.name}
               </span>
               {f.status === "uploading" && (
@@ -286,7 +286,7 @@ const BaseUpload = forwardRef<HTMLDivElement, UploadProps>(function BaseUpload(
               <button
                 type="button"
                 onClick={() => handleRemove(f)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-500"
+                className="opacity-0 group-hover:opacity-100 transition-opacity text-fg-muted hover:text-red-500"
               >
                 <XIcon className="w-3.5 h-3.5" />
               </button>
@@ -346,7 +346,7 @@ export function Dragger(props: DraggerProps) {
         {children ?? (
           <>
             <UploadIcon className="w-10 h-10 text-sky-500" />
-            <p className="text-sm text-slate-500">点击或拖拽文件到此区域上传</p>
+            <p className="text-sm text-fg-muted">点击或拖拽文件到此区域上传</p>
           </>
         )}
       </div>

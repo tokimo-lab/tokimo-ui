@@ -146,7 +146,7 @@ export function AppSidebar({
                 {section.label && (
                   <div
                     className={cn(
-                      "mb-1 px-3 text-[11px] font-medium uppercase tracking-wider text-zinc-600 dark:text-gray-500",
+                      "mb-1 px-3 text-[11px] font-medium uppercase tracking-wider text-fg-muted",
                       si > 0 && "mt-3",
                     )}
                   >
@@ -189,7 +189,7 @@ function SidebarItemButton({
     "mb-0.5 flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
     isActive
       ? "text-gray-900 dark:text-zinc-100 font-medium"
-      : "text-gray-500 dark:text-zinc-400 hover:bg-black/[0.06] dark:hover:bg-white/[0.06]",
+      : "text-fg-muted hover:bg-black/[0.06] dark:hover:bg-white/[0.06]",
     item.extra != null && "group/sidebar-item",
   );
 
@@ -199,7 +199,7 @@ function SidebarItemButton({
       {item.subtitle ? (
         <div className="min-w-0 flex-1">
           <span className="block truncate leading-tight">{item.label}</span>
-          <span className="mt-0.5 block truncate text-[10px] text-zinc-500 dark:text-zinc-500">
+          <span className="mt-0.5 block truncate text-[10px] text-fg-muted">
             {item.subtitle}
           </span>
         </div>

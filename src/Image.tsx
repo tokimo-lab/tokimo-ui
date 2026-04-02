@@ -58,7 +58,7 @@ export function Image({
           </span>
         ) : null}
         {error && !fallback ? (
-          <span className="absolute inset-0 flex items-center justify-center text-slate-400">
+          <span className="absolute inset-0 flex items-center justify-center text-fg-muted">
             <ImageOff className="h-8 w-8" />
           </span>
         ) : (

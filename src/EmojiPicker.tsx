@@ -200,7 +200,7 @@ export function EmojiPicker({
         <button
           type="button"
           onClick={() => onClear()}
-          className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-gray-600 dark:hover:text-zinc-300"
+          className="text-xs text-fg-muted hover:text-gray-600 dark:hover:text-zinc-300"
         >
           {clearLabel}
         </button>

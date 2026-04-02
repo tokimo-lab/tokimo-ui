@@ -158,7 +158,7 @@ export function Progress({
               ? "text-green-500"
               : effectiveStatus === "exception"
                 ? "text-red-500"
-                : "text-slate-500 dark:text-slate-400",
+                : "text-fg-muted",
           )}
         >
           {`${Math.round(clampedPercent)}%`}
