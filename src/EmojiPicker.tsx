@@ -183,7 +183,7 @@ export function EmojiPicker({
           "flex h-9 w-9 items-center justify-center rounded-lg border text-xl transition-colors",
           open
             ? "border-[var(--accent)] bg-[var(--accent)]/10"
-            : "border-[var(--glass-border)] bg-white hover:border-[var(--glass-border)] dark:bg-gray-900",
+            : "border-[var(--glass-border)] bg-surface-elevated hover:border-[var(--glass-border)] ",
           disabled && "cursor-not-allowed opacity-50",
           className,
         )}
@@ -200,7 +200,7 @@ export function EmojiPicker({
         <button
           type="button"
           onClick={() => onClear()}
-          className="text-xs text-fg-muted hover:text-gray-600 dark:hover:text-zinc-300"
+          className="text-xs text-fg-muted hover:text-fg-secondary"
         >
           {clearLabel}
         </button>

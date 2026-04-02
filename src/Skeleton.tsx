@@ -26,10 +26,7 @@ function SkeletonBlock({
 }) {
   return (
     <div
-      className={cn(
-        "h-4 bg-slate-200 dark:bg-white/10 rounded animate-pulse",
-        className,
-      )}
+      className={cn("h-4 bg-fill-tertiary rounded animate-pulse", className)}
       style={style}
     />
   );
@@ -65,7 +62,7 @@ export function Skeleton({
       {avatar ? (
         <div
           className={cn(
-            "shrink-0 bg-slate-200 dark:bg-white/10 animate-pulse",
+            "shrink-0 bg-fill-tertiary animate-pulse",
             avatarShape === "circle" ? "rounded-full" : "rounded",
           )}
           style={{ width: avatarSize, height: avatarSize }}

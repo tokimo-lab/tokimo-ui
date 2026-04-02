@@ -81,7 +81,7 @@ export function PillTabBar<K extends string>({
                 type="button"
                 className={`flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 text-[13px] font-medium transition-all duration-200 ${
                   active
-                    ? "bg-white/90 text-neutral-900 shadow-sm dark:bg-white/15 dark:text-white"
+                    ? "bg-white/90 text-fg-primary shadow-sm dark:bg-white/15"
                     : "text-[var(--text-secondary)] hover:bg-[var(--fill-tertiary)] hover:text-[var(--text-primary)]"
                 }`}
                 onClick={() => onTabChange(t.key)}

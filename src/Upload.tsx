@@ -262,7 +262,7 @@ const BaseUpload = forwardRef<HTMLDivElement, UploadProps>(function BaseUpload(
             <li
               key={f.uid}
               className={cn(
-                "group flex items-center gap-2 text-sm px-1 py-0.5 rounded hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors",
+                "group flex items-center gap-2 text-sm px-1 py-0.5 rounded hover:bg-fill-tertiary transition-colors",
                 f.status === "error" && "text-red-500",
               )}
             >

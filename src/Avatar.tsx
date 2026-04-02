@@ -39,7 +39,7 @@ export function Avatar({
     // biome-ignore lint/a11y/noStaticElementInteractions: role is conditionally set based on onClick
     <span
       className={cn(
-        "inline-flex items-center justify-center overflow-hidden bg-slate-300 text-white dark:bg-slate-600 shrink-0 select-none",
+        "inline-flex items-center justify-center overflow-hidden bg-fill-tertiary text-fg-muted shrink-0 select-none",
         shape === "circle" ? "rounded-full" : "rounded",
         onClick && "cursor-pointer",
         className,

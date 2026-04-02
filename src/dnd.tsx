@@ -27,7 +27,7 @@ export function DragHandle({
           ? "cursor-not-allowed opacity-30"
           : isDragging
             ? "cursor-grabbing"
-            : "cursor-grab hover:text-gray-600 dark:hover:text-zinc-300",
+            : "cursor-grab hover:text-fg-secondary",
         className,
       )}
       {...props}

@@ -348,7 +348,7 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
                           "px-3 py-1.5 cursor-pointer flex items-center gap-3",
                           idx === activeIdx
                             ? "bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400"
-                            : "text-fg-secondary hover:bg-slate-50 dark:hover:bg-slate-800",
+                            : "text-fg-secondary hover:bg-fill-tertiary",
                         )}
                         onMouseEnter={() => setActiveIdx(idx)}
                         onMouseDown={(e) => {
@@ -374,7 +374,7 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
                           "px-3 py-1.5 cursor-pointer flex items-center gap-3",
                           idx === activeIdx
                             ? "bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400"
-                            : "text-fg-secondary hover:bg-slate-50 dark:hover:bg-slate-800",
+                            : "text-fg-secondary hover:bg-fill-tertiary",
                         )}
                         onMouseEnter={() => setActiveIdx(idx)}
                         onMouseDown={(e) => {

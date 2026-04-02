@@ -407,7 +407,7 @@ function SegmentTabs({
               sizeClass,
               activeKey === item.key
                 ? "bg-white text-fg-primary shadow-sm dark:bg-white/[0.1]"
-                : "text-fg-muted hover:text-gray-700 dark:text-zinc-400 dark:hover:text-gray-200",
+                : "text-fg-muted hover:text-fg-secondary",
               item.disabled && "opacity-50 !cursor-not-allowed",
             )}
             onClick={() => !item.disabled && handleChange(item.key)}

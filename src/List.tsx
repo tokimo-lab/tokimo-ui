@@ -203,8 +203,7 @@ function ListItemComponent({
     <div
       className={cn(
         "flex items-start gap-3",
-        onClick &&
-          "cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50",
+        onClick && "cursor-pointer hover:bg-fill-tertiary/50",
         className,
       )}
       role={onClick ? "button" : undefined}

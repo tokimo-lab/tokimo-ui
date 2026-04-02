@@ -131,7 +131,7 @@ function ScrollNavRoot({
                   "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors text-left cursor-pointer",
                   isActive
                     ? "bg-[var(--accent)]/10 text-[var(--accent-text)] font-medium"
-                    : "text-fg-muted hover:bg-gray-100 dark:hover:bg-white/5",
+                    : "text-fg-muted hover:bg-fill-tertiary",
                 )}
               >
                 {Icon && <Icon className="w-4 h-4 shrink-0" />}
