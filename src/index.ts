@@ -6,6 +6,12 @@
 
 export type { AlertProps } from "./Alert";
 export { Alert } from "./Alert";
+export type {
+  AppSidebarItem,
+  AppSidebarProps,
+  AppSidebarSection,
+} from "./AppSidebar";
+export { AppSidebar } from "./AppSidebar";
 export type { AutoCompleteOption, AutoCompleteProps } from "./AutoComplete";
 export { AutoComplete } from "./AutoComplete";
 export type { AvatarProps } from "./Avatar";
