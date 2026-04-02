@@ -194,7 +194,7 @@ const BaseUpload = forwardRef<HTMLDivElement, UploadProps>(function BaseUpload(
             list.map((f) => (
               <div
                 key={f.uid}
-                className="group relative w-[104px] h-[104px] rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden flex items-center justify-center bg-slate-50 dark:bg-slate-900"
+                className="group relative w-[104px] h-[104px] rounded-lg border border-border-base overflow-hidden flex items-center justify-center bg-surface-base"
               >
                 {f.thumbUrl || f.url ? (
                   <img
@@ -223,7 +223,7 @@ const BaseUpload = forwardRef<HTMLDivElement, UploadProps>(function BaseUpload(
               onClick={trigger}
               disabled={disabled}
               className={cn(
-                "w-[104px] h-[104px] rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center gap-1 text-fg-muted hover:border-sky-400 hover:text-sky-500 transition-colors",
+                "w-[104px] h-[104px] rounded-lg border-2 border-dashed border-border-base flex flex-col items-center justify-center gap-1 text-fg-muted hover:border-sky-400 hover:text-sky-500 transition-colors",
                 disabled && "opacity-50 cursor-not-allowed",
               )}
             >
@@ -247,7 +247,7 @@ const BaseUpload = forwardRef<HTMLDivElement, UploadProps>(function BaseUpload(
             <button
               type="button"
               disabled={disabled}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm border border-slate-200 dark:border-slate-600 rounded-md hover:border-sky-400 transition"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm border border-border-base rounded-md hover:border-sky-400 transition"
             >
               <UploadIcon className="w-4 h-4" /> 上传文件
             </button>
@@ -339,7 +339,7 @@ export function Dragger(props: DraggerProps) {
           "w-full py-8 px-4 flex flex-col items-center gap-2 border-2 border-dashed rounded-lg cursor-pointer transition-colors select-none",
           dragging
             ? "border-sky-400 bg-sky-50 dark:bg-sky-950/30"
-            : "border-slate-300 dark:border-slate-600 hover:border-sky-400",
+            : "border-border-base hover:border-sky-400",
           disabled && "opacity-50 cursor-not-allowed",
         )}
       >

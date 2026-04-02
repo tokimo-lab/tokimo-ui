@@ -39,9 +39,7 @@ function Section({ id, title, className, children }: ScrollNavSectionProps) {
   return (
     <section data-scroll-key={id} className={className}>
       {title && (
-        <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          {title}
-        </h4>
+        <h4 className="text-sm font-semibold text-fg-primary mb-4">{title}</h4>
       )}
       {children}
     </section>

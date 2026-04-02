@@ -95,8 +95,7 @@ export function List<T = Record<string, unknown>>({
   return (
     <div
       className={cn(
-        bordered &&
-          "border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden",
+        bordered && "border border-border-base rounded-lg overflow-hidden",
         className,
       )}
     >
@@ -104,8 +103,8 @@ export function List<T = Record<string, unknown>>({
         <div
           className={cn(
             padClass,
-            "font-medium text-slate-700 dark:text-slate-200",
-            bordered && "border-b border-slate-200 dark:border-slate-700",
+            "font-medium text-fg-secondary",
+            bordered && "border-b border-border-base",
           )}
         >
           {header}
@@ -135,7 +134,7 @@ export function List<T = Record<string, unknown>>({
                   padClass,
                   split &&
                     i < dataSource.length - 1 &&
-                    "border-b border-slate-100 dark:border-slate-800",
+                    "border-b border-border-subtle",
                 )}
               >
                 {renderItem?.(item, i)}
@@ -145,10 +144,7 @@ export function List<T = Record<string, unknown>>({
         ))}
       {footer ? (
         <div
-          className={cn(
-            padClass,
-            bordered && "border-t border-slate-200 dark:border-slate-700",
-          )}
+          className={cn(padClass, bordered && "border-t border-border-base")}
         >
           {footer}
         </div>
@@ -185,9 +181,7 @@ function ListItemMetaComponent({
       {avatar ? <div className="shrink-0">{avatar}</div> : null}
       <div className="flex-1 min-w-0">
         {title ? (
-          <div className="text-sm font-medium text-slate-900 dark:text-slate-100">
-            {title}
-          </div>
+          <div className="text-sm font-medium text-fg-primary">{title}</div>
         ) : null}
         {description ? (
           <div className="mt-2 text-sm text-fg-muted">{description}</div>

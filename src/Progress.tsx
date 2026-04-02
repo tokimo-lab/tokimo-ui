@@ -122,7 +122,7 @@ export function Progress({
       >
         <div
           className={cn(
-            "bg-slate-200 dark:bg-slate-700 h-full w-full rounded-full overflow-hidden",
+            "bg-fill-tertiary h-full w-full rounded-full overflow-hidden",
           )}
           style={trailColor ? { backgroundColor: trailColor } : undefined}
         >

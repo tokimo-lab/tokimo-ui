@@ -23,6 +23,8 @@ export interface AppSidebarItem {
   subtitle?: string;
   /** Trailing content (e.g., edit button) rendered at the right side */
   extra?: ReactNode;
+  /** Rich content rendered below the main label row (e.g., charts, badges) */
+  content?: ReactNode;
   onContextMenu?: (e: React.MouseEvent) => void;
 }
 
@@ -185,15 +187,18 @@ function SidebarItemButton({
   isActive: boolean;
   onSelect?: (key: string) => void;
 }) {
+  const hasContent = !!item.content;
+
   const itemClasses = cn(
-    "mb-0.5 flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
+    "mb-0.5 flex w-full cursor-pointer rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
+    hasContent ? "flex-col" : "items-center gap-2.5",
     isActive
-      ? "text-gray-900 dark:text-zinc-100 font-medium"
+      ? "text-fg-primary font-medium"
       : "text-fg-muted hover:bg-black/[0.06] dark:hover:bg-white/[0.06]",
     item.extra != null && "group/sidebar-item",
   );
 
-  const content = (
+  const mainRow = (
     <>
       {item.icon && <span className="shrink-0">{item.icon}</span>}
       {item.subtitle ? (
@@ -210,6 +215,15 @@ function SidebarItemButton({
       )}
       {item.extra && <div className="shrink-0">{item.extra}</div>}
     </>
+  );
+
+  const fullContent = hasContent ? (
+    <>
+      <div className="flex w-full items-center gap-2.5">{mainRow}</div>
+      <div className="mt-1.5 w-full">{item.content}</div>
+    </>
+  ) : (
+    mainRow
   );
 
   if (item.extra) {
@@ -229,7 +243,7 @@ function SidebarItemButton({
         onContextMenu={item.onContextMenu}
         className={itemClasses}
       >
-        {content}
+        {fullContent}
       </div>
     );
   }
@@ -242,7 +256,7 @@ function SidebarItemButton({
       onContextMenu={item.onContextMenu}
       className={itemClasses}
     >
-      {content}
+      {fullContent}
     </button>
   );
 }

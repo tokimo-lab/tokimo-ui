@@ -296,7 +296,7 @@ function MenuItem({
         <span className="text-base text-fg-muted shrink-0">{item.icon}</span>
       )}
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium text-gray-900 dark:text-gray-100 leading-tight">
+        <div className="text-sm font-medium text-fg-primary leading-tight">
           {item.label}
         </div>
         {item.desc && (

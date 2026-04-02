@@ -121,6 +121,8 @@ export type { SettingsMenuItem, SettingsMenuProps } from "./SettingsMenu";
 export { SettingsMenu } from "./SettingsMenu";
 export type { SkeletonProps } from "./Skeleton";
 export { Skeleton } from "./Skeleton";
+export type { SliderProps } from "./Slider";
+export { Slider } from "./Slider";
 export type { SpinProps } from "./Spin";
 export { Spin } from "./Spin";
 export type { StatisticProps } from "./Statistic";

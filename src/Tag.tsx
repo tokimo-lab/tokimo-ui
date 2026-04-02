@@ -4,7 +4,7 @@ import { cn } from "./utils";
 
 const colorMap: Record<string, string> = {
   default:
-    "bg-slate-100 text-fg-secondary border-slate-200 dark:bg-white/[0.06] dark:border-white/[0.1]",
+    "bg-fill-tertiary text-fg-secondary border-border-base dark:bg-white/[0.06] dark:border-white/[0.1]",
   blue: "bg-blue-50 text-blue-600 border-blue-200 dark:bg-sky-500/[0.12] dark:text-sky-300 dark:border-sky-400/[0.15]",
   green:
     "bg-green-50 text-green-600 border-green-200 dark:bg-emerald-500/[0.12] dark:text-emerald-300 dark:border-emerald-400/[0.15]",
@@ -35,7 +35,7 @@ const colorMap: Record<string, string> = {
 };
 
 const borderlessColorMap: Record<string, string> = {
-  default: "bg-slate-100 text-fg-secondary dark:bg-white/[0.06]",
+  default: "bg-fill-tertiary text-fg-secondary dark:bg-white/[0.06]",
   blue: "bg-blue-50 text-blue-600 dark:bg-sky-500/[0.12] dark:text-sky-300",
   green:
     "bg-green-50 text-green-600 dark:bg-emerald-500/[0.12] dark:text-emerald-300",

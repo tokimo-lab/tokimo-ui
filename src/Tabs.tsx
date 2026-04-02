@@ -396,7 +396,7 @@ function SegmentTabs({
 
   return (
     <div className={className}>
-      <div className="flex gap-1 rounded-lg bg-gray-100 p-1 dark:bg-white/[0.06] select-none">
+      <div className="flex gap-1 rounded-lg bg-fill-tertiary p-1 dark:bg-white/[0.06] select-none">
         {items.map((item) => (
           <button
             key={item.key}
@@ -406,7 +406,7 @@ function SegmentTabs({
               "flex flex-1 items-center justify-center gap-2 rounded-md font-medium transition-all cursor-pointer",
               sizeClass,
               activeKey === item.key
-                ? "bg-white text-gray-900 shadow-sm dark:bg-white/[0.1] dark:text-gray-100"
+                ? "bg-white text-fg-primary shadow-sm dark:bg-white/[0.1]"
                 : "text-fg-muted hover:text-gray-700 dark:text-zinc-400 dark:hover:text-gray-200",
               item.disabled && "opacity-50 !cursor-not-allowed",
             )}

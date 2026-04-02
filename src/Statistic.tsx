@@ -39,10 +39,10 @@ export function Statistic({
     <div className={cn("text-left", className)}>
       {title ? <div className="text-sm text-fg-muted mb-2">{title}</div> : null}
       {loading ? (
-        <div className="h-8 w-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+        <div className="h-8 w-20 bg-fill-tertiary rounded animate-pulse" />
       ) : (
         <div
-          className="text-2xl font-semibold text-slate-800 dark:text-slate-100 flex items-baseline gap-1"
+          className="text-2xl font-semibold text-fg-primary flex items-baseline gap-1"
           style={valueStyle}
         >
           {prefix ? (
