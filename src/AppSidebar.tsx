@@ -48,6 +48,8 @@ export interface AppSidebarProps {
   onSelect?: (key: string) => void;
   /** Footer content rendered inside the standard footer wrapper */
   footer?: ReactNode;
+  /** Extra top padding (px) added above the nav items — use for macOS traffic-light inset */
+  topInset?: number;
   /** Show a centered spinner instead of items */
   loading?: boolean;
   className?: string;
@@ -63,6 +65,7 @@ export function AppSidebar({
   onSelect,
   footer,
   loading,
+  topInset,
   className,
   style,
 }: AppSidebarProps) {
@@ -128,7 +131,10 @@ export function AppSidebar({
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent opacity-40" />
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto px-2 pt-3">
+        <div
+          className="flex-1 overflow-y-auto px-2 pt-3"
+          style={topInset ? { paddingTop: topInset } : undefined}
+        >
           <div ref={itemsRef} className="relative isolate">
             {/* Sliding active indicator */}
             {indicator && (
