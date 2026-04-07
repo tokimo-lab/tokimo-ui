@@ -13,16 +13,21 @@ import {
   useRef,
   useState,
 } from "react";
+import { Tooltip } from "./Tooltip";
 import { cn } from "./utils";
 
 export interface AppSidebarItem {
   key: string;
   icon?: ReactNode;
+  /** Icon shown in collapsed (icon-only) mode — falls back to icon if not provided */
+  collapsedIcon?: ReactNode;
   label: string;
   /** Second-line text displayed below the label */
   subtitle?: string;
   /** Trailing content (e.g., edit button) rendered at the right side */
   extra?: ReactNode;
+  /** Tooltip text shown on hover */
+  tooltip?: string;
   /** Rich content rendered below the main label row (e.g., charts, badges) */
   content?: ReactNode;
   onContextMenu?: (e: React.MouseEvent) => void;
@@ -52,6 +57,8 @@ export interface AppSidebarProps {
   topInset?: number;
   /** Show a centered spinner instead of items */
   loading?: boolean;
+  /** When true, renders a 48 px icon-only sidebar with tooltips */
+  collapsed?: boolean;
   className?: string;
   /** CSS custom properties or other inline styles on the container */
   style?: React.CSSProperties;
@@ -66,6 +73,7 @@ export function AppSidebar({
   footer,
   loading,
   topInset,
+  collapsed,
   className,
   style,
 }: AppSidebarProps) {
@@ -111,6 +119,81 @@ export function AppSidebar({
   useEffect(() => {
     canAnimate.current = true;
   }, []);
+
+  // ── Collapsed (icon-only) mode ────────────────────────────────────
+  if (collapsed) {
+    return (
+      <div
+        className={cn(
+          "flex shrink-0 flex-col overflow-hidden border-r border-[var(--border-base)] bg-[var(--sidebar-bg)] select-none",
+          className,
+        )}
+        style={{ width: 48, ...style }}
+      >
+        {loading ? (
+          <div className="flex flex-1 items-center justify-center">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent opacity-40" />
+          </div>
+        ) : (
+          <div
+            className="flex flex-1 flex-col items-center gap-0.5 overflow-y-auto px-1 pt-2"
+            style={topInset ? { paddingTop: topInset } : undefined}
+          >
+            {sections.map((section, si) => {
+              if (section.items.length === 0) return null;
+              const hasPrevNonEmpty = sections
+                .slice(0, si)
+                .some((s) => s.items.length > 0);
+              return (
+                <div
+                  key={section.key ?? `s-${si}`}
+                  className="flex w-full flex-col items-center"
+                >
+                  {hasPrevNonEmpty && (
+                    <div className="my-1 w-6 border-t border-black/[0.08] dark:border-white/[0.08]" />
+                  )}
+                  {section.items.map((item) => {
+                    const isActive = activeKey === item.key;
+                    const btn = (
+                      <button
+                        key={item.key}
+                        type="button"
+                        onClick={() => onSelect?.(item.key)}
+                        onContextMenu={item.onContextMenu}
+                        className={cn(
+                          "flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg transition-colors",
+                          isActive
+                            ? "bg-[var(--accent-subtle)] text-[var(--accent)]"
+                            : "text-fg-muted hover:bg-black/[0.08] dark:hover:bg-white/[0.08]",
+                        )}
+                      >
+                        {item.collapsedIcon ?? item.icon}
+                      </button>
+                    );
+                    return (
+                      <Tooltip
+                        key={item.key}
+                        title={item.tooltip ?? item.label}
+                        placement="right"
+                      >
+                        {btn}
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {footer && (
+          <div className="shrink-0 border-t border-black/[0.06] px-1 py-1 dark:border-white/[0.08]">
+            {footer}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -233,7 +316,7 @@ function SidebarItemButton({
   );
 
   if (item.extra) {
-    return (
+    const el = (
       // biome-ignore lint/a11y/useSemanticElements: div wrapper needed for nested interactive content in extra
       <div
         data-sidebar-key={item.key}
@@ -252,9 +335,16 @@ function SidebarItemButton({
         {fullContent}
       </div>
     );
+    return item.tooltip ? (
+      <Tooltip title={item.tooltip} placement="right">
+        {el}
+      </Tooltip>
+    ) : (
+      el
+    );
   }
 
-  return (
+  const btn = (
     <button
       data-sidebar-key={item.key}
       type="button"
@@ -264,5 +354,12 @@ function SidebarItemButton({
     >
       {fullContent}
     </button>
+  );
+  return item.tooltip ? (
+    <Tooltip title={item.tooltip} placement="right">
+      {btn}
+    </Tooltip>
+  ) : (
+    btn
   );
 }

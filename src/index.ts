@@ -78,7 +78,12 @@ export type { ListProps } from "./List";
 export { List } from "./List";
 export type { MenuItem as MenuItemType, MenuProps } from "./Menu";
 export { Menu } from "./Menu";
-export type { ConfirmConfig, ModalProps, ScaledModalSize } from "./Modal";
+export type {
+  ConfirmConfig,
+  ConfirmVariant,
+  ModalProps,
+  ScaledModalSize,
+} from "./Modal";
 // ─── Feedback / Navigation ───
 export {
   Modal,

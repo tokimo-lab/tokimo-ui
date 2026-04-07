@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { AlertTriangle, Info, X, XCircle } from "lucide-react";
 import {
   type CSSProperties,
   createContext,
@@ -462,6 +462,10 @@ export function Modal({
 }
 
 /* ─── Modal.confirm utility ─── */
+
+/** Visual variant for confirm dialogs — sets the icon and accent colour. */
+export type ConfirmVariant = "info" | "warning" | "danger";
+
 export interface ConfirmConfig {
   title: ReactNode;
   content?: ReactNode;
@@ -470,11 +474,77 @@ export interface ConfirmConfig {
   onOk?: () => undefined | Promise<unknown>;
   onCancel?: () => void;
   okButtonProps?: ModalProps["okButtonProps"];
+  /** @deprecated Use `variant` instead */
   type?: "confirm" | "info" | "success" | "error" | "warning";
-  /** Icon for confirm dialog */
+  /** Visual variant — sets the icon and accent colour. "danger" auto-enables the danger button. */
+  variant?: ConfirmVariant;
+  /** Custom icon — overrides the variant icon when provided */
   icon?: ReactNode;
   /** OK button type (antd compat) */
   okType?: string;
+}
+
+function resolveConfirmVariant(
+  config: ConfirmConfig,
+): ConfirmVariant | undefined {
+  if (config.variant) return config.variant;
+  if (config.type === "warning") return "warning";
+  if (config.type === "error") return "danger";
+  if (config.type === "info") return "info";
+  return undefined;
+}
+
+/** Renders icon + title + optional description for variant confirm dialogs. */
+function ConfirmIconBody({
+  title,
+  content,
+  variant,
+  icon: customIcon,
+}: {
+  title: ReactNode;
+  content?: ReactNode;
+  variant?: ConfirmVariant;
+  icon?: ReactNode;
+}) {
+  let icon = customIcon;
+  if (!icon && variant) {
+    const base =
+      "flex items-center justify-center w-10 h-10 rounded-full shrink-0";
+    if (variant === "danger") {
+      icon = (
+        <span className={cn(base, "bg-red-100 dark:bg-red-900/30")}>
+          <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+        </span>
+      );
+    } else if (variant === "warning") {
+      icon = (
+        <span className={cn(base, "bg-amber-100 dark:bg-amber-900/30")}>
+          <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+        </span>
+      );
+    } else {
+      icon = (
+        <span className={cn(base, "bg-blue-100 dark:bg-blue-900/30")}>
+          <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        </span>
+      );
+    }
+  }
+  return (
+    <div className="flex gap-4 items-start py-1">
+      {icon && <div className="mt-0.5 shrink-0">{icon}</div>}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-[var(--text-primary)] leading-snug">
+          {title}
+        </p>
+        {content && (
+          <div className="mt-1.5 text-sm text-[var(--text-secondary)] leading-relaxed">
+            {content}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 /**
@@ -496,6 +566,12 @@ Modal.confirm = (config: ConfirmConfig) => {
     container.remove();
   };
 
+  const variant = resolveConfirmVariant(config);
+  const okButtonProps: ModalProps["okButtonProps"] = {
+    ...(variant === "danger" ? { danger: true } : {}),
+    ...config.okButtonProps,
+  };
+
   const ConfirmDialog = () => {
     const [open, setOpen] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -503,10 +579,11 @@ Modal.confirm = (config: ConfirmConfig) => {
       <ModalContainerContext value={containerRef}>
         <Modal
           open={open}
-          title={config.title}
+          title={variant ? undefined : config.title}
+          closable={!variant}
           okText={config.okText ?? "确定"}
           cancelText={config.cancelText ?? "取消"}
-          okButtonProps={config.okButtonProps}
+          okButtonProps={okButtonProps}
           confirmLoading={loading}
           maskClosable={!loading}
           onOk={async () => {
@@ -526,7 +603,16 @@ Modal.confirm = (config: ConfirmConfig) => {
             setTimeout(destroy, 300);
           }}
         >
-          {config.content}
+          {variant ? (
+            <ConfirmIconBody
+              title={config.title}
+              content={config.content}
+              variant={variant}
+              icon={config.icon}
+            />
+          ) : (
+            config.content
+          )}
         </Modal>
       </ModalContainerContext>
     );
@@ -560,20 +646,28 @@ export function useConfirm(): [ReactNode, (config: ConfirmConfig) => void] {
     forceUpdate((n) => n + 1);
   }, []);
 
+  const cfg = configRef.current;
+  const variant = cfg ? resolveConfirmVariant(cfg) : undefined;
+  const okButtonProps: ModalProps["okButtonProps"] = {
+    ...(variant === "danger" ? { danger: true } : {}),
+    ...cfg?.okButtonProps,
+  };
+
   const contextHolder = (
     <Modal
       open={open}
-      title={configRef.current?.title}
-      okText={configRef.current?.okText ?? "确定"}
-      cancelText={configRef.current?.cancelText ?? "取消"}
-      okButtonProps={configRef.current?.okButtonProps}
+      title={variant ? undefined : cfg?.title}
+      closable={!variant}
+      okText={cfg?.okText ?? "确定"}
+      cancelText={cfg?.cancelText ?? "取消"}
+      okButtonProps={okButtonProps}
       confirmLoading={loading}
       maskClosable={!loading}
       onOk={async () => {
         loadingRef.current = true;
         setLoading(true);
         try {
-          await configRef.current?.onOk?.();
+          await cfg?.onOk?.();
           setOpen(false);
         } finally {
           loadingRef.current = false;
@@ -582,11 +676,20 @@ export function useConfirm(): [ReactNode, (config: ConfirmConfig) => void] {
       }}
       onCancel={() => {
         if (loadingRef.current) return;
-        configRef.current?.onCancel?.();
+        cfg?.onCancel?.();
         setOpen(false);
       }}
     >
-      {configRef.current?.content}
+      {variant ? (
+        <ConfirmIconBody
+          title={cfg?.title}
+          content={cfg?.content}
+          variant={variant}
+          icon={cfg?.icon}
+        />
+      ) : (
+        cfg?.content
+      )}
     </Modal>
   );
 
