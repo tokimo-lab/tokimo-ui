@@ -387,7 +387,7 @@ export function Modal({
         ref={contentRef}
         className={cn(
           "relative rounded-lg shadow-2xl flex flex-col shrink-0 transition-all duration-200",
-          "bg-white/72 dark:bg-[rgba(20,20,35,0.65)] backdrop-blur-2xl border border-white/[0.12] dark:border-white/[0.12] shadow-[0_8px_32px_rgba(0,0,0,0.3)]",
+          "bg-white/72 dark:bg-black/65 backdrop-blur-2xl border border-white/[0.12] dark:border-white/[0.12] shadow-[0_8px_32px_rgba(0,0,0,0.3)]",
           animClass
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 translate-y-4",
