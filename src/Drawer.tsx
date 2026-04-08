@@ -232,7 +232,6 @@ export function Drawer({
         <div
           className="flex-1 overflow-y-auto px-6 py-4"
           style={{
-            scrollbarWidth: "thin",
             scrollbarColor: "rgba(128,128,128,0.4) transparent",
             ...bodyStyle,
             ...styles?.body,

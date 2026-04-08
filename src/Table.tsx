@@ -529,7 +529,6 @@ export function Table<T = Record<string, unknown>>({
           ...(virtual && scroll?.y
             ? { height: scroll.y, overflowY: "scroll" as const }
             : { maxHeight: scroll?.y }),
-          scrollbarWidth: "thin",
           scrollbarColor: "rgba(128,128,128,0.4) transparent",
         }}
         onScroll={virtual ? handleVirtualScroll : undefined}

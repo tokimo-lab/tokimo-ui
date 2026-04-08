@@ -495,7 +495,6 @@ function LeftTabs({
         <div className="flex flex-col min-h-0">
           <div
             className={cn("flex-1 overflow-y-auto px-6 py-5", contentClassName)}
-            style={{ scrollbarWidth: "thin" }}
           >
             <TabPanels
               items={items}

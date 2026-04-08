@@ -499,7 +499,6 @@ export function Select({
             <div
               ref={scrollContainerRef}
               className="relative max-h-60 overflow-y-auto py-1"
-              style={{ scrollbarWidth: "thin" }}
             >
               {filtered.length === 0 ? (
                 <div className="px-3 py-4 text-center text-sm text-[var(--text-muted)]">

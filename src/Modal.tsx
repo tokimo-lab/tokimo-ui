@@ -105,7 +105,6 @@ export interface ModalProps {
 }
 
 const THIN_SCROLLBAR: CSSProperties = {
-  scrollbarWidth: "thin",
   scrollbarColor: "rgba(128,128,128,0.4) transparent",
 };
 
