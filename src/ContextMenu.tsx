@@ -33,7 +33,7 @@ export interface ContextMenuItem {
   disabled?: boolean;
   danger?: boolean;
   /** Divider or group title */
-  type?: "divider" | "group";
+  type?: "divider" | "separator" | "group";
   onClick?: () => void;
   /** Custom content rendered in a hover-triggered submenu panel to the right */
   submenuContent?: ReactNode;
@@ -207,7 +207,7 @@ function MenuItemList({
   return (
     <div className="relative py-1.5">
       {items.map((item, i) => {
-        if (item.type === "divider") {
+        if (item.type === "divider" || item.type === "separator") {
           return (
             <div
               key={item.key ?? `d-${i}`}
