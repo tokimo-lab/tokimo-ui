@@ -37,6 +37,12 @@ export interface ContextMenuItem {
   onClick?: () => void;
   /** Custom content rendered in a hover-triggered submenu panel to the right */
   submenuContent?: ReactNode;
+  /**
+   * Inline custom content rendered directly inside the menu body.
+   * When set, `label` / `icon` / `onClick` are ignored — the ReactNode
+   * is rendered as-is with standard horizontal padding.
+   */
+  content?: ReactNode;
 }
 
 export interface ContextMenuProps {
@@ -222,6 +228,13 @@ function MenuItemList({
               className="px-3 py-1 text-xs font-medium text-[var(--text-tertiary)] select-none"
             >
               {item.label}
+            </div>
+          );
+        }
+        if (item.content) {
+          return (
+            <div key={item.key ?? `c-${i}`} className="px-2 py-1 select-none">
+              {item.content}
             </div>
           );
         }

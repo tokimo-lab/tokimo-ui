@@ -27,7 +27,7 @@ export function Divider({
         className={cn(
           "inline-block mx-2 h-[1em] w-px align-middle",
           dashed
-            ? "border-l border-dashed border-[var(--border-base)]"
+            ? "border-l border-dashed border-border-base"
             : "bg-[var(--border-base)]",
           className,
         )}
@@ -49,7 +49,7 @@ export function Divider({
           className={cn(
             "h-px flex-1",
             dashed
-              ? "border-t border-dashed border-[var(--border-base)]"
+              ? "border-t border-dashed border-border-base"
               : "bg-[var(--border-base)]",
             orientation === "left" && "max-w-[5%]",
             orientation === "right" && "flex-[1]",
@@ -60,7 +60,7 @@ export function Divider({
           className={cn(
             "h-px flex-1",
             dashed
-              ? "border-t border-dashed border-[var(--border-base)]"
+              ? "border-t border-dashed border-border-base"
               : "bg-[var(--border-base)]",
             orientation === "right" && "max-w-[5%]",
             orientation === "left" && "flex-[1]",
@@ -75,7 +75,7 @@ export function Divider({
       className={cn(
         "my-4 border-none h-px",
         dashed
-          ? "border-t border-dashed border-[var(--border-base)]"
+          ? "border-t border-dashed border-border-base"
           : "bg-[var(--border-base)]",
         className,
       )}

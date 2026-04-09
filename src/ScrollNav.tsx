@@ -145,7 +145,7 @@ function ScrollNavRoot({
       {/* Right scrollable content */}
       <div
         ref={contentRef}
-        className="flex-1 min-w-0 overflow-y-auto border-l border-[var(--border-base)] pl-6"
+        className="flex-1 min-w-0 overflow-y-auto border-l border-border-base pl-6"
       >
         {children}
       </div>

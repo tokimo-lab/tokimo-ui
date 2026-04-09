@@ -125,7 +125,7 @@ export function AppSidebar({
     return (
       <div
         className={cn(
-          "flex shrink-0 flex-col overflow-hidden border-r border-[var(--border-base)] bg-[var(--sidebar-bg)] select-none",
+          "flex shrink-0 flex-col overflow-hidden border-r border-border-base bg-[var(--sidebar-bg)] select-none",
           className,
         )}
         style={{ width: 48, ...style }}
@@ -198,7 +198,7 @@ export function AppSidebar({
   return (
     <div
       className={cn(
-        "flex shrink-0 flex-col overflow-hidden border-r border-[var(--border-base)] bg-[var(--sidebar-bg)] select-none",
+        "flex shrink-0 flex-col overflow-hidden border-r border-border-base bg-[var(--sidebar-bg)] select-none",
         className,
       )}
       style={{ width, ...style }}

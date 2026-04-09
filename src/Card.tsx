@@ -47,7 +47,7 @@ export function Card({
     <div
       className={cn(
         "rounded-2xl overflow-hidden bg-surface-glass backdrop-blur-xl",
-        bordered ? "border border-border-glass" : "shadow-sm",
+        bordered ? "border border-border-base" : "shadow-sm",
         hoverable && "transition-shadow hover:shadow-md cursor-pointer",
         className,
       )}
@@ -59,7 +59,7 @@ export function Card({
       {hasHeader ? (
         <div
           className={cn(
-            "flex items-center justify-between border-b border-border-glass",
+            "flex items-center justify-between border-b border-border-base",
             size === "small" ? "px-3 py-2" : "px-6 py-4",
           )}
           style={headStyle}
@@ -88,7 +88,7 @@ export function Card({
         )}
       </div>
       {actions?.length ? (
-        <div className="flex border-t border-border-glass divide-x divide-border-glass">
+        <div className="flex border-t border-border-base divide-x divide-border-glass">
           {actions.map((action, i) => (
             <div
               // biome-ignore lint/suspicious/noArrayIndexKey: static action list

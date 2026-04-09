@@ -465,7 +465,7 @@ function LeftTabs({
       style={{ gridTemplateColumns: "188px 1fr" }}
     >
       {/* Left: nav sidebar */}
-      <div className="border-r border-[var(--border-base)] bg-[var(--sidebar-bg)] flex flex-col overflow-hidden select-none">
+      <div className="border-r border-border-base bg-[var(--sidebar-bg)] flex flex-col overflow-hidden select-none">
         {tabBarHeader}
         <div className="px-2 pt-3 overflow-y-auto flex-1">
           {items.map((item) => (
