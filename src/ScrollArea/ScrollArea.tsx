@@ -269,7 +269,11 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       >
         <div
           ref={contentRef}
-          className={cn("will-change-transform", innerClassName)}
+          className={cn(
+            "will-change-transform",
+            direction !== "vertical" && "w-max",
+            innerClassName,
+          )}
         >
           {children}
         </div>
