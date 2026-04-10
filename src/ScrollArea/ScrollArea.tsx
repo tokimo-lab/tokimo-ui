@@ -31,11 +31,7 @@ export interface ScrollAreaProps
   thumbMinSize?: number;
   /** Extra className for inner content wrapper */
   innerClassName?: string;
-<<<<<<< HEAD
   /** Hide the scrollbar tracks entirely (still scrollable). @default false */
-=======
-  /** Hide scrollbar tracks (scroll still works). @default false */
->>>>>>> 4814178d (feat: add hideScrollbar prop to ScrollArea; replace HorizontalScroll globally)
   hideScrollbar?: boolean;
   /** Fires on every scroll position change */
   onScrollChange?: (scrollX: number, scrollY: number) => void;
