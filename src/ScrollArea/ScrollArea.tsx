@@ -67,6 +67,9 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
     const contentRef = useRef<HTMLDivElement>(null);
     const scrollXRef = useRef(0);
     const scrollYRef = useRef(0);
+    const targetXRef = useRef(0);
+    const targetYRef = useRef(0);
+    const rafRef = useRef<number | null>(null);
     const dimsRef = useRef({ vw: 0, vh: 0, cw: 0, ch: 0 });
     const [overflow, setOverflow] = useState({ x: false, y: false });
     const onScrollRef = useRef(onScrollChange);
@@ -103,6 +106,9 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       const my = Math.max(0, d.ch - d.vh);
       scrollXRef.current = Math.max(0, Math.min(x, mx));
       scrollYRef.current = Math.max(0, Math.min(y, my));
+      // Sync target so an ongoing wheel animation doesn't fight thumb drag
+      targetXRef.current = scrollXRef.current;
+      targetYRef.current = scrollYRef.current;
       if (contentRef.current) {
         contentRef.current.style.transform = `translate3d(${-scrollXRef.current}px,${-scrollYRef.current}px,0)`;
       }
@@ -112,6 +118,52 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
         sbRef.current?.flash();
       }
       onScrollRef.current?.(scrollXRef.current, scrollYRef.current);
+    }, []);
+
+    // Smooth lerp scroll — only used for wheel events
+    const wheelScrollTo = useCallback((x: number, y: number) => {
+      const d = dimsRef.current;
+      const mx = Math.max(0, d.cw - d.vw);
+      const my = Math.max(0, d.ch - d.vh);
+      targetXRef.current = Math.max(0, Math.min(x, mx));
+      targetYRef.current = Math.max(0, Math.min(y, my));
+
+      if (rafRef.current !== null) return; // RAF already running
+
+      const tick = () => {
+        const tx = targetXRef.current;
+        const ty = targetYRef.current;
+        const cx = scrollXRef.current;
+        const cy = scrollYRef.current;
+        const dx = tx - cx;
+        const dy = ty - cy;
+
+        if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) {
+          scrollXRef.current = tx;
+          scrollYRef.current = ty;
+          if (contentRef.current) {
+            contentRef.current.style.transform = `translate3d(${-tx}px,${-ty}px,0)`;
+          }
+          if (!hideScrollbarRef.current) sbRef.current?.syncThumbs();
+          onScrollRef.current?.(tx, ty);
+          rafRef.current = null;
+          return;
+        }
+
+        const LERP = 0.14;
+        const nx = cx + dx * LERP;
+        const ny = cy + dy * LERP;
+        scrollXRef.current = nx;
+        scrollYRef.current = ny;
+        if (contentRef.current) {
+          contentRef.current.style.transform = `translate3d(${-nx}px,${-ny}px,0)`;
+        }
+        if (!hideScrollbarRef.current) sbRef.current?.syncThumbs();
+        onScrollRef.current?.(nx, ny);
+        rafRef.current = requestAnimationFrame(tick);
+      };
+
+      rafRef.current = requestAnimationFrame(tick);
     }, []);
 
     const sb = useScrollbar(
@@ -165,16 +217,17 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
         }
         if ((canY && dy !== 0) || (canX && dx !== 0)) {
           e.preventDefault();
-          applyScroll(
-            scrollXRef.current + (canX ? dx : 0),
-            scrollYRef.current + (canY ? dy : 0),
+          e.stopPropagation();
+          wheelScrollTo(
+            targetXRef.current + (canX ? dx : 0),
+            targetYRef.current + (canY ? dy : 0),
           );
         }
       };
 
       el.addEventListener("wheel", onWheel, { passive: false });
       return () => el.removeEventListener("wheel", onWheel);
-    }, [direction, applyScroll]);
+    }, [direction, wheelScrollTo]);
 
     // ─── Touch ───
 
@@ -256,6 +309,17 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       measure();
       return () => ro.disconnect();
     }, [direction, applyScroll]);
+
+    // ─── Cleanup RAF on unmount ───
+
+    useEffect(() => {
+      return () => {
+        if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
+      };
+    }, []);
 
     // ─── Render ───
 
