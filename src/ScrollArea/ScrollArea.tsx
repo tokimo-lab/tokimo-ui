@@ -31,6 +31,8 @@ export interface ScrollAreaProps
   thumbMinSize?: number;
   /** Extra className for inner content wrapper */
   innerClassName?: string;
+  /** Hide the scrollbar tracks entirely (still scrollable). @default false */
+  hideScrollbar?: boolean;
   /** Fires on every scroll position change */
   onScrollChange?: (scrollX: number, scrollY: number) => void;
 }
@@ -54,6 +56,7 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       autoHideDelay = 800,
       thumbMinSize = 24,
       innerClassName,
+      hideScrollbar = false,
       onScrollChange,
       className,
       ...rest
@@ -68,6 +71,18 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
     const [overflow, setOverflow] = useState({ x: false, y: false });
     const onScrollRef = useRef(onScrollChange);
     onScrollRef.current = onScrollChange;
+    const hideScrollbarRef = useRef(hideScrollbar);
+    hideScrollbarRef.current = hideScrollbar;
+
+    // Stable config refs — avoids recreating useScrollbar callbacks on every render
+    const directionRef = useRef(direction);
+    directionRef.current = direction;
+    const autoHideRef = useRef(autoHide);
+    autoHideRef.current = autoHide;
+    const autoHideDelayRef = useRef(autoHideDelay);
+    autoHideDelayRef.current = autoHideDelay;
+    const thumbMinSizeRef = useRef(thumbMinSize);
+    thumbMinSizeRef.current = thumbMinSize;
 
     const config: ScrollbarConfig = {
       direction,
@@ -91,8 +106,11 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       if (contentRef.current) {
         contentRef.current.style.transform = `translate3d(${-scrollXRef.current}px,${-scrollYRef.current}px,0)`;
       }
-      sbRef.current?.syncThumbs();
-      sbRef.current?.flash();
+      // Skip scrollbar updates entirely when hideScrollbar — avoids setState on every scroll
+      if (!hideScrollbarRef.current) {
+        sbRef.current?.syncThumbs();
+        sbRef.current?.flash();
+      }
       onScrollRef.current?.(scrollXRef.current, scrollYRef.current);
     }, []);
 
@@ -218,12 +236,14 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
           ch: ct.scrollHeight,
         };
         dimsRef.current = d;
-        // clamp
+        // clamp scroll
         applyScroll(scrollXRef.current, scrollYRef.current);
-        setOverflow({
-          x: direction !== "vertical" && d.cw > d.vw,
-          y: direction !== "horizontal" && d.ch > d.vh,
-        });
+        // equality guard — avoid re-render when overflow state hasn't changed
+        const nx = direction !== "vertical" && d.cw > d.vw;
+        const ny = direction !== "horizontal" && d.ch > d.vh;
+        setOverflow((prev) =>
+          prev.x === nx && prev.y === ny ? prev : { x: nx, y: ny },
+        );
       };
 
       const ro = new ResizeObserver(measure);

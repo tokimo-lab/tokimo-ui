@@ -77,6 +77,8 @@ export const VirtualList = forwardRef<VirtualListRef, VirtualListProps>(
     const vpSizeRef = useRef(0); // viewport size in scroll axis
     const onScrollRef = useRef(onScrollChange);
     onScrollRef.current = onScrollChange;
+    const renderItemRef = useRef(renderItem);
+    renderItemRef.current = renderItem;
 
     const totalSize = itemCount * itemHeight;
 
@@ -263,7 +265,7 @@ export const VirtualList = forwardRef<VirtualListRef, VirtualListProps>(
         els.push(
           vertical ? (
             <div key={i} style={{ height: itemHeight, width: "100%" }}>
-              {renderItem(i)}
+              {renderItemRef.current(i)}
             </div>
           ) : (
             <div
@@ -276,13 +278,13 @@ export const VirtualList = forwardRef<VirtualListRef, VirtualListProps>(
                 top: 0,
               }}
             >
-              {renderItem(i)}
+              {renderItemRef.current(i)}
             </div>
           ),
         );
       }
       return els;
-    }, [range.start, range.end, itemHeight, vertical, renderItem]);
+    }, [range.start, range.end, itemHeight, vertical]); // renderItemRef is stable
 
     const showY = vertical && totalSize > (dimsRef.current.vh || 1);
     const showX = !vertical && totalSize > (dimsRef.current.vw || 1);

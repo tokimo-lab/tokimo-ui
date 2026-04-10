@@ -54,6 +54,14 @@ export function useScrollbar(
   const hoveringRef = useRef(false);
   const [visible, setVisible] = useState(false);
 
+  // Keep config values in refs so callbacks never need to recreate on prop changes
+  const thumbMinSizeRef = useRef(config.thumbMinSize);
+  thumbMinSizeRef.current = config.thumbMinSize;
+  const autoHideRef = useRef(config.autoHide);
+  autoHideRef.current = config.autoHide;
+  const autoHideDelayRef = useRef(config.autoHideDelay);
+  autoHideDelayRef.current = config.autoHideDelay;
+
   // Inline helpers — read from refs, safe to call anytime
   const getMaxSX = useCallback(
     () => Math.max(0, dimsRef.current.cw - dimsRef.current.vw),
@@ -69,6 +77,7 @@ export function useScrollbar(
     const { vw, vh, cw, ch } = dimsRef.current;
     const sx = scrollXRef.current;
     const sy = scrollYRef.current;
+    const minSize = thumbMinSizeRef.current;
 
     if (thumbYRef.current && trackYRef.current) {
       if (ch <= vh) {
@@ -76,10 +85,7 @@ export function useScrollbar(
       } else {
         trackYRef.current.style.display = "";
         const tH = trackYRef.current.clientHeight;
-        const thumbH = Math.max(
-          config.thumbMinSize,
-          Math.round(tH * (vh / ch)),
-        );
+        const thumbH = Math.max(minSize, Math.round(tH * (vh / ch)));
         const maxTY = tH - thumbH;
         const msy = Math.max(0, ch - vh);
         const r = msy > 0 ? sy / msy : 0;
@@ -93,10 +99,7 @@ export function useScrollbar(
       } else {
         trackXRef.current.style.display = "";
         const tW = trackXRef.current.clientWidth;
-        const thumbW = Math.max(
-          config.thumbMinSize,
-          Math.round(tW * (vw / cw)),
-        );
+        const thumbW = Math.max(minSize, Math.round(tW * (vw / cw)));
         const maxTX = tW - thumbW;
         const msx = Math.max(0, cw - vw);
         const r = msx > 0 ? sx / msx : 0;
@@ -104,23 +107,23 @@ export function useScrollbar(
         thumbXRef.current.style.transform = `translate3d(${Math.round(r * maxTX)}px,0,0)`;
       }
     }
-  }, [config.thumbMinSize, dimsRef, scrollXRef, scrollYRef]);
+  }, [dimsRef, scrollXRef, scrollYRef]); // thumbMinSizeRef is stable, read via ref
 
   // ─── Visibility ───
 
   const scheduleHide = useCallback(() => {
-    if (config.autoHide && !dragRef.current && !hoveringRef.current) {
+    if (autoHideRef.current && !dragRef.current && !hoveringRef.current) {
       if (hideTimer.current) clearTimeout(hideTimer.current);
       hideTimer.current = setTimeout(
         () => setVisible(false),
-        config.autoHideDelay,
+        autoHideDelayRef.current,
       );
     }
-  }, [config.autoHide, config.autoHideDelay]);
+  }, []); // reads config via refs — never recreates
 
   const flash = useCallback(() => {
     if (hideTimer.current) clearTimeout(hideTimer.current);
-    setVisible(true);
+    setVisible((v) => (v ? v : true)); // bail out if already true
     scheduleHide();
   }, [scheduleHide]);
 
@@ -146,7 +149,7 @@ export function useScrollbar(
 
       if (drag.axis === "y" && trackYRef.current) {
         const tH = trackYRef.current.clientHeight;
-        const thumbH = Math.max(config.thumbMinSize, tH * (vh / ch));
+        const thumbH = Math.max(thumbMinSizeRef.current, tH * (vh / ch));
         const maxTY = tH - thumbH;
         if (maxTY <= 0) return;
         const msy = getMaxSY();
@@ -158,7 +161,7 @@ export function useScrollbar(
         applyScroll(scrollXRef.current, newY);
       } else if (drag.axis === "x" && trackXRef.current) {
         const tW = trackXRef.current.clientWidth;
-        const thumbW = Math.max(config.thumbMinSize, tW * (vw / cw));
+        const thumbW = Math.max(thumbMinSizeRef.current, tW * (vw / cw));
         const maxTX = tW - thumbW;
         if (maxTX <= 0) return;
         const msx = getMaxSX();
@@ -187,14 +190,13 @@ export function useScrollbar(
     };
   }, [
     applyScroll,
-    config.thumbMinSize,
     dimsRef,
     getMaxSX,
     getMaxSY,
     scheduleHide,
     scrollXRef,
     scrollYRef,
-  ]);
+  ]); // thumbMinSizeRef is stable, read via ref
 
   const onThumbYDown = useCallback(
     (e: React.MouseEvent) => {
