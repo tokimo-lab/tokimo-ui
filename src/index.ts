@@ -37,6 +37,12 @@ export {
   ContextMenu,
   useContextMenu,
 } from "./ContextMenu";
+export type {
+  DatePickerProps,
+  DateTimePickerProps,
+  TimePickerProps,
+} from "./DatePicker";
+export { DatePicker, DateTimePicker, TimePicker } from "./DatePicker";
 export type { DescriptionsItem, DescriptionsProps } from "./Descriptions";
 export { Descriptions } from "./Descriptions";
 export type { DividerProps } from "./Divider";
