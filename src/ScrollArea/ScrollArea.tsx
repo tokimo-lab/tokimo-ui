@@ -155,8 +155,12 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
 
         let dx = e.deltaX;
         let dy = e.deltaY;
-        if (e.shiftKey && canX) {
-          dx = dy;
+        // horizontal-only: treat vertical wheel as horizontal scroll
+        if (canX && !canY) {
+          dx = e.deltaX + e.deltaY;
+          dy = 0;
+        } else if (e.shiftKey && canX) {
+          dx = e.deltaX + e.deltaY;
           dy = 0;
         }
         if ((canY && dy !== 0) || (canX && dx !== 0)) {
