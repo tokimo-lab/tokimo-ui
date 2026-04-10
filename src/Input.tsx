@@ -161,7 +161,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       ref={ref}
       suffix={<Search className="h-4 w-4" />}
       onKeyDown={(e) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && !e.nativeEvent.isComposing) {
           onSearch?.((e.target as HTMLInputElement).value);
         }
         onKeyDown?.(e);
