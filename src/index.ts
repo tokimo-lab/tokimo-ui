@@ -112,11 +112,23 @@ export { PosterCard } from "./PosterCard";
 export type { ProgressProps } from "./Progress";
 export { Progress } from "./Progress";
 export type {
+  ScrollAreaProps,
+  ScrollAreaRef,
+  VirtualListProps,
+  VirtualListRef,
+} from "./ScrollArea";
+export { ScrollArea, VirtualList } from "./ScrollArea";
+export type {
   ScrollNavItem,
   ScrollNavProps,
   ScrollNavSectionProps,
 } from "./ScrollNav";
 export { ScrollNav } from "./ScrollNav";
+export type {
+  SegmentedControlOption,
+  SegmentedControlProps,
+} from "./SegmentedControl";
+export { SegmentedControl } from "./SegmentedControl";
 export type { SegmentedToggleProps } from "./SegmentedToggle";
 export { SegmentedToggle } from "./SegmentedToggle";
 export type { SelectOption, SelectProps } from "./Select";
