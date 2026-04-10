@@ -20,8 +20,14 @@ import { cn } from "./utils/cn";
 
 export interface SettingsMenuItem {
   key: string;
+  /**
+   * `"divider"` renders a visual section separator instead of a clickable row.
+   * Only `key` and `label` (optional section heading) are used when type is "divider".
+   */
+  type?: "divider";
   icon?: React.ReactNode;
-  label: string;
+  /** Required for normal items; optional section heading for dividers. */
+  label?: string;
   /** Short description shown in the list row */
   desc?: string;
   /** Sub-menu items (branch node) */
@@ -78,7 +84,9 @@ function resolveView(
   const ancestorLabels: string[] = [];
 
   for (let i = 0; i < path.length; i++) {
-    const item = currentItems.find((x) => x.key === path[i]);
+    const item = currentItems.find(
+      (x) => x.key === path[i] && x.type !== "divider",
+    );
     if (!item) {
       // Invalid key — fall back to root
       return {
@@ -108,7 +116,7 @@ function resolveView(
       };
     }
 
-    ancestorLabels.push(item.label);
+    ancestorLabels.push(item.label ?? "");
     currentItems = item.items ?? [];
   }
 
@@ -229,6 +237,36 @@ function SlidePanel({
   return <div ref={ref}>{children}</div>;
 }
 
+// ── Divider grouping ──
+
+interface ItemGroup {
+  /** Optional heading for the section (from the preceding divider's label). */
+  heading?: string;
+  items: SettingsMenuItem[];
+  /** Global offset used for stagger animation index. */
+  startIndex: number;
+}
+
+function groupByDividers(items: SettingsMenuItem[]): ItemGroup[] {
+  const result: ItemGroup[] = [];
+  let pendingHeading: string | undefined;
+  let idx = 0;
+
+  for (const item of items) {
+    if (item.type === "divider") {
+      pendingHeading = item.label;
+    } else {
+      if (result.length === 0 || pendingHeading !== undefined) {
+        result.push({ heading: pendingHeading, items: [], startIndex: idx });
+        pendingHeading = undefined;
+      }
+      result[result.length - 1].items.push(item);
+      idx++;
+    }
+  }
+  return result;
+}
+
 // ── Menu list ──
 
 function MenuList({
@@ -244,8 +282,10 @@ function MenuList({
   onSelect: (key: string) => void;
   onBack: () => void;
 }) {
+  const groups = groupByDividers(items);
+
   return (
-    <div className="select-none">
+    <div className="select-none space-y-3">
       {backPath !== null && (
         <button
           type="button"
@@ -256,11 +296,25 @@ function MenuList({
           {backLabel && <span>{backLabel}</span>}
         </button>
       )}
-      <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.03] overflow-hidden divide-y divide-black/[0.04] dark:divide-white/[0.06]">
-        {items.map((item, i) => (
-          <MenuItem key={item.key} item={item} index={i} onSelect={onSelect} />
-        ))}
-      </div>
+      {groups.map((group) => (
+        <div key={group.heading ?? `group-${group.startIndex}`}>
+          {group.heading && (
+            <div className="px-1 pb-1.5 pt-0.5 text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
+              {group.heading}
+            </div>
+          )}
+          <div className="rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.03] overflow-hidden divide-y divide-black/[0.04] dark:divide-white/[0.06]">
+            {group.items.map((item, i) => (
+              <MenuItem
+                key={item.key}
+                item={item}
+                index={group.startIndex + i}
+                onSelect={onSelect}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
