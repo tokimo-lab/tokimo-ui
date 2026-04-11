@@ -25,6 +25,7 @@ export type { CardProps } from "./Card";
 export { Card } from "./Card";
 export type { CheckboxProps } from "./Checkbox";
 export { Checkbox } from "./Checkbox";
+export { CircularProgress } from "./CircularProgress";
 export type { CollapseItem, CollapseProps } from "./Collapse";
 export { Collapse } from "./Collapse";
 export type {
