@@ -168,5 +168,7 @@ export type { UIContextValue } from "./UIContext";
 export { UIContext, useUIContext } from "./UIContext";
 export type { UploadChangeInfo, UploadFile, UploadProps } from "./Upload";
 export { Dragger, Upload } from "./Upload";
+export type { MiniAreaChartProps } from "./MiniAreaChart";
+export { MiniAreaChart } from "./MiniAreaChart";
 // ─── Utilities ───
 export { cn } from "./utils";

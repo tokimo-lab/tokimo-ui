@@ -65,13 +65,15 @@ export interface TableProps<T = Record<string, unknown>> {
   onChange?: (pagination: { current: number; pageSize: number }) => void;
   /** Scroll config */
   scroll?: { x?: number | string; y?: number | string };
-  /** Expand config for tree data */
+  /** Expand config for tree data or custom expanded rows */
   expandable?: {
     defaultExpandAllRows?: boolean;
     expandedRowKeys?: string[];
     onExpand?: (expanded: boolean, record: T) => void;
     childrenColumnName?: string;
     indentSize?: number;
+    /** Render custom expanded content below a row (full-width). Takes precedence over tree children. */
+    expandedRowRender?: (record: T) => ReactNode;
   };
   /** Row class name */
   rowClassName?: string | ((record: T, index: number) => string);
@@ -149,6 +151,8 @@ function renderRows<T>(
   const indentSize = expandable?.indentSize ?? 20;
   const rows: ReactNode[] = [];
 
+  const hasExpandedRowRender = !!expandable?.expandedRowRender;
+
   for (const record of dataSource) {
     const idx = startIdx.v++;
     const key = getKey(record, rowKey, idx);
@@ -156,6 +160,7 @@ function renderRows<T>(
       | T[]
       | undefined;
     const hasKids = Array.isArray(kids) && kids.length > 0;
+    const isExpandable = hasKids || hasExpandedRowRender;
     const expanded = expandedKeys.has(key);
     const rowCls =
       typeof rowClassName === "function"
@@ -163,15 +168,29 @@ function renderRows<T>(
         : rowClassName;
     const rowProps = onRow?.(record, idx) ?? {};
 
-    const { className: rowPropClassName, ...restRowProps } = rowProps;
+    const {
+      className: rowPropClassName,
+      onClick: rowOnClick,
+      ...restRowProps
+    } = rowProps;
+
+    const handleRowClick = hasExpandedRowRender
+      ? (e: React.MouseEvent<HTMLTableRowElement>) => {
+          toggleExpand(key, record, !expanded);
+          rowOnClick?.(e);
+        }
+      : rowOnClick;
+
     rows.push(
       <tr
         key={key}
         className={cn(
           "border-b border-black/[0.04] dark:border-white/[0.04] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors",
+          hasExpandedRowRender && "cursor-pointer",
           rowCls,
           rowPropClassName,
         )}
+        onClick={handleRowClick}
         {...restRowProps}
       >
         {columns.map((col, ci) => {
@@ -214,11 +233,14 @@ function renderRows<T>(
                         : undefined,
                 }}
               >
-                {ci === 0 && hasKids ? (
+                {ci === 0 && isExpandable ? (
                   <button
                     type="button"
-                    className="shrink-0 text-[var(--text-muted)] hover:text-[var(--text-secondary)] w-4"
-                    onClick={() => toggleExpand(key, record, !expanded)}
+                    className="shrink-0 text-[var(--text-muted)] hover:text-[var(--text-secondary)] w-4 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleExpand(key, record, !expanded);
+                    }}
                   >
                     {expanded ? "▾" : "▸"}
                   </button>
@@ -241,23 +263,36 @@ function renderRows<T>(
       </tr>,
     );
 
-    if (hasKids && expanded) {
-      rows.push(
-        ...renderRows(
-          kids!,
-          columns,
-          rowKey,
-          expandable,
-          expandedKeys,
-          toggleExpand,
-          level + 1,
-          sizeClass,
-          bordered,
-          rowClassName,
-          onRow,
-          startIdx,
-        ),
-      );
+    if (expanded) {
+      if (hasExpandedRowRender) {
+        rows.push(
+          <tr
+            key={`${key}-expanded`}
+            className="border-b border-black/[0.04] dark:border-white/[0.04]"
+          >
+            <td colSpan={columns.length} className="p-0">
+              {expandable!.expandedRowRender!(record)}
+            </td>
+          </tr>,
+        );
+      } else if (hasKids) {
+        rows.push(
+          ...renderRows(
+            kids!,
+            columns,
+            rowKey,
+            expandable,
+            expandedKeys,
+            toggleExpand,
+            level + 1,
+            sizeClass,
+            bordered,
+            rowClassName,
+            onRow,
+            startIdx,
+          ),
+        );
+      }
     }
   }
 
