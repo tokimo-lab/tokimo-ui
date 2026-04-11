@@ -17,6 +17,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { ScrollArea } from "./ScrollArea";
 import { cn } from "./utils";
 
 export interface AutoCompleteOption {
@@ -287,33 +288,39 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
               ref={refs.setFloating}
               style={floatingStyles}
               {...getFloatingProps()}
-              className="z-[9999] bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] rounded-md shadow-lg py-1 max-h-64 overflow-auto"
+              className="z-[9999] bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] rounded-md shadow-lg overflow-hidden"
             >
-              {filtered.map((opt, i) => (
-                <div
-                  key={opt.value}
-                  role="option"
-                  tabIndex={0}
-                  className={cn(
-                    "px-3 py-1.5 text-sm cursor-pointer select-none transition-colors",
-                    i === activeIdx
-                      ? "bg-black/[0.04] dark:bg-white/[0.06] text-[var(--text-primary)]"
-                      : "text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
-                    opt.disabled && "opacity-40 cursor-not-allowed",
-                  )}
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => {
-                    if (!opt.disabled) handleSelect(opt);
-                  }}
-                  onKeyDown={(e) => {
-                    if ((e.key === "Enter" || e.key === " ") && !opt.disabled)
-                      handleSelect(opt);
-                  }}
-                  onMouseEnter={() => setActiveIdx(i)}
-                >
-                  {opt.label ?? opt.value}
-                </div>
-              ))}
+              <ScrollArea
+                direction="vertical"
+                className="max-h-64"
+                innerClassName="py-1"
+              >
+                {filtered.map((opt, i) => (
+                  <div
+                    key={opt.value}
+                    role="option"
+                    tabIndex={0}
+                    className={cn(
+                      "px-3 py-1.5 text-sm cursor-pointer select-none transition-colors",
+                      i === activeIdx
+                        ? "bg-black/[0.04] dark:bg-white/[0.06] text-[var(--text-primary)]"
+                        : "text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
+                      opt.disabled && "opacity-40 cursor-not-allowed",
+                    )}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      if (!opt.disabled) handleSelect(opt);
+                    }}
+                    onKeyDown={(e) => {
+                      if ((e.key === "Enter" || e.key === " ") && !opt.disabled)
+                        handleSelect(opt);
+                    }}
+                    onMouseEnter={() => setActiveIdx(i)}
+                  >
+                    {opt.label ?? opt.value}
+                  </div>
+                ))}
+              </ScrollArea>
             </div>
           </FloatingPortal>
         )}

@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useId, useMemo } from "react";
+import { forwardRef, useCallback, useId, useMemo, useRef } from "react";
 import { cn } from "./utils";
 
 export interface SliderProps
@@ -14,8 +14,10 @@ export interface SliderProps
   max?: number;
   /** Step increment */
   step?: number;
-  /** Change handler (receives number, not event) */
+  /** Change handler (receives number, not event) — fires on every tick */
   onChange?: (value: number) => void;
+  /** Commit handler — fires once on pointer/key release */
+  onCommit?: (value: number) => void;
   /** Size variant */
   size?: "default" | "small";
   /** Custom accent color (CSS color string, defaults to var(--accent)) */
@@ -35,6 +37,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
       step = 1,
       disabled = false,
       onChange,
+      onCommit,
       size = "default",
       accentColor,
       className,
@@ -57,12 +60,19 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
       [pct, fill, style],
     );
 
+    const valueRef = useRef(value);
+    valueRef.current = value;
+
     const handleChange = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         onChange?.(Number(e.target.value));
       },
       [onChange],
     );
+
+    const handleCommit = useCallback(() => {
+      onCommit?.(valueRef.current);
+    }, [onCommit]);
 
     const isSmall = size === "small";
 
@@ -77,6 +87,8 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
         value={value}
         disabled={disabled}
         onChange={handleChange}
+        onPointerUp={handleCommit}
+        onKeyUp={handleCommit}
         style={trackStyle}
         className={cn(
           "appearance-none rounded-full outline-none cursor-pointer",

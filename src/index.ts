@@ -28,6 +28,8 @@ export { Checkbox } from "./Checkbox";
 export { CircularProgress } from "./CircularProgress";
 export type { CollapseItem, CollapseProps } from "./Collapse";
 export { Collapse } from "./Collapse";
+export type { ColorPickerProps } from "./ColorPicker";
+export { ColorPicker } from "./ColorPicker";
 export type {
   ActiveDescendantControls,
   ContextMenuItem,

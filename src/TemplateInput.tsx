@@ -16,6 +16,7 @@ import {
   useState,
 } from "react";
 import { FloatingVibrancy } from "./FloatingVibrancy";
+import { ScrollArea } from "./ScrollArea";
 import { cn } from "./utils";
 
 export interface TemplateVariable {
@@ -328,69 +329,71 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
           <FloatingPortal>
             <div
               ref={refs.setFloating}
-              style={{
-                ...floatingStyles,
-                scrollbarWidth: "thin",
-                scrollbarColor: "rgb(128 128 128 / 0.35) transparent",
-              }}
-              className="z-[9999] rounded-md overflow-hidden bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg py-1 text-sm max-h-60 overflow-auto"
+              style={floatingStyles}
+              className="z-[9999] rounded-md overflow-hidden bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg text-sm"
             >
               <FloatingVibrancy />
-              <div ref={listRef} className="relative">
-                {mode === "var"
-                  ? filteredVars.map((item, idx) => (
-                      <div
-                        key={item.key}
-                        role="option"
-                        tabIndex={-1}
-                        aria-selected={idx === activeIdx}
-                        className={cn(
-                          "px-3 py-1.5 cursor-pointer flex items-center gap-3",
-                          idx === activeIdx
-                            ? "bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400"
-                            : "text-fg-secondary hover:bg-fill-tertiary",
-                        )}
-                        onMouseEnter={() => setActiveIdx(idx)}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          insertVar(item.key);
-                        }}
-                      >
-                        <code className="text-sky-600 dark:text-sky-400 text-xs">
-                          {`{{${item.key}}}`}
-                        </code>
-                        <span className="text-xs text-fg-muted">
-                          {item.label}
-                        </span>
-                      </div>
-                    ))
-                  : filteredJinja.map((kw, idx) => (
-                      <div
-                        key={kw.key}
-                        role="option"
-                        tabIndex={-1}
-                        aria-selected={idx === activeIdx}
-                        className={cn(
-                          "px-3 py-1.5 cursor-pointer flex items-center gap-3",
-                          idx === activeIdx
-                            ? "bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400"
-                            : "text-fg-secondary hover:bg-fill-tertiary",
-                        )}
-                        onMouseEnter={() => setActiveIdx(idx)}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          insertJinja(kw);
-                        }}
-                      >
-                        <code className="text-violet-600 dark:text-violet-400 text-xs">
-                          {kw.key}
-                        </code>
-                        <span className="text-xs text-fg-muted">
-                          {kw.display}
-                        </span>
-                      </div>
-                    ))}
-              </div>
+              <ScrollArea
+                direction="vertical"
+                className="max-h-60"
+                innerClassName="py-1"
+              >
+                <div ref={listRef} className="relative">
+                  {mode === "var"
+                    ? filteredVars.map((item, idx) => (
+                        <div
+                          key={item.key}
+                          role="option"
+                          tabIndex={-1}
+                          aria-selected={idx === activeIdx}
+                          className={cn(
+                            "px-3 py-1.5 cursor-pointer flex items-center gap-3",
+                            idx === activeIdx
+                              ? "bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400"
+                              : "text-fg-secondary hover:bg-fill-tertiary",
+                          )}
+                          onMouseEnter={() => setActiveIdx(idx)}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            insertVar(item.key);
+                          }}
+                        >
+                          <code className="text-sky-600 dark:text-sky-400 text-xs">
+                            {`{{${item.key}}}`}
+                          </code>
+                          <span className="text-xs text-fg-muted">
+                            {item.label}
+                          </span>
+                        </div>
+                      ))
+                    : filteredJinja.map((kw, idx) => (
+                        <div
+                          key={kw.key}
+                          role="option"
+                          tabIndex={-1}
+                          aria-selected={idx === activeIdx}
+                          className={cn(
+                            "px-3 py-1.5 cursor-pointer flex items-center gap-3",
+                            idx === activeIdx
+                              ? "bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400"
+                              : "text-fg-secondary hover:bg-fill-tertiary",
+                          )}
+                          onMouseEnter={() => setActiveIdx(idx)}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            insertJinja(kw);
+                          }}
+                        >
+                          <code className="text-violet-600 dark:text-violet-400 text-xs">
+                            {kw.key}
+                          </code>
+                          <span className="text-xs text-fg-muted">
+                            {kw.display}
+                          </span>
+                        </div>
+                      ))}
+                </div>
+              </ScrollArea>
             </div>
           </FloatingPortal>
         )}

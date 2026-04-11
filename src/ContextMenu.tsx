@@ -281,12 +281,14 @@ function FloatingMenuPanel({
   point,
   onOpenChange,
   placement,
+  zIndex,
 }: {
   items: ContextMenuItem[];
   open: boolean;
   point: { x: number; y: number };
   onOpenChange: (v: boolean) => void;
   placement: "right-start" | "right-end";
+  zIndex?: number;
 }) {
   const { refs, floatingStyles, context } = useFloating({
     open,
@@ -318,8 +320,8 @@ function FloatingMenuPanel({
     <FloatingPortal>
       <div
         ref={refs.setFloating}
-        style={floatingStyles}
-        className="z-[9999]"
+        style={{ ...floatingStyles, ...(zIndex != null ? { zIndex } : {}) }}
+        className={zIndex == null ? "z-[9999]" : undefined}
         {...getFloatingProps()}
       >
         <div
@@ -381,6 +383,11 @@ interface OpenAtOptions {
   bottomAnchor?: boolean;
 }
 
+export interface UseContextMenuOptions {
+  /** Override the default z-index (9999) of the floating menu portal */
+  zIndex?: number;
+}
+
 interface ContextMenuTrigger {
   /**
    * Call from onContextMenu handler.
@@ -398,7 +405,9 @@ interface ContextMenuTrigger {
   contextMenu: ReactNode;
 }
 
-export function useContextMenu(): ContextMenuTrigger {
+export function useContextMenu(
+  options?: UseContextMenuOptions,
+): ContextMenuTrigger {
   const [isOpen, setIsOpen] = useState(false);
   const [items, setItems] = useState<ContextMenuItem[]>([]);
   const [point, setPoint] = useState({ x: 0, y: 0 });
@@ -433,6 +442,7 @@ export function useContextMenu(): ContextMenuTrigger {
     [],
   );
 
+  const zIndex = options?.zIndex;
   const contextMenu = useMemo(
     () => (
       <FloatingMenuPanel
@@ -441,9 +451,10 @@ export function useContextMenu(): ContextMenuTrigger {
         point={point}
         onOpenChange={setIsOpen}
         placement={placement}
+        zIndex={zIndex}
       />
     ),
-    [items, isOpen, point, placement],
+    [items, isOpen, point, placement, zIndex],
   );
 
   return { open, openAt, contextMenu };

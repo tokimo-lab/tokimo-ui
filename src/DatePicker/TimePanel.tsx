@@ -1,4 +1,6 @@
 import { useEffect, useRef } from "react";
+import type { ScrollAreaRef } from "../ScrollArea";
+import { ScrollArea } from "../ScrollArea";
 import { cn } from "../utils";
 
 interface TimePanelProps {
@@ -109,43 +111,51 @@ function TimeColumn({
   selected: number;
   onSelect: (v: number) => void;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<ScrollAreaRef>(null);
   const selectedRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (selectedRef.current && containerRef.current) {
-      const container = containerRef.current;
+    if (selectedRef.current && wrapperRef.current && scrollAreaRef.current) {
+      const container = wrapperRef.current;
       const item = selectedRef.current;
-      container.scrollTop =
+      const scrollTop =
         item.offsetTop - container.clientHeight / 2 + item.clientHeight / 2;
+      scrollAreaRef.current.scrollTo(0, scrollTop);
     }
   }, []);
 
   return (
     <div
-      ref={containerRef}
-      className="h-[224px] overflow-y-auto flex-1 border-r border-black/[0.06] dark:border-white/[0.08] last:border-r-0"
-      style={{ scrollbarWidth: "thin" }}
+      ref={wrapperRef}
+      className="h-[224px] flex-1 border-r border-black/[0.06] dark:border-white/[0.08] last:border-r-0"
     >
-      {items.map((v) => {
-        const isSelected = v === selected;
-        return (
-          <button
-            key={v}
-            ref={isSelected ? selectedRef : undefined}
-            type="button"
-            className={cn(
-              "w-full h-7 text-xs text-center cursor-pointer transition-colors",
-              isSelected
-                ? "bg-[var(--accent-subtle)] text-[var(--accent)] font-medium"
-                : "text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
-            )}
-            onClick={() => onSelect(v)}
-          >
-            {String(v).padStart(2, "0")}
-          </button>
-        );
-      })}
+      <ScrollArea
+        ref={scrollAreaRef}
+        direction="vertical"
+        className="h-full"
+        innerClassName="w-full"
+      >
+        {items.map((v) => {
+          const isSelected = v === selected;
+          return (
+            <button
+              key={v}
+              ref={isSelected ? selectedRef : undefined}
+              type="button"
+              className={cn(
+                "w-full h-7 text-xs text-center cursor-pointer transition-colors",
+                isSelected
+                  ? "bg-[var(--accent-subtle)] text-[var(--accent)] font-medium"
+                  : "text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
+              )}
+              onClick={() => onSelect(v)}
+            >
+              {String(v).padStart(2, "0")}
+            </button>
+          );
+        })}
+      </ScrollArea>
     </div>
   );
 }
