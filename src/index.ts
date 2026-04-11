@@ -82,6 +82,8 @@ export type { ListProps } from "./List";
 export { List } from "./List";
 export type { MenuItem as MenuItemType, MenuProps } from "./Menu";
 export { Menu } from "./Menu";
+export type { MiniAreaChartProps } from "./MiniAreaChart";
+export { MiniAreaChart } from "./MiniAreaChart";
 export type {
   ConfirmConfig,
   ConfirmVariant,
@@ -168,7 +170,5 @@ export type { UIContextValue } from "./UIContext";
 export { UIContext, useUIContext } from "./UIContext";
 export type { UploadChangeInfo, UploadFile, UploadProps } from "./Upload";
 export { Dragger, Upload } from "./Upload";
-export type { MiniAreaChartProps } from "./MiniAreaChart";
-export { MiniAreaChart } from "./MiniAreaChart";
 // ─── Utilities ───
 export { cn } from "./utils";
