@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { forwardRef, type InputHTMLAttributes } from "react";
+import { forwardRef, type InputHTMLAttributes, useRef } from "react";
 import { cn } from "./utils";
 
 export interface InputNumberProps
@@ -63,6 +63,8 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
     },
     ref,
   ) => {
+    const composingRef = useRef(false);
+
     const clamp = (v: number) => {
       let val = v;
       if (min !== undefined) val = Math.max(min, val);
@@ -73,6 +75,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (composingRef.current) return;
       const raw = e.target.value;
       if (raw === "" || raw === "-") {
         onChange?.(null);
@@ -120,6 +123,13 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
           inputMode="decimal"
           disabled={disabled}
           value={value ?? ""}
+          onCompositionStart={() => {
+            composingRef.current = true;
+          }}
+          onCompositionEnd={(e) => {
+            composingRef.current = false;
+            handleChange(e as unknown as React.ChangeEvent<HTMLInputElement>);
+          }}
           onChange={handleChange}
           className="w-full min-w-[3em] bg-transparent outline-none text-left px-2"
           {...rest}

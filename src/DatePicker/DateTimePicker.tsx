@@ -176,7 +176,7 @@ export function DateTimePicker({
   };
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
       handleInputBlur();
       setOpen(false);
     }

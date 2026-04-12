@@ -143,6 +143,7 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
     const [activeIdx, setActiveIdx] = useState(0);
     const [triggerPos, setTriggerPos] = useState(-1);
     const [mode, setMode] = useState<TriggerMode>("var");
+    const composingRef = useRef(false);
 
     const { refs, floatingStyles } = useFloating({
       open,
@@ -212,8 +213,32 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
 
     function handleChange(e: ChangeEvent<HTMLInputElement>) {
       onChange?.(e);
+      if (composingRef.current) return;
       const val = e.target.value;
       const cursor = e.target.selectionStart ?? val.length;
+      const before = val.slice(0, cursor);
+
+      const result = detectTrigger(before);
+      if (result) {
+        const partial = before.slice(result.pos + 2);
+        const trimmed =
+          result.detected === "jinja" ? partial.trimStart() : partial;
+        if (/^\w*$/.test(trimmed)) {
+          setMode(result.detected);
+          setTriggerPos(result.pos);
+          setActiveIdx(0);
+          setOpen(true);
+          return;
+        }
+      }
+      setOpen(false);
+      setTriggerPos(-1);
+    }
+
+    function handleCompositionEnd(e: React.CompositionEvent<HTMLInputElement>) {
+      composingRef.current = false;
+      const val = e.currentTarget.value;
+      const cursor = e.currentTarget.selectionStart ?? val.length;
       const before = val.slice(0, cursor);
 
       const result = detectTrigger(before);
@@ -294,7 +319,10 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setActiveIdx((i) => (i - 1 + itemCount) % itemCount);
-      } else if (e.key === "Enter" || e.key === "Tab") {
+      } else if (
+        (e.key === "Enter" || e.key === "Tab") &&
+        !e.nativeEvent.isComposing
+      ) {
         e.preventDefault();
         handleSelect(activeIdx);
       } else if (e.key === "Escape") {
@@ -312,6 +340,10 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
           ref={useMergeRefs([inputRef, refs.setReference])}
           value={value}
           onChange={handleChange}
+          onCompositionStart={() => {
+            composingRef.current = true;
+          }}
+          onCompositionEnd={handleCompositionEnd}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
           placeholder={placeholder}

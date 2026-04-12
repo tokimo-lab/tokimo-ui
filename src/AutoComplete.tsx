@@ -108,6 +108,7 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
     const [activeIdx, setActiveIdx] = useState(-1);
     const inputRef = useRef<HTMLInputElement>(null);
     const interactedRef = useRef(false);
+    const composingRef = useRef(false);
 
     const normalised: AutoCompleteOption[] = useMemo(
       () =>
@@ -183,7 +184,7 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
         const prev = activeIdx > 0 ? activeIdx - 1 : filtered.length - 1;
         setActiveIdx(prev);
         if (backfill) updateVal(filtered[prev].value);
-      } else if (e.key === "Enter") {
+      } else if (e.key === "Enter" && !e.nativeEvent.isComposing) {
         if (activeIdx >= 0 && activeIdx < filtered.length) {
           e.preventDefault();
           handleSelect(filtered[activeIdx]);
@@ -245,10 +246,21 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
             value={val}
             placeholder={placeholder}
             disabled={disabled}
+            onCompositionStart={() => {
+              composingRef.current = true;
+            }}
+            onCompositionEnd={(e) => {
+              composingRef.current = false;
+              const v = (e.target as HTMLInputElement).value;
+              onSearch?.(v);
+              if (!open) setOpen(true);
+            }}
             onChange={(e) => {
               updateVal(e.target.value);
-              onSearch?.(e.target.value);
-              if (!open) setOpen(true);
+              if (!composingRef.current) {
+                onSearch?.(e.target.value);
+                if (!open) setOpen(true);
+              }
             }}
             onMouseDown={() => {
               interactedRef.current = true;

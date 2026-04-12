@@ -4,6 +4,8 @@ import {
   type InputHTMLAttributes,
   type ReactNode,
   type TextareaHTMLAttributes,
+  useEffect,
+  useRef,
   useState,
 } from "react";
 import { cn } from "./utils";
@@ -42,40 +44,78 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
       status,
       className,
       autoComplete = "off",
+      value: valueProp,
+      onChange: onChangeProp,
+      onCompositionStart: onCompositionStartProp,
+      onCompositionEnd: onCompositionEndProp,
       ...rest
     },
     ref,
-  ) => (
-    <div
-      className={cn(
-        "inline-flex items-center gap-2 rounded-md border bg-[var(--input-bg)] transition-colors focus-within:border-[var(--accent)] focus-within:ring-1 focus-within:ring-[var(--accent)] dark:focus-within:border-[var(--accent)]",
-        status === "error"
-          ? "border-red-500"
-          : status === "warning"
-            ? "border-amber-500"
-            : "border-black/[0.08] dark:border-white/[0.1]",
-        sizeMap[size],
-        className,
-      )}
-    >
-      {prefix ? (
-        <span className="text-[var(--text-muted)] shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
-          {prefix}
-        </span>
-      ) : null}
-      <input
-        ref={ref}
-        autoComplete={autoComplete}
-        className="w-full min-w-0 bg-transparent outline-none placeholder:text-[var(--text-muted)] text-inherit"
-        {...rest}
-      />
-      {suffix ? (
-        <span className="text-[var(--text-muted)] shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
-          {suffix}
-        </span>
-      ) : null}
-    </div>
-  ),
+  ) => {
+    // IME composition: buffer value locally so external re-renders
+    // (e.g. React-Query optimistic update) cannot reset the DOM input
+    // mid-composition. Same approach as rc-input (antd).
+    const composingRef = useRef(false);
+    const isControlled = valueProp !== undefined;
+    const [localValue, setLocalValue] = useState(valueProp);
+
+    useEffect(() => {
+      if (!composingRef.current) {
+        setLocalValue(valueProp);
+      }
+    }, [valueProp]);
+
+    return (
+      <div
+        className={cn(
+          "inline-flex items-center gap-2 rounded-md border bg-[var(--input-bg)] transition-colors focus-within:border-[var(--accent)] focus-within:ring-1 focus-within:ring-[var(--accent)] dark:focus-within:border-[var(--accent)]",
+          status === "error"
+            ? "border-red-500"
+            : status === "warning"
+              ? "border-amber-500"
+              : "border-black/[0.08] dark:border-white/[0.1]",
+          sizeMap[size],
+          className,
+        )}
+      >
+        {prefix ? (
+          <span className="text-[var(--text-muted)] shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
+            {prefix}
+          </span>
+        ) : null}
+        <input
+          ref={ref}
+          autoComplete={autoComplete}
+          className="w-full min-w-0 bg-transparent outline-none placeholder:text-[var(--text-muted)] text-inherit"
+          {...rest}
+          value={isControlled ? localValue : valueProp}
+          onChange={(e) => {
+            setLocalValue(e.target.value);
+            if (!composingRef.current) {
+              onChangeProp?.(e);
+            }
+          }}
+          onCompositionStart={(e) => {
+            composingRef.current = true;
+            onCompositionStartProp?.(e);
+          }}
+          onCompositionEnd={(e) => {
+            composingRef.current = false;
+            onCompositionEndProp?.(e);
+            // Browser fires `input` event after compositionend → triggers
+            // the onChange above with composingRef already false. For Safari
+            // (which may not fire a separate input event) we also call it here.
+            onChangeProp?.(e as unknown as React.ChangeEvent<HTMLInputElement>);
+          }}
+        />
+        {suffix ? (
+          <span className="text-[var(--text-muted)] shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
+            {suffix}
+          </span>
+        ) : null}
+      </div>
+    );
+  },
 );
 BaseInput.displayName = "Input";
 

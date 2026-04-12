@@ -368,6 +368,7 @@ export function Modal({
       )}
       style={{ zIndex, ...THIN_SCROLLBAR }}
       role="presentation"
+      onContextMenu={(e) => e.stopPropagation()}
       onMouseDown={(e) => {
         mouseDownOnMask.current = e.target === e.currentTarget;
       }}

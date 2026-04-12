@@ -43,6 +43,7 @@ export interface ScrollAreaRef {
   scrollToTop: () => void;
   scrollToBottom: () => void;
   getScrollPosition: () => { x: number; y: number };
+  getViewportRect: () => DOMRect | null;
 }
 
 // ─── Component ───
@@ -191,6 +192,8 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
         x: scrollXRef.current,
         y: scrollYRef.current,
       }),
+      getViewportRect: () =>
+        viewportRef.current?.getBoundingClientRect() ?? null,
     }));
 
     // ─── Wheel ───

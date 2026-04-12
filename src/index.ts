@@ -76,6 +76,7 @@ export type { ImageProps } from "./Image";
 export { Image } from "./Image";
 export type { InlineEmojiPickerProps } from "./InlineEmojiPicker";
 export { InlineEmojiPicker } from "./InlineEmojiPicker";
+export type { InputProps } from "./Input";
 export { Input, Password, SearchInput, TextArea } from "./Input";
 export type { InputNumberProps } from "./InputNumber";
 export { InputNumber } from "./InputNumber";

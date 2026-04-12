@@ -43,7 +43,7 @@ export const PosterCard = memo(function PosterCard({
         containIntrinsicSize: landscape ? "auto 200px" : "auto 350px",
       }}
       className={cn(
-        "group w-full cursor-pointer overflow-hidden rounded-lg border border-border-base bg-surface-elevated text-left transition-shadow hover:shadow-md /50",
+        "group w-full cursor-pointer overflow-hidden rounded-lg border border-border-base bg-surface-elevated text-left transition-shadow hover:shadow-md/50",
         className,
       )}
       onClick={onClick}
