@@ -155,20 +155,26 @@ export function AppSidebar({
                   {section.items.map((item) => {
                     const isActive = activeKey === item.key;
                     const btn = (
-                      <button
-                        key={item.key}
-                        type="button"
-                        onClick={() => onSelect?.(item.key)}
-                        onContextMenu={item.onContextMenu}
-                        className={cn(
-                          "flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg transition-colors",
-                          isActive
-                            ? "bg-[var(--accent-subtle)] text-[var(--accent)]"
-                            : "text-fg-muted hover:bg-black/[0.08] dark:hover:bg-white/[0.08]",
+                      <div key={item.key} className="relative">
+                        <button
+                          type="button"
+                          onClick={() => onSelect?.(item.key)}
+                          onContextMenu={item.onContextMenu}
+                          className={cn(
+                            "flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg transition-colors",
+                            isActive
+                              ? "bg-[var(--accent-subtle)] text-[var(--accent)]"
+                              : "text-fg-muted hover:bg-black/[0.08] dark:hover:bg-white/[0.08]",
+                          )}
+                        >
+                          {item.collapsedIcon ?? item.icon}
+                        </button>
+                        {item.extra && (
+                          <span className="pointer-events-none absolute -top-1 -right-1">
+                            {item.extra}
+                          </span>
                         )}
-                      >
-                        {item.collapsedIcon ?? item.icon}
-                      </button>
+                      </div>
                     );
                     return (
                       <Tooltip
