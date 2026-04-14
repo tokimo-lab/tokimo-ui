@@ -64,6 +64,7 @@ export type { EmojiPickerProps } from "./EmojiPicker";
 export { EmojiPicker } from "./EmojiPicker";
 export type { EmptyProps } from "./Empty";
 export { Empty } from "./Empty";
+export { FloatingVibrancy } from "./FloatingVibrancy";
 export type { FieldValues as FormFieldValues, FormInstance } from "./Form";
 export {
   Form,
