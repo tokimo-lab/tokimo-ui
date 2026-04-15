@@ -196,9 +196,10 @@ export interface SearchInputProps extends Omit<InputProps, "suffix"> {
 }
 
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
-  ({ onSearch, onKeyDown, ...rest }, ref) => (
+  ({ onSearch, onKeyDown, className, ...rest }, ref) => (
     <BaseInput
       ref={ref}
+      className={cn("w-full", className)}
       suffix={<Search className="h-4 w-4" />}
       onKeyDown={(e) => {
         if (e.key === "Enter" && !e.nativeEvent.isComposing) {
