@@ -113,12 +113,24 @@ export function AppSidebar({
       if (prev && prev.top === top && prev.height === height) return prev;
       return { top, height };
     });
-  }, [activeKey, sectionFingerprint]);
+  }, [activeKey, sectionFingerprint, collapsed]);
 
   // Enable slide animation after initial positioning
   useEffect(() => {
     canAnimate.current = true;
   }, []);
+
+  // Reset animation on mode change to avoid cross-mode sliding
+  const prevCollapsed = useRef(collapsed);
+  useLayoutEffect(() => {
+    if (prevCollapsed.current !== collapsed) {
+      canAnimate.current = false;
+      prevCollapsed.current = collapsed;
+      requestAnimationFrame(() => {
+        canAnimate.current = true;
+      });
+    }
+  }, [collapsed]);
 
   // ── Collapsed (icon-only) mode ────────────────────────────────────
   if (collapsed) {
@@ -136,59 +148,81 @@ export function AppSidebar({
           </div>
         ) : (
           <div
-            className="flex flex-1 flex-col items-center gap-0.5 overflow-y-auto px-1 pt-2"
+            className="flex flex-1 flex-col items-center overflow-y-auto px-1 pt-2"
             style={topInset ? { paddingTop: topInset } : undefined}
           >
-            {sections.map((section, si) => {
-              if (section.items.length === 0) return null;
-              const hasPrevNonEmpty = sections
-                .slice(0, si)
-                .some((s) => s.items.length > 0);
-              return (
-                <div
-                  key={section.key ?? `s-${si}`}
-                  className="flex w-full flex-col items-center"
-                >
-                  {hasPrevNonEmpty && (
-                    <div className="my-1 w-6 border-t border-black/[0.08] dark:border-white/[0.08]" />
-                  )}
-                  {section.items.map((item) => {
-                    const isActive = activeKey === item.key;
-                    const btn = (
-                      <div key={item.key} className="relative">
-                        <button
-                          type="button"
-                          onClick={() => onSelect?.(item.key)}
-                          onContextMenu={item.onContextMenu}
-                          className={cn(
-                            "flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg transition-colors",
-                            isActive
-                              ? "bg-[var(--accent-subtle)] text-[var(--accent)]"
-                              : "text-fg-muted hover:bg-black/[0.08] dark:hover:bg-white/[0.08]",
-                          )}
+            <div
+              ref={itemsRef}
+              className="relative flex w-full flex-col items-center gap-0.5"
+            >
+              {/* Sliding accent indicator */}
+              {indicator && (
+                <span
+                  className="pointer-events-none absolute left-0 z-10 w-[3px] rounded-r-full bg-[var(--accent)]"
+                  style={{
+                    top: indicator.top + (indicator.height - 28) / 2,
+                    height: 28,
+                    transition: canAnimate.current
+                      ? "top 200ms ease-out"
+                      : "none",
+                  }}
+                />
+              )}
+              {sections.map((section, si) => {
+                if (section.items.length === 0) return null;
+                const hasPrevNonEmpty = sections
+                  .slice(0, si)
+                  .some((s) => s.items.length > 0);
+                return (
+                  <div
+                    key={section.key ?? `s-${si}`}
+                    className="flex w-full flex-col items-center"
+                  >
+                    {hasPrevNonEmpty && (
+                      <div className="my-1 w-6 border-t border-black/[0.08] dark:border-white/[0.08]" />
+                    )}
+                    {section.items.map((item) => {
+                      const isActive = activeKey === item.key;
+                      const btn = (
+                        <div
+                          key={item.key}
+                          data-sidebar-key={item.key}
+                          className="relative"
                         >
-                          {item.collapsedIcon ?? item.icon}
-                        </button>
-                        {item.extra && (
-                          <span className="pointer-events-none absolute -top-1 -right-1">
-                            {item.extra}
-                          </span>
-                        )}
-                      </div>
-                    );
-                    return (
-                      <Tooltip
-                        key={item.key}
-                        title={item.tooltip ?? item.label}
-                        placement="right"
-                      >
-                        {btn}
-                      </Tooltip>
-                    );
-                  })}
-                </div>
-              );
-            })}
+                          <button
+                            type="button"
+                            onClick={() => onSelect?.(item.key)}
+                            onContextMenu={item.onContextMenu}
+                            className={cn(
+                              "flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg transition-colors",
+                              isActive
+                                ? ""
+                                : "text-fg-muted hover:bg-black/[0.08] dark:hover:bg-white/[0.08]",
+                            )}
+                          >
+                            {item.collapsedIcon ?? item.icon}
+                          </button>
+                          {item.extra && (
+                            <span className="pointer-events-none absolute -top-1 -right-1">
+                              {item.extra}
+                            </span>
+                          )}
+                        </div>
+                      );
+                      return (
+                        <Tooltip
+                          key={item.key}
+                          title={item.tooltip ?? item.label}
+                          placement="right"
+                        >
+                          {btn}
+                        </Tooltip>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
