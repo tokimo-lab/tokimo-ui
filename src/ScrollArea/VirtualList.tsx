@@ -39,6 +39,8 @@ export interface VirtualListProps
   thumbMinSize?: number;
   /** Fires on every scroll offset change */
   onScrollChange?: (offset: number) => void;
+  /** Fires when the visible item range changes (includes overscan) */
+  onRangeChange?: (start: number, end: number) => void;
 }
 
 export interface VirtualListRef {
@@ -62,6 +64,7 @@ export const VirtualList = forwardRef<VirtualListRef, VirtualListProps>(
       autoHideDelay = 800,
       thumbMinSize = 24,
       onScrollChange,
+      onRangeChange,
       className,
       style,
       ...rest
@@ -77,6 +80,8 @@ export const VirtualList = forwardRef<VirtualListRef, VirtualListProps>(
     const vpSizeRef = useRef(0); // viewport size in scroll axis
     const onScrollRef = useRef(onScrollChange);
     onScrollRef.current = onScrollChange;
+    const onRangeRef = useRef(onRangeChange);
+    onRangeRef.current = onRangeChange;
     const renderItemRef = useRef(renderItem);
     renderItemRef.current = renderItem;
 
@@ -127,9 +132,11 @@ export const VirtualList = forwardRef<VirtualListRef, VirtualListProps>(
 
         // Update visible range (batched via setState)
         const nr = computeRange(offset, vpSizeRef.current);
-        setRange((prev) =>
-          prev.start === nr.start && prev.end === nr.end ? prev : nr,
-        );
+        setRange((prev) => {
+          if (prev.start === nr.start && prev.end === nr.end) return prev;
+          onRangeRef.current?.(nr.start, nr.end);
+          return nr;
+        });
       },
       [vertical, computeRange],
     );
