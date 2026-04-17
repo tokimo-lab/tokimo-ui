@@ -122,13 +122,8 @@ export type { PosterCardProps } from "./PosterCard";
 export { PosterCard } from "./PosterCard";
 export type { ProgressProps } from "./Progress";
 export { Progress } from "./Progress";
-export type {
-  ScrollAreaProps,
-  ScrollAreaRef,
-  VirtualListProps,
-  VirtualListRef,
-} from "./ScrollArea";
-export { ScrollArea, VirtualList } from "./ScrollArea";
+export type { ScrollAreaProps, ScrollAreaRef } from "./ScrollArea";
+export { ScrollArea } from "./ScrollArea";
 export type {
   ScrollNavItem,
   ScrollNavProps,
@@ -145,6 +140,12 @@ export { SegmentedToggle } from "./SegmentedToggle";
 export type { SelectOption, SelectProps } from "./Select";
 // ─── Complex components ───
 export { Select } from "./Select";
+export type {
+  SettingGroupProps,
+  SettingRowProps,
+  SettingSliderProps,
+} from "./SettingRow";
+export { SettingGroup, SettingRow, SettingSlider } from "./SettingRow";
 export type { SettingsMenuItem, SettingsMenuProps } from "./SettingsMenu";
 export { SettingsMenu } from "./SettingsMenu";
 export type { SkeletonProps } from "./Skeleton";
