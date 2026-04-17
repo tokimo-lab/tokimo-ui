@@ -60,7 +60,7 @@ export interface ModalProps {
     disabled?: boolean;
   };
   /** OK callback */
-  onOk?: () => undefined | Promise<unknown>;
+  onOk?: () => void | Promise<unknown>;
   /** Cancel / close callback */
   onCancel?: () => void;
   /** Custom footer — pass null to hide */
@@ -471,7 +471,7 @@ export interface ConfirmConfig {
   content?: ReactNode;
   okText?: string;
   cancelText?: string;
-  onOk?: () => undefined | Promise<unknown>;
+  onOk?: () => void | Promise<unknown>;
   onCancel?: () => void;
   okButtonProps?: ModalProps["okButtonProps"];
   /** @deprecated Use `variant` instead */

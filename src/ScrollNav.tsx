@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { ScrollArea, type ScrollAreaRef } from "./ScrollArea";
 import { cn } from "./utils";
 
 // ─── Types ───
@@ -55,40 +56,34 @@ function ScrollNavRoot({
   children,
 }: ScrollNavProps) {
   const [activeKey, setActiveKey] = useState(items[0]?.key ?? "");
+  const scrollAreaRef = useRef<ScrollAreaRef>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const isClickScrolling = useRef(false);
   const clickTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
 
-  // Scroll-spy: track which section is at the top of the viewport
-  const handleScroll = useCallback(() => {
-    if (isClickScrolling.current) return;
-    const container = contentRef.current;
-    if (!container) return;
+  // Scroll-spy: pick the section whose top has scrolled past the viewport top
+  const handleScroll = useCallback(
+    (_x: number, y: number) => {
+      if (isClickScrolling.current) return;
+      const content = contentRef.current;
+      if (!content) return;
 
-    const sections = Array.from(
-      container.querySelectorAll<HTMLElement>("[data-scroll-key]"),
-    );
-    const containerRect = container.getBoundingClientRect();
+      const sections = Array.from(
+        content.querySelectorAll<HTMLElement>("[data-scroll-key]"),
+      );
 
-    let active = items[0]?.key ?? "";
-    for (const section of sections) {
-      const rect = section.getBoundingClientRect();
-      // Section whose top has scrolled past the container top (with 50px offset)
-      if (rect.top - containerRect.top <= 50) {
-        active = section.dataset.scrollKey!;
+      let active = items[0]?.key ?? "";
+      for (const section of sections) {
+        if (section.offsetTop - y <= 50) {
+          active = section.dataset.scrollKey ?? active;
+        }
       }
-    }
-    setActiveKey(active);
-  }, [items]);
-
-  useEffect(() => {
-    const container = contentRef.current;
-    if (!container) return;
-    container.addEventListener("scroll", handleScroll, { passive: true });
-    return () => container.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+      setActiveKey(active);
+    },
+    [items],
+  );
 
   // Reset active key when items change
   useEffect(() => {
@@ -96,9 +91,10 @@ function ScrollNavRoot({
   }, [items]);
 
   const handleNavClick = (key: string) => {
-    const container = contentRef.current;
-    if (!container) return;
-    const section = container.querySelector<HTMLElement>(
+    const content = contentRef.current;
+    const area = scrollAreaRef.current;
+    if (!content || !area) return;
+    const section = content.querySelector<HTMLElement>(
       `[data-scroll-key="${key}"]`,
     );
     if (!section) return;
@@ -107,11 +103,11 @@ function ScrollNavRoot({
     isClickScrolling.current = true;
     clearTimeout(clickTimer.current);
 
-    section.scrollIntoView({ behavior: "smooth", block: "start" });
+    area.scrollTo(0, section.offsetTop);
 
     clickTimer.current = setTimeout(() => {
       isClickScrolling.current = false;
-    }, 800);
+    }, 600);
   };
 
   return (
@@ -143,12 +139,15 @@ function ScrollNavRoot({
       </nav>
 
       {/* Right scrollable content */}
-      <div
-        ref={contentRef}
-        className="flex-1 min-w-0 overflow-y-auto border-l border-border-base pl-6"
+      <ScrollArea
+        ref={scrollAreaRef}
+        direction="vertical"
+        onScrollChange={handleScroll}
+        className="flex-1 min-w-0 border-l border-border-base"
+        innerClassName="pl-6 pr-6"
       >
-        {children}
-      </div>
+        <div ref={contentRef}>{children}</div>
+      </ScrollArea>
     </div>
   );
 }

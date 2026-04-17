@@ -3,25 +3,17 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
   "files": [
-    "dist"
+    "src"
   ],
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./icons": {
-      "types": "./dist/icons/index.d.ts",
-      "default": "./dist/icons/index.js"
-    }
+    ".": "./src/index.ts",
+    "./icons": "./src/icons/index.ts"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc --noEmit",
-    "prepare": "pnpm build"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@emoji-mart/data": "^1.2.1",
