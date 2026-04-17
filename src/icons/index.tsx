@@ -52,6 +52,7 @@ import {
   Loader2,
   Lock,
   LogOut,
+  Mail,
   Menu,
   MinusCircle,
   Moon,
@@ -83,6 +84,7 @@ import {
   User,
   UserPlus,
   Video,
+  Webhook,
   X,
   XCircle,
   Zap,
@@ -241,6 +243,8 @@ export const RocketOutlined = withDefaultSize(Rocket, "RocketOutlined");
 export const SaveOutlined = withDefaultSize(Save, "SaveOutlined");
 export const ScanOutlined = withDefaultSize(ScanLine, "ScanOutlined");
 export const SendOutlined = withDefaultSize(Send, "SendOutlined");
+export const MailOutlined = withDefaultSize(Mail, "MailOutlined");
+export const WebhookOutlined = withDefaultSize(Webhook, "WebhookOutlined");
 export const ControlOutlined = withDefaultSize(Settings, "ControlOutlined");
 export const ShieldOutlined = withDefaultSize(Shield, "ShieldOutlined");
 export const StopOutlined = withDefaultSize(Square, "StopOutlined");
