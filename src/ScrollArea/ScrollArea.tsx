@@ -108,8 +108,6 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
     hideScrollbarRef.current = hideScrollbar;
     const onRangeRef = useRef(onRangeChange);
     onRangeRef.current = onRangeChange;
-    const renderItemRef = useRef(renderItem);
-    renderItemRef.current = renderItem;
 
     // Virtualization visible range
     const [range, setRange] = useState({ start: 0, end: 0 });
@@ -449,12 +447,19 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
                   }
             }
           >
-            {renderItemRef.current?.(i)}
+            {renderItem?.(i)}
           </div>,
         );
       }
       return els;
-    }, [virtualizing, itemHeight, virtualAxis, range.start, range.end]);
+    }, [
+      virtualizing,
+      itemHeight,
+      virtualAxis,
+      range.start,
+      range.end,
+      renderItem,
+    ]);
 
     return (
       // biome-ignore lint/a11y/noStaticElementInteractions: mouse enter/leave controls scrollbar visibility only
