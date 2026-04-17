@@ -6,6 +6,7 @@ import {
   useEffect,
   useId,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -20,7 +21,7 @@ import {
 
 export interface ScrollAreaProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
-  children: ReactNode;
+  children?: ReactNode;
   /** Scroll direction. @default "both" */
   direction?: ScrollbarConfig["direction"];
   /** Auto-hide scrollbar when idle. @default true */
@@ -35,6 +36,21 @@ export interface ScrollAreaProps
   hideScrollbar?: boolean;
   /** Fires on every scroll position change */
   onScrollChange?: (scrollX: number, scrollY: number) => void;
+
+  // ─── Virtualization (single-axis, uniform item size) ───
+  // When `itemCount` + `itemHeight` + `renderItem` are provided, ScrollArea
+  // switches to virtualized mode and only renders items inside the viewport
+  // (+ overscan). `direction` must be "vertical" or "horizontal" in this mode.
+  /** Total number of items (enables virtualization) */
+  itemCount?: number;
+  /** Item size in the scroll axis (height for vertical, width for horizontal) */
+  itemHeight?: number;
+  /** Render callback; wrapped in an absolutely-positioned slot */
+  renderItem?: (index: number) => ReactNode;
+  /** Extra items rendered outside viewport for smooth scrolling. @default 5 */
+  overscan?: number;
+  /** Fires when the visible item range (incl. overscan) changes */
+  onRangeChange?: (start: number, end: number) => void;
 }
 
 export interface ScrollAreaRef {
@@ -42,6 +58,8 @@ export interface ScrollAreaRef {
   scrollBy: (dx: number, dy: number) => void;
   scrollToTop: () => void;
   scrollToBottom: () => void;
+  /** Only useful in virtualized mode */
+  scrollToIndex: (index: number) => void;
   getScrollPosition: () => { x: number; y: number };
   getViewportRect: () => DOMRect | null;
 }
@@ -59,11 +77,22 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       innerClassName,
       hideScrollbar = false,
       onScrollChange,
+      itemCount,
+      itemHeight,
+      renderItem,
+      overscan = 5,
+      onRangeChange,
       className,
       ...rest
     },
     ref,
   ) {
+    const virtualizing =
+      itemCount != null && itemHeight != null && renderItem != null;
+    const virtualAxis: "vertical" | "horizontal" =
+      direction === "horizontal" ? "horizontal" : "vertical";
+    const totalSize = virtualizing ? itemCount * itemHeight : 0;
+
     const viewportRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
     const scrollXRef = useRef(0);
@@ -77,6 +106,29 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
     onScrollRef.current = onScrollChange;
     const hideScrollbarRef = useRef(hideScrollbar);
     hideScrollbarRef.current = hideScrollbar;
+    const onRangeRef = useRef(onRangeChange);
+    onRangeRef.current = onRangeChange;
+    const renderItemRef = useRef(renderItem);
+    renderItemRef.current = renderItem;
+
+    // Virtualization visible range
+    const [range, setRange] = useState({ start: 0, end: 0 });
+
+    // Keep virt params in refs for use inside applyScroll
+    const virtRef = useRef({
+      virtualizing,
+      axis: virtualAxis,
+      itemHeight: itemHeight ?? 0,
+      itemCount: itemCount ?? 0,
+      overscan,
+    });
+    virtRef.current = {
+      virtualizing,
+      axis: virtualAxis,
+      itemHeight: itemHeight ?? 0,
+      itemCount: itemCount ?? 0,
+      overscan,
+    };
 
     // Stable config refs — avoids recreating useScrollbar callbacks on every render
     const directionRef = useRef(direction);
@@ -101,71 +153,105 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       flash: () => void;
     } | null>(null);
 
-    const applyScroll = useCallback((x: number, y: number) => {
-      const d = dimsRef.current;
-      const mx = Math.max(0, d.cw - d.vw);
-      const my = Math.max(0, d.ch - d.vh);
-      scrollXRef.current = Math.max(0, Math.min(x, mx));
-      scrollYRef.current = Math.max(0, Math.min(y, my));
-      // Sync target so an ongoing wheel animation doesn't fight thumb drag
-      targetXRef.current = scrollXRef.current;
-      targetYRef.current = scrollYRef.current;
-      if (contentRef.current) {
-        contentRef.current.style.transform = `translate3d(${-scrollXRef.current}px,${-scrollYRef.current}px,0)`;
-      }
-      // Skip scrollbar updates entirely when hideScrollbar — avoids setState on every scroll
-      if (!hideScrollbarRef.current) {
-        sbRef.current?.syncThumbs();
-        sbRef.current?.flash();
-      }
-      onScrollRef.current?.(scrollXRef.current, scrollYRef.current);
+    const computeRange = useCallback((offset: number, vpSize: number) => {
+      const v = virtRef.current;
+      if (!v.virtualizing || v.itemHeight <= 0) return { start: 0, end: 0 };
+      const first = Math.floor(offset / v.itemHeight);
+      const visible = Math.ceil(vpSize / v.itemHeight);
+      const start = Math.max(0, first - v.overscan);
+      const end = Math.min(v.itemCount - 1, first + visible + v.overscan);
+      return { start, end };
     }, []);
+
+    const updateRange = useCallback(() => {
+      const v = virtRef.current;
+      if (!v.virtualizing) return;
+      const d = dimsRef.current;
+      const offset =
+        v.axis === "vertical" ? scrollYRef.current : scrollXRef.current;
+      const vpSize = v.axis === "vertical" ? d.vh : d.vw;
+      const nr = computeRange(offset, vpSize);
+      setRange((prev) => {
+        if (prev.start === nr.start && prev.end === nr.end) return prev;
+        onRangeRef.current?.(nr.start, nr.end);
+        return nr;
+      });
+    }, [computeRange]);
+
+    const applyScroll = useCallback(
+      (x: number, y: number) => {
+        const d = dimsRef.current;
+        const mx = Math.max(0, d.cw - d.vw);
+        const my = Math.max(0, d.ch - d.vh);
+        scrollXRef.current = Math.max(0, Math.min(x, mx));
+        scrollYRef.current = Math.max(0, Math.min(y, my));
+        // Sync target so an ongoing wheel animation doesn't fight thumb drag
+        targetXRef.current = scrollXRef.current;
+        targetYRef.current = scrollYRef.current;
+        if (contentRef.current) {
+          contentRef.current.style.transform = `translate3d(${-scrollXRef.current}px,${-scrollYRef.current}px,0)`;
+        }
+        // Skip scrollbar updates entirely when hideScrollbar — avoids setState on every scroll
+        if (!hideScrollbarRef.current) {
+          sbRef.current?.syncThumbs();
+          sbRef.current?.flash();
+        }
+        onScrollRef.current?.(scrollXRef.current, scrollYRef.current);
+        updateRange();
+      },
+      [updateRange],
+    );
 
     // Smooth lerp scroll — only used for wheel events
-    const wheelScrollTo = useCallback((x: number, y: number) => {
-      const d = dimsRef.current;
-      const mx = Math.max(0, d.cw - d.vw);
-      const my = Math.max(0, d.ch - d.vh);
-      targetXRef.current = Math.max(0, Math.min(x, mx));
-      targetYRef.current = Math.max(0, Math.min(y, my));
+    const wheelScrollTo = useCallback(
+      (x: number, y: number) => {
+        const d = dimsRef.current;
+        const mx = Math.max(0, d.cw - d.vw);
+        const my = Math.max(0, d.ch - d.vh);
+        targetXRef.current = Math.max(0, Math.min(x, mx));
+        targetYRef.current = Math.max(0, Math.min(y, my));
 
-      if (rafRef.current !== null) return; // RAF already running
+        if (rafRef.current !== null) return; // RAF already running
 
-      const tick = () => {
-        const tx = targetXRef.current;
-        const ty = targetYRef.current;
-        const cx = scrollXRef.current;
-        const cy = scrollYRef.current;
-        const dx = tx - cx;
-        const dy = ty - cy;
+        const tick = () => {
+          const tx = targetXRef.current;
+          const ty = targetYRef.current;
+          const cx = scrollXRef.current;
+          const cy = scrollYRef.current;
+          const dx = tx - cx;
+          const dy = ty - cy;
 
-        if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) {
-          scrollXRef.current = tx;
-          scrollYRef.current = ty;
+          if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) {
+            scrollXRef.current = tx;
+            scrollYRef.current = ty;
+            if (contentRef.current) {
+              contentRef.current.style.transform = `translate3d(${-tx}px,${-ty}px,0)`;
+            }
+            if (!hideScrollbarRef.current) sbRef.current?.syncThumbs();
+            onScrollRef.current?.(tx, ty);
+            updateRange();
+            rafRef.current = null;
+            return;
+          }
+
+          const LERP = 0.14;
+          const nx = cx + dx * LERP;
+          const ny = cy + dy * LERP;
+          scrollXRef.current = nx;
+          scrollYRef.current = ny;
           if (contentRef.current) {
-            contentRef.current.style.transform = `translate3d(${-tx}px,${-ty}px,0)`;
+            contentRef.current.style.transform = `translate3d(${-nx}px,${-ny}px,0)`;
           }
           if (!hideScrollbarRef.current) sbRef.current?.syncThumbs();
-          onScrollRef.current?.(tx, ty);
-          rafRef.current = null;
-          return;
-        }
+          onScrollRef.current?.(nx, ny);
+          updateRange();
+          rafRef.current = requestAnimationFrame(tick);
+        };
 
-        const LERP = 0.14;
-        const nx = cx + dx * LERP;
-        const ny = cy + dy * LERP;
-        scrollXRef.current = nx;
-        scrollYRef.current = ny;
-        if (contentRef.current) {
-          contentRef.current.style.transform = `translate3d(${-nx}px,${-ny}px,0)`;
-        }
-        if (!hideScrollbarRef.current) sbRef.current?.syncThumbs();
-        onScrollRef.current?.(nx, ny);
         rafRef.current = requestAnimationFrame(tick);
-      };
-
-      rafRef.current = requestAnimationFrame(tick);
-    }, []);
+      },
+      [updateRange],
+    );
 
     const sb = useScrollbar(
       config,
@@ -188,6 +274,13 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
           scrollXRef.current,
           dimsRef.current.ch - dimsRef.current.vh,
         ),
+      scrollToIndex: (index) => {
+        const v = virtRef.current;
+        if (!v.virtualizing) return;
+        const offset = index * v.itemHeight;
+        if (v.axis === "vertical") applyScroll(scrollXRef.current, offset);
+        else applyScroll(offset, scrollYRef.current);
+      },
       getScrollPosition: () => ({
         x: scrollXRef.current,
         y: scrollYRef.current,
@@ -289,18 +382,21 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       if (!vp || !ct) return;
 
       const measure = () => {
-        const d = {
-          vw: vp.clientWidth,
-          vh: vp.clientHeight,
-          cw: ct.scrollWidth,
-          ch: ct.scrollHeight,
-        };
-        dimsRef.current = d;
+        const v = virtRef.current;
+        const vw = vp.clientWidth;
+        const vh = vp.clientHeight;
+        const cw =
+          v.virtualizing && v.axis === "horizontal"
+            ? totalSize
+            : ct.scrollWidth;
+        const ch =
+          v.virtualizing && v.axis === "vertical" ? totalSize : ct.scrollHeight;
+        dimsRef.current = { vw, vh, cw, ch };
         // clamp scroll
         applyScroll(scrollXRef.current, scrollYRef.current);
         // equality guard — avoid re-render when overflow state hasn't changed
-        const nx = direction !== "vertical" && d.cw > d.vw;
-        const ny = direction !== "horizontal" && d.ch > d.vh;
+        const nx = direction !== "vertical" && cw > vw;
+        const ny = direction !== "horizontal" && ch > vh;
         setOverflow((prev) =>
           prev.x === nx && prev.y === ny ? prev : { x: nx, y: ny },
         );
@@ -308,10 +404,10 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
 
       const ro = new ResizeObserver(measure);
       ro.observe(vp);
-      ro.observe(ct);
+      if (!virtualizing) ro.observe(ct);
       measure();
       return () => ro.disconnect();
-    }, [direction, applyScroll]);
+    }, [direction, applyScroll, totalSize, virtualizing]);
 
     // ─── Cleanup RAF on unmount ───
 
@@ -328,6 +424,38 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
 
     const viewportId = useId();
 
+    const virtualItems = useMemo(() => {
+      if (!virtualizing || !itemHeight) return null;
+      const els: ReactNode[] = [];
+      for (let i = range.start; i <= range.end; i++) {
+        els.push(
+          <div
+            key={i}
+            style={
+              virtualAxis === "vertical"
+                ? {
+                    position: "absolute",
+                    top: i * itemHeight,
+                    left: 0,
+                    right: 0,
+                    height: itemHeight,
+                  }
+                : {
+                    position: "absolute",
+                    left: i * itemHeight,
+                    top: 0,
+                    bottom: 0,
+                    width: itemHeight,
+                  }
+            }
+          >
+            {renderItemRef.current?.(i)}
+          </div>,
+        );
+      }
+      return els;
+    }, [virtualizing, itemHeight, virtualAxis, range.start, range.end]);
+
     return (
       // biome-ignore lint/a11y/noStaticElementInteractions: mouse enter/leave controls scrollbar visibility only
       <div
@@ -342,11 +470,21 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
           ref={contentRef}
           className={cn(
             "will-change-transform",
-            direction !== "vertical" && "w-max",
+            !virtualizing && direction !== "vertical" && "w-max",
             innerClassName,
           )}
+          style={
+            virtualizing
+              ? {
+                  position: "relative",
+                  ...(virtualAxis === "vertical"
+                    ? { height: totalSize, width: "100%" }
+                    : { width: totalSize, height: "100%" }),
+                }
+              : undefined
+          }
         >
-          {children}
+          {virtualizing ? virtualItems : children}
         </div>
 
         {!hideScrollbar && (
