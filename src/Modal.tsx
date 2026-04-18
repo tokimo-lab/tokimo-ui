@@ -208,7 +208,13 @@ const SIZE_CONFIG: Record<ScaledModalSize, SizeConfig> = {
   default: {
     width: 520,
     dialogStyle: {},
-    bodyStyle: {},
+    bodyStyle: {
+      flex: 1,
+      minHeight: 0,
+      overflowY: "auto",
+      overflowX: "hidden",
+      ...THIN_SCROLLBAR,
+    },
   },
 };
 
@@ -409,6 +415,12 @@ export function Modal({
               ? isInline
                 ? "calc(100% - 32px)"
                 : "calc(100vw - 32px)"
+              : undefined,
+          maxHeight:
+            size === "default" || size === "large"
+              ? isInline
+                ? "calc(100% - 32px)"
+                : "calc(100vh - 32px)"
               : undefined,
           ...resolvedDialogStyle,
           ...style,
