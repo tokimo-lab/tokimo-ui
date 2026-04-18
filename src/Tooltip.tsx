@@ -37,6 +37,13 @@ export interface TooltipProps {
   mouseEnterDelay?: number;
   /** Mouse leave delay (ms) */
   mouseLeaveDelay?: number;
+  /**
+   * Override the floating panel className. Use this for rich tooltips that
+   * need to escape the default `max-w-xs` / `break-all` text-tooltip styling
+   * (e.g. wide grids, structured cards). When provided, replaces the
+   * default sizing/typography classes; the background/border classes stay.
+   */
+  className?: string;
 }
 
 export function Tooltip({
@@ -47,6 +54,7 @@ export function Tooltip({
   color,
   mouseEnterDelay = 100,
   mouseLeaveDelay = 100,
+  className,
 }: TooltipProps) {
   const [isOpen, setIsOpen] = useState(false);
   const open = openProp ?? isOpen;
@@ -89,7 +97,8 @@ export function Tooltip({
             ref={refs.setFloating}
             style={floatingStyles}
             className={cn(
-              "z-[9999] max-w-xs overflow-hidden break-all rounded px-2 py-1 text-xs shadow-lg",
+              "z-[9999] overflow-hidden rounded shadow-lg",
+              className ?? "max-w-xs break-all px-2 py-1 text-xs",
               color
                 ? color
                 : "bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(15,15,25,calc(var(--window-opacity,85)/100))] text-[var(--text-primary)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08]",
