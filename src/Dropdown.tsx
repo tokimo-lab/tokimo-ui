@@ -91,7 +91,10 @@ function MenuList({
         }
         if (item.type === "label") {
           return (
-            <div key={item.key ?? `label-${i}`} className="px-1">
+            <div
+              key={item.key ?? `label-${i}`}
+              className="px-3 pt-1.5 pb-0.5 text-xs text-[var(--text-muted)]"
+            >
               {item.label}
             </div>
           );
