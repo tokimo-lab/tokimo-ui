@@ -30,6 +30,8 @@ export interface SelectOption {
   disabled?: boolean;
   /** Label shown in selected tags. Falls back to `label` if not set. */
   tagLabel?: ReactNode;
+  /** Optional second-line description shown only in the dropdown options list. */
+  description?: ReactNode;
 }
 
 export interface SelectProps {
@@ -82,6 +84,40 @@ const sizeMap = {
   middle: "min-h-8 py-0.5 text-sm",
   large: "min-h-10 py-1 text-base",
 };
+
+/**
+ * Shared classname for Select-style triggers.
+ * Exposed so other trigger-like components (e.g. SelectTrigger,
+ * Popover-driven custom dropdowns) can match Select's visual style exactly.
+ */
+export function selectTriggerClassName({
+  size = "middle",
+  status,
+  disabled,
+  open,
+  className,
+}: {
+  size?: "small" | "middle" | "large";
+  status?: "error" | "warning";
+  disabled?: boolean;
+  open?: boolean;
+  className?: string;
+}) {
+  return cn(
+    "inline-flex items-center gap-1 px-2 rounded-md border bg-[var(--input-bg)] cursor-pointer transition-colors",
+    open
+      ? "border-[var(--accent)] ring-1 ring-[var(--accent)]"
+      : status === "error"
+        ? "border-red-500"
+        : status === "warning"
+          ? "border-amber-500"
+          : "border-black/[0.08] dark:border-white/[0.1] data-[open=true]:border-[var(--accent)] data-[open=true]:ring-1 data-[open=true]:ring-[var(--accent)]",
+    disabled &&
+      "opacity-50 cursor-not-allowed bg-black/[0.02] dark:bg-white/[0.02]",
+    sizeMap[size],
+    className,
+  );
+}
 
 export function Select({
   options = [],
@@ -350,20 +386,13 @@ export function Select({
     <>
       <div
         ref={refs.setReference}
-        className={cn(
-          "inline-flex items-center gap-1 px-2 rounded-md border bg-[var(--input-bg)] cursor-pointer transition-colors",
-          open
-            ? "border-[var(--accent)] ring-1 ring-[var(--accent)]"
-            : status === "error"
-              ? "border-red-500"
-              : status === "warning"
-                ? "border-amber-500"
-                : "border-black/[0.08] dark:border-white/[0.1]",
-          disabled &&
-            "opacity-50 cursor-not-allowed bg-black/[0.02] dark:bg-white/[0.02]",
-          sizeMap[size],
+        className={selectTriggerClassName({
+          size,
+          status,
+          disabled,
+          open,
           className,
-        )}
+        })}
         style={{
           ...style,
         }}
@@ -528,7 +557,7 @@ export function Select({
                         listRef.current[i] = node;
                       }}
                       className={cn(
-                        "flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer transition-colors",
+                        "flex items-start gap-2 px-3 py-2 text-sm cursor-pointer transition-colors",
                         selected
                           ? "text-[var(--accent)] bg-[var(--accent-subtle)]"
                           : "text-[var(--text-primary)]",
@@ -543,7 +572,14 @@ export function Select({
                         },
                       })}
                     >
-                      <span className="flex-1">{opt.label}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="truncate">{opt.label}</div>
+                        {opt.description ? (
+                          <div className="mt-0.5 text-[11px] leading-tight text-[var(--text-muted)]">
+                            {opt.description}
+                          </div>
+                        ) : null}
+                      </div>
                       {selected ? <Check className="h-4 w-4 shrink-0" /> : null}
                     </div>
                   );

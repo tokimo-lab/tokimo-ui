@@ -51,6 +51,8 @@ export interface PopoverProps {
   contentClassName?: string;
   /** Constrain height to fit within the viewport */
   fitViewport?: boolean;
+  /** Match the floating panel's min-width to the trigger's width (like Select's dropdown). */
+  matchTriggerWidth?: boolean;
 }
 
 export function Popover({
@@ -64,6 +66,7 @@ export function Popover({
   popupClassName,
   contentClassName,
   fitViewport,
+  matchTriggerWidth,
 }: PopoverProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const open = openProp ?? uncontrolledOpen;
@@ -83,15 +86,20 @@ export function Popover({
   const placement = (placementMap[placementProp] ?? placementProp) as Placement;
 
   const middleware = [offset(6), flip(), shift({ padding: 5 })];
-  if (fitViewport) {
+  if (fitViewport || matchTriggerWidth) {
     middleware.push(
       size({
         padding: 16,
-        apply({ availableHeight, elements }) {
-          Object.assign(elements.floating.style, {
-            maxHeight: `${availableHeight}px`,
-            overflowY: "auto",
-          });
+        apply({ availableHeight, rects, elements }) {
+          const styles: Partial<CSSStyleDeclaration> = {};
+          if (fitViewport) {
+            styles.maxHeight = `${availableHeight}px`;
+            styles.overflowY = "auto";
+          }
+          if (matchTriggerWidth) {
+            styles.minWidth = `${rects.reference.width}px`;
+          }
+          Object.assign(elements.floating.style, styles);
         },
       }),
     );
@@ -125,6 +133,7 @@ export function Popover({
       {isValidElement(children)
         ? cloneElement(children as ReactElement<Record<string, unknown>>, {
             ref: refs.setReference,
+            "data-open": open ? "true" : undefined,
             ...getReferenceProps(),
           })
         : children}
