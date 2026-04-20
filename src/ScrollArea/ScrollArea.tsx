@@ -63,6 +63,12 @@ export interface ScrollAreaProps
   estimateSize?: (index: number) => number;
   /** Render callback; wrapped in an absolutely-positioned slot */
   renderItem?: (index: number) => ReactNode;
+  /**
+   * Renders arbitrary content inside the scrolling content wrapper, behind the
+   * items. Useful for overlays (e.g. active-row indicators) that must move
+   * together with scroll. Consumer is responsible for positioning.
+   */
+  renderOverlay?: () => ReactNode;
   /** Extra items rendered outside viewport for smooth scrolling. @default 5 */
   overscan?: number;
   /** Fires when the visible item range (incl. overscan) changes */
@@ -105,6 +111,7 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       itemHeight,
       estimateSize,
       renderItem,
+      renderOverlay,
       overscan = 5,
       onRangeChange,
       className,
@@ -612,7 +619,14 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
               : undefined
           }
         >
-          {virtualizing ? virtualItems : children}
+          {virtualizing ? (
+            <>
+              {renderOverlay?.()}
+              {virtualItems}
+            </>
+          ) : (
+            children
+          )}
         </div>
 
         {!hideScrollbar && (
