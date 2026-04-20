@@ -34,6 +34,13 @@ export interface ScrollAreaProps
   innerClassName?: string;
   /** Hide the scrollbar tracks entirely (still scrollable). @default false */
   hideScrollbar?: boolean;
+  /**
+   * Reserve symmetric padding on both edges equal to scrollbar width **only
+   * when the content actually overflows**. Prevents the overlay scrollbar
+   * from occluding content while keeping the layout symmetric.
+   * @default false
+   */
+  scrollbarGutter?: boolean;
   /** Fires on every scroll position change */
   onScrollChange?: (scrollX: number, scrollY: number) => void;
 
@@ -76,6 +83,7 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       thumbMinSize = 24,
       innerClassName,
       hideScrollbar = false,
+      scrollbarGutter = false,
       onScrollChange,
       itemCount,
       itemHeight,
@@ -476,6 +484,7 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
           className={cn(
             "will-change-transform",
             !virtualizing && direction !== "vertical" && "w-max",
+            scrollbarGutter && overflow.y && "px-2",
             innerClassName,
           )}
           style={
