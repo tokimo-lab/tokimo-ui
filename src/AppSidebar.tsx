@@ -197,7 +197,7 @@ export function AppSidebar({
                               "flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg transition-colors",
                               isActive
                                 ? ""
-                                : "text-fg-muted hover:bg-black/[0.08] dark:hover:bg-white/[0.08]",
+                                : "text-fg-muted hover:bg-black/[0.08] dark:hover:bg-white/[0.08] [&_[data-app-icon]]:opacity-60 hover:[&_[data-app-icon]]:opacity-100",
                             )}
                           >
                             {item.collapsedIcon ?? item.icon}
@@ -323,7 +323,7 @@ function SidebarItemButton({
     hasContent ? "flex-col" : "items-center gap-2.5",
     isActive
       ? "text-fg-primary font-medium"
-      : "text-fg-muted hover:bg-black/[0.06] dark:hover:bg-white/[0.06]",
+      : "text-fg-muted hover:bg-black/[0.06] dark:hover:bg-white/[0.06] [&_[data-app-icon]]:opacity-60 hover:[&_[data-app-icon]]:opacity-100",
     item.extra != null && "group/sidebar-item",
   );
 
