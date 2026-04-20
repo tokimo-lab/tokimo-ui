@@ -16,6 +16,7 @@ import {
   ScrollbarTracks,
   useScrollbar,
 } from "./use-scrollbar";
+import { useVariableVirtualizer } from "./use-variable-virtualizer";
 
 // ─── Types ───
 
@@ -46,12 +47,20 @@ export interface ScrollAreaProps
 
   // ─── Virtualization (single-axis, uniform item size) ───
   // When `itemCount` + `itemHeight` + `renderItem` are provided, ScrollArea
-  // switches to virtualized mode and only renders items inside the viewport
-  // (+ overscan). `direction` must be "vertical" or "horizontal" in this mode.
+  // switches to fixed-size virtualized mode and only renders items inside the
+  // viewport (+ overscan). `direction` must be "vertical" or "horizontal".
+  //
+  // For VARIABLE-height virtualization, pass `estimateSize` instead of
+  // `itemHeight`. Each slot's real size is measured via ResizeObserver and
+  // the estimate is only used until the first measurement lands. Use
+  // `getItemOffset` on the imperative ref to position overlays against the
+  // measured layout.
   /** Total number of items (enables virtualization) */
   itemCount?: number;
-  /** Item size in the scroll axis (height for vertical, width for horizontal) */
+  /** Uniform item size in the scroll axis. Mutually exclusive with `estimateSize`. */
   itemHeight?: number;
+  /** Per-index size estimator. Enables variable-height virtualization. */
+  estimateSize?: (index: number) => number;
   /** Render callback; wrapped in an absolutely-positioned slot */
   renderItem?: (index: number) => ReactNode;
   /** Extra items rendered outside viewport for smooth scrolling. @default 5 */
@@ -66,9 +75,16 @@ export interface ScrollAreaRef {
   scrollToTop: () => void;
   scrollToBottom: () => void;
   /** Only useful in virtualized mode */
-  scrollToIndex: (index: number) => void;
+  scrollToIndex: (
+    index: number,
+    options?: { align?: "start" | "center" | "end" },
+  ) => void;
   getScrollPosition: () => { x: number; y: number };
   getViewportRect: () => DOMRect | null;
+  /** Virtualized-mode only: start offset of item `index` along the scroll axis. */
+  getItemOffset: (index: number) => number | null;
+  /** Virtualized-mode only: size of item `index` along the scroll axis. */
+  getItemSize: (index: number) => number | null;
 }
 
 // ─── Component ───
@@ -87,6 +103,7 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       onScrollChange,
       itemCount,
       itemHeight,
+      estimateSize,
       renderItem,
       overscan = 5,
       onRangeChange,
@@ -95,11 +112,14 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
     },
     ref,
   ) {
-    const virtualizing =
+    const fixedVirtualizing =
       itemCount != null && itemHeight != null && renderItem != null;
+    const variableVirtualizing =
+      itemCount != null && estimateSize != null && renderItem != null;
+    const virtualizing = fixedVirtualizing || variableVirtualizing;
     const virtualAxis: "vertical" | "horizontal" =
       direction === "horizontal" ? "horizontal" : "vertical";
-    const totalSize = virtualizing ? itemCount * itemHeight : 0;
+    const fixedTotalSize = fixedVirtualizing ? itemCount * itemHeight : 0;
 
     const viewportRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -117,12 +137,16 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
     const onRangeRef = useRef(onRangeChange);
     onRangeRef.current = onRangeChange;
 
-    // Virtualization visible range
-    const [range, setRange] = useState({ start: 0, end: 0 });
+    // Virtualization view state (scroll offset + viewport size along axis).
+    // Tracked in state — both virtualization paths (fixed + variable) read it
+    // to derive the visible range.
+    const [scrollView, setScrollView] = useState({ offset: 0, vpSize: 0 });
 
     // Keep virt params in refs for use inside applyScroll
     const virtRef = useRef({
       virtualizing,
+      fixed: fixedVirtualizing,
+      variable: variableVirtualizing,
       axis: virtualAxis,
       itemHeight: itemHeight ?? 0,
       itemCount: itemCount ?? 0,
@@ -130,11 +154,28 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
     });
     virtRef.current = {
       virtualizing,
+      fixed: fixedVirtualizing,
+      variable: variableVirtualizing,
       axis: virtualAxis,
       itemHeight: itemHeight ?? 0,
       itemCount: itemCount ?? 0,
       overscan,
     };
+
+    // ─── Variable-height virtualizer ───
+    const variableVirt = useVariableVirtualizer({
+      enabled: variableVirtualizing,
+      itemCount: itemCount ?? 0,
+      axis: virtualAxis,
+      estimateSize: estimateSize ?? (() => 0),
+      overscan,
+      scrollOffset: scrollView.offset,
+      viewportSize: scrollView.vpSize,
+    });
+
+    const totalSize = variableVirtualizing
+      ? variableVirt.totalSize
+      : fixedTotalSize;
 
     // Stable config refs — avoids recreating useScrollbar callbacks on every render
     const directionRef = useRef(direction);
@@ -159,9 +200,9 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       flash: () => void;
     } | null>(null);
 
-    const computeRange = useCallback((offset: number, vpSize: number) => {
+    const computeFixedRange = useCallback((offset: number, vpSize: number) => {
       const v = virtRef.current;
-      if (!v.virtualizing || v.itemHeight <= 0) return { start: 0, end: 0 };
+      if (!v.fixed || v.itemHeight <= 0) return { start: 0, end: 0 };
       const first = Math.floor(offset / v.itemHeight);
       const visible = Math.ceil(vpSize / v.itemHeight);
       const start = Math.max(0, first - v.overscan);
@@ -176,13 +217,25 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       const offset =
         v.axis === "vertical" ? scrollYRef.current : scrollXRef.current;
       const vpSize = v.axis === "vertical" ? d.vh : d.vw;
-      const nr = computeRange(offset, vpSize);
-      setRange((prev) => {
-        if (prev.start === nr.start && prev.end === nr.end) return prev;
-        onRangeRef.current?.(nr.start, nr.end);
-        return nr;
-      });
-    }, [computeRange]);
+      setScrollView((prev) =>
+        prev.offset === offset && prev.vpSize === vpSize
+          ? prev
+          : { offset, vpSize },
+      );
+    }, []);
+
+    // Fire onRangeChange (for fixed virtualization consumers) when the derived
+    // fixed-range changes. Variable mode doesn't expose index ranges this way.
+    const lastFixedRangeRef = useRef({ start: -1, end: -1 });
+    useEffect(() => {
+      const v = virtRef.current;
+      if (!v.fixed) return;
+      const r = computeFixedRange(scrollView.offset, scrollView.vpSize);
+      const prev = lastFixedRangeRef.current;
+      if (prev.start === r.start && prev.end === r.end) return;
+      lastFixedRangeRef.current = r;
+      onRangeRef.current?.(r.start, r.end);
+    }, [scrollView, computeFixedRange]);
 
     const applyScroll = useCallback(
       (x: number, y: number) => {
@@ -280,12 +333,25 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
           scrollXRef.current,
           dimsRef.current.ch - dimsRef.current.vh,
         ),
-      scrollToIndex: (index) => {
+      scrollToIndex: (index, options) => {
         const v = virtRef.current;
         if (!v.virtualizing) return;
-        const offset = index * v.itemHeight;
-        if (v.axis === "vertical") applyScroll(scrollXRef.current, offset);
-        else applyScroll(offset, scrollYRef.current);
+        const align = options?.align ?? "start";
+        // Resolve item start + size via whichever mode is active.
+        const start = v.variable
+          ? (variableVirt.getItemOffset(index) ?? 0)
+          : index * v.itemHeight;
+        const size = v.variable
+          ? (variableVirt.getItemSize(index) ?? v.itemHeight)
+          : v.itemHeight;
+        const vpSize =
+          v.axis === "vertical" ? dimsRef.current.vh : dimsRef.current.vw;
+        let target = start;
+        if (align === "center") target = start - Math.max(0, vpSize - size) / 2;
+        else if (align === "end") target = start - Math.max(0, vpSize - size);
+        target = Math.max(0, target);
+        if (v.axis === "vertical") applyScroll(scrollXRef.current, target);
+        else applyScroll(target, scrollYRef.current);
       },
       getScrollPosition: () => ({
         x: scrollXRef.current,
@@ -293,6 +359,18 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       }),
       getViewportRect: () =>
         viewportRef.current?.getBoundingClientRect() ?? null,
+      getItemOffset: (index) => {
+        const v = virtRef.current;
+        if (!v.virtualizing) return null;
+        if (v.variable) return variableVirt.getItemOffset(index);
+        return index * v.itemHeight;
+      },
+      getItemSize: (index) => {
+        const v = virtRef.current;
+        if (!v.virtualizing) return null;
+        if (v.variable) return variableVirt.getItemSize(index);
+        return v.itemHeight;
+      },
     }));
 
     // ─── Wheel ───
@@ -400,6 +478,9 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
         dimsRef.current = { vw, vh, cw, ch };
         // clamp scroll
         applyScroll(scrollXRef.current, scrollYRef.current);
+        // push fresh viewport size into the virtualization view state so
+        // variable-height virtualization reacts to container resizes.
+        updateRange();
         // equality guard — avoid re-render when overflow state hasn't changed
         const nx = direction !== "vertical" && cw > vw;
         const ny = direction !== "horizontal" && ch > vh;
@@ -413,7 +494,7 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       if (!virtualizing) ro.observe(ct);
       measure();
       return () => ro.disconnect();
-    }, [direction, applyScroll, totalSize, virtualizing]);
+    }, [direction, applyScroll, totalSize, virtualizing, updateRange]);
 
     // ─── Cleanup RAF on unmount ───
 
@@ -431,8 +512,39 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
     const viewportId = useId();
 
     const virtualItems = useMemo(() => {
-      if (!virtualizing || !itemHeight) return null;
+      if (!virtualizing) return null;
       const els: ReactNode[] = [];
+      if (variableVirtualizing) {
+        for (const item of variableVirt.virtualItems) {
+          els.push(
+            <div
+              key={item.index}
+              ref={item.measureRef}
+              style={
+                virtualAxis === "vertical"
+                  ? {
+                      position: "absolute",
+                      top: item.start,
+                      left: 0,
+                      right: 0,
+                    }
+                  : {
+                      position: "absolute",
+                      left: item.start,
+                      top: 0,
+                      bottom: 0,
+                    }
+              }
+            >
+              {renderItem?.(item.index)}
+            </div>,
+          );
+        }
+        return els;
+      }
+      if (!itemHeight) return null;
+      // Fixed-height path
+      const range = computeFixedRange(scrollView.offset, scrollView.vpSize);
       for (let i = range.start; i <= range.end; i++) {
         els.push(
           <div
@@ -462,10 +574,12 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       return els;
     }, [
       virtualizing,
+      variableVirtualizing,
+      variableVirt.virtualItems,
       itemHeight,
       virtualAxis,
-      range.start,
-      range.end,
+      scrollView,
+      computeFixedRange,
       renderItem,
     ]);
 
