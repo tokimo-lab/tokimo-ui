@@ -13,6 +13,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { ScrollArea } from "./ScrollArea/ScrollArea";
 import { Tooltip } from "./Tooltip";
 import { cn } from "./utils";
 
@@ -147,8 +148,9 @@ export function AppSidebar({
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent opacity-40" />
           </div>
         ) : (
-          <div
-            className="flex flex-1 flex-col items-center overflow-y-auto px-1 pt-2"
+          <ScrollArea
+            direction="vertical"
+            className="flex-1 px-1 pt-2"
             style={topInset ? { paddingTop: topInset } : undefined}
           >
             <div
@@ -223,7 +225,7 @@ export function AppSidebar({
                 );
               })}
             </div>
-          </div>
+          </ScrollArea>
         )}
 
         {footer && (
@@ -254,8 +256,9 @@ export function AppSidebar({
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent opacity-40" />
         </div>
       ) : (
-        <div
-          className="flex-1 overflow-y-auto px-2 pt-3"
+        <ScrollArea
+          direction="vertical"
+          className="flex-1 px-2 pt-3"
           style={topInset ? { paddingTop: topInset } : undefined}
         >
           <div ref={itemsRef} className="relative isolate">
@@ -295,7 +298,7 @@ export function AppSidebar({
               </div>
             ))}
           </div>
-        </div>
+        </ScrollArea>
       )}
 
       {footer && (
