@@ -9,6 +9,7 @@ import { enUS } from "./en-US";
 import type { Locale } from "./types";
 
 export { enUS } from "./en-US";
+export { jaJP } from "./ja-JP";
 export type { Locale } from "./types";
 export { zhCN } from "./zh-CN";
 

@@ -87,7 +87,7 @@ export type { ListProps } from "./List";
 export { List } from "./List";
 // ─── Locale / ConfigProvider ───
 export type { Locale } from "./locale";
-export { ConfigProvider, enUS, useLocale, zhCN } from "./locale";
+export { ConfigProvider, enUS, jaJP, useLocale, zhCN } from "./locale";
 export type { MenuItem as MenuItemType, MenuProps } from "./Menu";
 export { Menu } from "./Menu";
 export type { MiniAreaChartProps } from "./MiniAreaChart";
