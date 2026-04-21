@@ -13,6 +13,7 @@ import {
 import { CalendarDays, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { FloatingVibrancy } from "../FloatingVibrancy";
+import { useLocale } from "../locale";
 import { cn } from "../utils";
 import { CalendarPanel } from "./CalendarPanel";
 import { TimePanel } from "./TimePanel";
@@ -61,7 +62,7 @@ export function DateTimePicker({
   hourStep = 1,
   minuteStep = 1,
   secondStep = 1,
-  placeholder = "选择日期时间",
+  placeholder: placeholderProp,
   allowClear = false,
   disabled = false,
   size = "middle",
@@ -72,6 +73,8 @@ export function DateTimePicker({
   open: openProp,
   onOpenChange,
 }: DateTimePickerProps) {
+  const locale = useLocale().DatePicker;
+  const placeholder = placeholderProp ?? locale.dateTimePlaceholder;
   const format =
     formatProp ?? (showSecond ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD HH:mm");
 
@@ -277,14 +280,14 @@ export function DateTimePicker({
                   className="text-xs text-[var(--accent)] cursor-pointer hover:text-[var(--accent-hover)] transition-colors"
                   onClick={handleNow}
                 >
-                  此刻
+                  {locale.now}
                 </button>
                 <button
                   type="button"
                   className="text-xs px-3 py-0.5 rounded bg-[var(--accent)] text-white cursor-pointer hover:bg-[var(--accent-hover)] transition-colors"
                   onClick={handleOk}
                 >
-                  确定
+                  {locale.ok}
                 </button>
               </div>
             </div>

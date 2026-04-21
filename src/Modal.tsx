@@ -14,6 +14,7 @@ import { createPortal } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { Button } from "./Button";
 import { pushEscapeHandler, removeEscapeHandler } from "./escape-stack";
+import { ConfigProvider, getGlobalLocale, useLocale } from "./locale";
 import { cn } from "./utils";
 
 /* ─── Modal container context ─── */
@@ -221,8 +222,8 @@ const SIZE_CONFIG: Record<ScaledModalSize, SizeConfig> = {
 export function Modal({
   open = false,
   title,
-  okText = "确定",
-  cancelText = "取消",
+  okText: okTextProp,
+  cancelText: cancelTextProp,
   okButtonProps,
   cancelButtonProps,
   onOk,
@@ -248,6 +249,9 @@ export function Modal({
   container,
   children,
 }: ModalProps) {
+  const locale = useLocale().Modal;
+  const okText = okTextProp ?? locale.okText;
+  const cancelText = cancelTextProp ?? locale.cancelText;
   const destroyOnClose = destroyOnCloseProp ?? destroyOnHidden ?? false;
   const contentRef = useRef<HTMLDivElement>(null);
   const ctxContainer = useContext(ModalContainerContext);
@@ -593,8 +597,8 @@ Modal.confirm = (config: ConfirmConfig) => {
           open={open}
           title={variant ? undefined : config.title}
           closable={!variant}
-          okText={config.okText ?? "确定"}
-          cancelText={config.cancelText ?? "取消"}
+          okText={config.okText}
+          cancelText={config.cancelText}
           okButtonProps={okButtonProps}
           confirmLoading={loading}
           maskClosable={!loading}
@@ -630,7 +634,11 @@ Modal.confirm = (config: ConfirmConfig) => {
     );
   };
 
-  root.render(<ConfirmDialog />);
+  root.render(
+    <ConfigProvider locale={getGlobalLocale()}>
+      <ConfirmDialog />
+    </ConfigProvider>,
+  );
 };
 
 /**
@@ -670,8 +678,8 @@ export function useConfirm(): [ReactNode, (config: ConfirmConfig) => void] {
       open={open}
       title={variant ? undefined : cfg?.title}
       closable={!variant}
-      okText={cfg?.okText ?? "确定"}
-      cancelText={cfg?.cancelText ?? "取消"}
+      okText={cfg?.okText}
+      cancelText={cfg?.cancelText}
       okButtonProps={okButtonProps}
       confirmLoading={loading}
       maskClosable={!loading}

@@ -22,6 +22,7 @@ import React, {
   useState,
 } from "react";
 import { FloatingVibrancy } from "./FloatingVibrancy";
+import { useLocale } from "./locale";
 import { cn } from "./utils";
 
 export interface SelectOption {
@@ -124,7 +125,7 @@ export function Select({
   value: valueProp,
   defaultValue,
   onChange,
-  placeholder = "请选择",
+  placeholder: placeholderProp,
   allowClear = false,
   mode,
   disabled = false,
@@ -140,6 +141,8 @@ export function Select({
   virtual = false,
   children,
 }: SelectProps) {
+  const localeSelect = useLocale().Select;
+  const placeholder = placeholderProp ?? localeSelect.placeholder;
   const isMultiple = mode === "multiple" || mode === "tags";
   const [internalValue, setInternalValue] = useState<
     string | number | (string | number)[] | undefined
@@ -517,7 +520,7 @@ export function Select({
                   <input
                     ref={inputRef}
                     className="flex-1 bg-transparent outline-none text-sm placeholder:text-[var(--text-muted)]"
-                    placeholder="搜索..."
+                    placeholder={localeSelect.searchPlaceholder}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
@@ -531,7 +534,7 @@ export function Select({
             >
               {filtered.length === 0 ? (
                 <div className="px-3 py-4 text-center text-sm text-[var(--text-muted)]">
-                  {notFoundContent ?? "无匹配选项"}
+                  {notFoundContent ?? localeSelect.notFoundContent}
                 </div>
               ) : virtual ? (
                 <VirtualList

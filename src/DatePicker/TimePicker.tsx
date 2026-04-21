@@ -13,6 +13,7 @@ import {
 import { Clock, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { FloatingVibrancy } from "../FloatingVibrancy";
+import { useLocale } from "../locale";
 import { cn } from "../utils";
 import { TimePanel } from "./TimePanel";
 import { formatDate, parseDate } from "./utils";
@@ -68,8 +69,9 @@ export function TimePicker({
   open: openProp,
   onOpenChange,
 }: TimePickerProps) {
+  const locale = useLocale().DatePicker;
   const format = formatProp ?? (showSecond ? "HH:mm:ss" : "HH:mm");
-  const placeholder = placeholderProp ?? "选择时间";
+  const placeholder = placeholderProp ?? locale.timePlaceholder;
 
   const [internalValue, setInternalValue] = useState<Date | null>(
     defaultValue ?? null,

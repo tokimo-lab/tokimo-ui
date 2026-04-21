@@ -13,6 +13,7 @@ import {
 import { CalendarDays, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { FloatingVibrancy } from "../FloatingVibrancy";
+import { useLocale } from "../locale";
 import { cn } from "../utils";
 import { CalendarPanel } from "./CalendarPanel";
 import { formatDate, parseDate } from "./utils";
@@ -51,7 +52,7 @@ export function DatePicker({
   defaultValue,
   onChange,
   format = "YYYY-MM-DD",
-  placeholder = "选择日期",
+  placeholder: placeholderProp,
   allowClear = false,
   disabled = false,
   size = "middle",
@@ -62,6 +63,8 @@ export function DatePicker({
   open: openProp,
   onOpenChange,
 }: DatePickerProps) {
+  const locale = useLocale().DatePicker;
+  const placeholder = placeholderProp ?? locale.datePlaceholder;
   const [internalValue, setInternalValue] = useState<Date | null>(
     defaultValue ?? null,
   );

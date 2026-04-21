@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useLocale } from "./locale";
 import { cn } from "./utils";
 
 export interface ListItem {
@@ -47,6 +48,7 @@ export function List<T = Record<string, unknown>>({
   className,
   children,
 }: ListProps<T>) {
+  const fallbackEmptyText = useLocale().List.emptyText;
   const getKey = (item: T, i: number): string => {
     if (typeof rowKey === "function") return rowKey(item);
     if (typeof rowKey === "string")
@@ -113,7 +115,7 @@ export function List<T = Record<string, unknown>>({
       {children ??
         (isEmpty ? (
           <div className="py-8 text-center text-sm text-fg-muted">
-            {locale?.emptyText ?? "暂无数据"}
+            {locale?.emptyText ?? fallbackEmptyText}
           </div>
         ) : grid ? (
           <div

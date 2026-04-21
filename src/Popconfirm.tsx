@@ -21,6 +21,7 @@ import {
 } from "react";
 import { Button } from "./Button";
 import { FloatingVibrancy } from "./FloatingVibrancy";
+import { useLocale } from "./locale";
 import { cn } from "./utils";
 
 export interface PopconfirmProps {
@@ -57,8 +58,8 @@ export function Popconfirm({
   title,
   description,
   placement = "top",
-  okText = "确定",
-  cancelText = "取消",
+  okText: okTextProp,
+  cancelText: cancelTextProp,
   okType = "primary",
   onConfirm,
   onCancel,
@@ -68,6 +69,9 @@ export function Popconfirm({
   onOpenChange,
   disabled = false,
 }: PopconfirmProps) {
+  const locale = useLocale().Popconfirm;
+  const okText = okTextProp ?? locale.okText;
+  const cancelText = cancelTextProp ?? locale.cancelText;
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const open = openProp ?? uncontrolledOpen;

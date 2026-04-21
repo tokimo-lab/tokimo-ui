@@ -14,6 +14,7 @@ import {
 } from "@floating-ui/react";
 import { Smile } from "lucide-react";
 import React, { type MouseEvent, useState } from "react";
+import { useLocale } from "./locale";
 import { cn } from "./utils";
 
 export interface EmojiPickerProps {
@@ -61,12 +62,15 @@ export function EmojiPicker({
   placement = "bottom-start",
   theme = "auto",
   locale = "zh",
-  title = "点击选择图标",
+  title: titleProp,
   stopPropagation = false,
-  clearLabel = "清除",
+  clearLabel: clearLabelProp,
   variant = "default",
   triggerAs = "button",
 }: EmojiPickerProps) {
+  const ui = useLocale().EmojiPicker;
+  const title = titleProp ?? ui.title;
+  const clearLabel = clearLabelProp ?? ui.clearLabel;
   const [open, setOpen] = useState(false);
 
   const { refs, floatingStyles, context } = useFloating({

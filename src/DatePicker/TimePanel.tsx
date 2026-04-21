@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useLocale } from "../locale";
 import type { ScrollAreaRef } from "../ScrollArea";
 import { ScrollArea } from "../ScrollArea";
 import { cn } from "../utils";
@@ -28,6 +29,7 @@ export function TimePanel({
   showNow = true,
   showOk = true,
 }: TimePanelProps) {
+  const locale = useLocale().DatePicker;
   const hour = value?.getHours() ?? 0;
   const minute = value?.getMinutes() ?? 0;
   const second = value?.getSeconds() ?? 0;
@@ -82,7 +84,7 @@ export function TimePanel({
               className="text-xs text-[var(--accent)] cursor-pointer hover:text-[var(--accent-hover)] transition-colors"
               onClick={onNow}
             >
-              此刻
+              {locale.now}
             </button>
           ) : (
             <span />
@@ -93,7 +95,7 @@ export function TimePanel({
               className="text-xs px-3 py-0.5 rounded bg-[var(--accent)] text-white cursor-pointer hover:bg-[var(--accent-hover)] transition-colors"
               onClick={onOk}
             >
-              确定
+              {locale.ok}
             </button>
           ) : null}
         </div>

@@ -12,6 +12,7 @@ import {
 } from "react";
 
 import { QuestionCircleOutlined } from "./icons";
+import { type Locale, useLocale } from "./locale";
 import { Tooltip } from "./Tooltip";
 import { cn } from "./utils";
 
@@ -101,6 +102,9 @@ export function useForm<T extends FieldValues = FieldValues>(
   const listenersRef = useRef<Map<string, (v: unknown) => void>>(new Map());
   const rulesRef = useRef<Map<string, FormRule[]>>(new Map());
   const watchersRef = useRef<Map<string, Set<(v: unknown) => void>>>(new Map());
+  const formLocale = useLocale().Form;
+  const localeRef = useRef(formLocale);
+  localeRef.current = formLocale;
 
   const instance = useMemo<FormInstance<T>>(() => {
     const init = initRef.current;
@@ -149,7 +153,12 @@ export function useForm<T extends FieldValues = FieldValues>(
               typeof rawRule === "function"
                 ? rawRule(instance as unknown as FormInstance)
                 : rawRule;
-            const errMsg = await validateRule(rule, value, name);
+            const errMsg = await validateRule(
+              rule,
+              value,
+              name,
+              localeRef.current,
+            );
             if (errMsg) {
               newErrors[name] = errMsg;
               break;
@@ -218,6 +227,7 @@ async function validateRule(
   rule: FieldRule,
   value: unknown,
   name: string,
+  locale: Locale["Form"],
 ): Promise<string | undefined> {
   const strVal = typeof value === "string" ? value : "";
 
@@ -228,7 +238,7 @@ async function validateRule(
       value === "" ||
       (Array.isArray(value) && value.length === 0)
     ) {
-      return rule.message ?? `${name} 为必填项`;
+      return rule.message ?? locale.required(name);
     }
   }
 
@@ -236,33 +246,36 @@ async function validateRule(
     try {
       new URL(strVal);
     } catch {
-      return rule.message ?? "请输入有效的 URL";
+      return rule.message ?? locale.invalidUrl;
     }
   }
 
   if (rule.type === "email" && strVal) {
     if (!/\S+@\S+\.\S+/.test(strVal)) {
-      return rule.message ?? "请输入有效的邮箱";
+      return rule.message ?? locale.invalidEmail;
     }
   }
 
   if (rule.min !== undefined && strVal && strVal.length < rule.min) {
-    return rule.message ?? `至少 ${rule.min} 个字符`;
+    return rule.message ?? locale.minLength(rule.min);
   }
 
   if (rule.max !== undefined && strVal && strVal.length > rule.max) {
-    return rule.message ?? `最多 ${rule.max} 个字符`;
+    return rule.message ?? locale.maxLength(rule.max);
   }
 
   if (rule.pattern && strVal && !rule.pattern.test(strVal)) {
-    return rule.message ?? "格式不正确";
+    return rule.message ?? locale.patternMismatch;
   }
 
   if (rule.validator) {
     try {
       await rule.validator(rule, value);
     } catch (err) {
-      return rule.message ?? (err instanceof Error ? err.message : "验证失败");
+      return (
+        rule.message ??
+        (err instanceof Error ? err.message : locale.validationFailed)
+      );
     }
   }
   return undefined;
@@ -428,6 +441,7 @@ Form.Item = function FormItem({
   children,
 }: FormItemProps) {
   const form = useFormContext();
+  const formItemLocale = useLocale().Form;
   const [, rerender] = useState(0);
   const generatedId = useId();
   const controlWrapperRef = useRef<HTMLDivElement>(null);
@@ -436,12 +450,15 @@ Form.Item = function FormItem({
   const mergedRules = useMemo(() => {
     if (required && !rules.some((r) => typeof r !== "function" && r.required)) {
       return [
-        { required: true, message: `${label ?? name} 为必填项` },
+        {
+          required: true,
+          message: formItemLocale.required(String(label ?? name ?? "")),
+        },
         ...rules,
       ];
     }
     return rules;
-  }, [rules, required, label, name]);
+  }, [rules, required, label, name, formItemLocale]);
 
   // Register field
   const onChangeRef = useRef<((v: unknown) => void) | undefined>(undefined);

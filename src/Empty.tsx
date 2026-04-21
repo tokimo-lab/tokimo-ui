@@ -1,5 +1,6 @@
 import { Inbox, PackageOpen } from "lucide-react";
 import type { ReactNode } from "react";
+import { useLocale } from "./locale";
 import { cn } from "./utils";
 
 export interface EmptyProps {
@@ -19,10 +20,12 @@ const SIMPLE_SENTINEL = "__empty_simple__" as const;
 export function Empty({
   image,
   imageStyle,
-  description = "暂无数据",
+  description,
   children,
   className,
 }: EmptyProps) {
+  const locale = useLocale().Empty;
+  const resolvedDescription = description ?? locale.description;
   const isSimple = image === SIMPLE_SENTINEL;
 
   const renderedImage = isSimple ? (
@@ -39,8 +42,8 @@ export function Empty({
       )}
     >
       <div style={imageStyle}>{renderedImage}</div>
-      {description !== false && description !== null ? (
-        <p className="text-sm mb-2">{description}</p>
+      {resolvedDescription !== false && resolvedDescription !== null ? (
+        <p className="text-sm mb-2">{resolvedDescription}</p>
       ) : null}
       {children}
     </div>

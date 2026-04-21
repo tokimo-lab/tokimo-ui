@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useLocale } from "./locale";
 import { cn } from "./utils";
 
 /* ─── types ─── */
@@ -103,6 +104,7 @@ const BaseUpload = forwardRef<HTMLDivElement, UploadProps>(function BaseUpload(
   },
   ref,
 ) {
+  const localeUpload = useLocale().Upload;
   const inputRef = useRef<HTMLInputElement>(null);
   const [internalList, setInternalList] = useState<UploadFile[]>(
     defaultFileList ?? [],
@@ -228,7 +230,7 @@ const BaseUpload = forwardRef<HTMLDivElement, UploadProps>(function BaseUpload(
               )}
             >
               <UploadIcon className="w-6 h-6" />
-              <span className="text-xs">上传</span>
+              <span className="text-xs">{localeUpload.uploadText}</span>
             </button>
           )}
         </div>
@@ -249,7 +251,7 @@ const BaseUpload = forwardRef<HTMLDivElement, UploadProps>(function BaseUpload(
               disabled={disabled}
               className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm border border-border-base rounded-md hover:border-sky-400 transition"
             >
-              <UploadIcon className="w-4 h-4" /> 上传文件
+              <UploadIcon className="w-4 h-4" /> {localeUpload.uploadFile}
             </button>
           )}
         </div>
@@ -280,7 +282,9 @@ const BaseUpload = forwardRef<HTMLDivElement, UploadProps>(function BaseUpload(
               </span>
               {f.status === "uploading" && (
                 <span className="text-xs text-sky-500 shrink-0">
-                  {f.percent != null ? `${Math.round(f.percent)}%` : "上传中…"}
+                  {f.percent != null
+                    ? `${Math.round(f.percent)}%`
+                    : localeUpload.uploading}
                 </span>
               )}
               <button
@@ -307,6 +311,7 @@ export function Dragger(props: DraggerProps) {
   const { children, className, disabled, ...rest } = props;
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  const dragHint = useLocale().Upload.dragHint;
 
   return (
     <BaseUpload {...rest} disabled={disabled} className={className}>
@@ -346,7 +351,7 @@ export function Dragger(props: DraggerProps) {
         {children ?? (
           <>
             <UploadIcon className="w-10 h-10 text-sky-500" />
-            <p className="text-sm text-fg-muted">点击或拖拽文件到此区域上传</p>
+            <p className="text-sm text-fg-muted">{dragHint}</p>
           </>
         )}
       </div>

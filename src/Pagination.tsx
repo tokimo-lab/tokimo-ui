@@ -1,3 +1,4 @@
+import { useLocale } from "./locale";
 import { Select } from "./Select";
 import { cn } from "./utils";
 
@@ -47,6 +48,7 @@ export function Pagination({
   disabled = false,
   className,
 }: PaginationProps) {
+  const pageSizeSuffix = useLocale().Pagination.pageSizeSuffix;
   const pageSize = pageSizeProp ?? defaultPageSize;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
@@ -178,7 +180,7 @@ export function Pagination({
           disabled={disabled}
           size={size === "small" ? "small" : "middle"}
           options={pageSizeOptions.map((opt) => ({
-            label: `${opt} / 页`,
+            label: `${opt} ${pageSizeSuffix}`,
             value: Number(opt),
           }))}
           onChange={(val: number) => {

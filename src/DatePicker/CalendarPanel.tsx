@@ -6,14 +6,9 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
+import { useLocale } from "../locale";
 import { cn } from "../utils";
-import {
-  type CalendarDay,
-  generateCalendarDays,
-  isSameDay,
-  MONTH_NAMES,
-  WEEK_DAYS,
-} from "./utils";
+import { type CalendarDay, generateCalendarDays, isSameDay } from "./utils";
 
 type ViewMode = "day" | "month" | "year";
 
@@ -32,6 +27,7 @@ export function CalendarPanel({
   onToday,
   showToday = true,
 }: CalendarPanelProps) {
+  const locale = useLocale().DatePicker;
   const now = new Date();
   const initYear = value?.getFullYear() ?? now.getFullYear();
   const initMonth = value?.getMonth() ?? now.getMonth();
@@ -119,14 +115,14 @@ export function CalendarPanel({
               className="cursor-pointer hover:text-[var(--accent)] transition-colors px-1"
               onClick={() => setViewMode("year")}
             >
-              {viewYear}年
+              {locale.formatYear(viewYear)}
             </button>
             <button
               type="button"
               className="cursor-pointer hover:text-[var(--accent)] transition-colors px-1"
               onClick={() => setViewMode("month")}
             >
-              {viewMonth + 1}月
+              {locale.formatMonth(viewMonth + 1)}
             </button>
           </div>
           <div className="flex items-center gap-0.5">
@@ -152,7 +148,7 @@ export function CalendarPanel({
             className="text-sm font-medium cursor-pointer hover:text-[var(--accent)] transition-colors px-1"
             onClick={() => setViewMode("year")}
           >
-            {viewYear}年
+            {locale.formatYear(viewYear)}
           </button>
           <NavBtn onClick={handleNextYear}>
             <ChevronRight className="h-3.5 w-3.5" />
@@ -179,7 +175,7 @@ export function CalendarPanel({
   const renderDayView = () => (
     <div className="px-2 pb-1">
       <div className="grid grid-cols-7 mb-0.5">
-        {WEEK_DAYS.map((d) => (
+        {locale.weekDays.map((d) => (
           <div
             key={d}
             className="text-center text-xs text-[var(--text-muted)] py-1"
@@ -226,7 +222,7 @@ export function CalendarPanel({
 
   const renderMonthView = () => (
     <div className="grid grid-cols-3 gap-2 px-3 py-2">
-      {MONTH_NAMES.map((name, i) => {
+      {locale.monthNamesShort.map((name, i) => {
         const isCurrent =
           viewYear === now.getFullYear() && i === now.getMonth();
         const isSelected =
@@ -303,7 +299,7 @@ export function CalendarPanel({
             className="text-xs text-[var(--accent)] cursor-pointer hover:text-[var(--accent-hover)] transition-colors"
             onClick={handleToday}
           >
-            今天
+            {locale.today}
           </button>
         </div>
       ) : null}
