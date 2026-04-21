@@ -34,7 +34,7 @@ export interface ConfigProviderProps {
 }
 
 /**
- * Inject a `Locale` to all `@tokiomo/components` descendants.
+ * Inject a `Locale` to all `@tokimo/ui` descendants.
  *
  * Defaults to `enUS` when omitted. Per-component prop overrides always win
  * over the locale default.

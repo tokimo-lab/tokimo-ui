@@ -1,5 +1,5 @@
 /**
- * Locale interface for @tokiomo/components.
+ * Locale interface for @tokimo/ui.
  *
  * Components read defaults from this object via `useLocale()`. Per-call
  * overrides via component props always take precedence.
