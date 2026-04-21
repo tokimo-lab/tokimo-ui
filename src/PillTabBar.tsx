@@ -100,7 +100,10 @@ export function PillTabBar<K extends string>({
   }, [activeTab]);
 
   return (
-    <div className={stickyClass}>
+    <div
+      className={stickyClass}
+      data-sticky-tab-bar={sticky ? "true" : undefined}
+    >
       <div className="relative flex items-center justify-center">
         <div className="relative inline-flex items-center gap-0.5 rounded-full border border-white/10 bg-black/20 p-1 backdrop-blur-xl dark:border-white/[0.06] dark:bg-white/[0.06]">
           {/* Sliding active pill */}
