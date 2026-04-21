@@ -1,35 +1,45 @@
 {
   "name": "@tokimo/ui",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
+  "description": "Tokimo UI — a React component library built with Tailwind CSS, Floating UI, and Lucide icons. Ships ConfigProvider/Locale, no third-party UI framework dependency.",
+  "keywords": ["react", "ui", "components", "tailwindcss", "floating-ui", "tokimo"],
+  "license": "MIT",
+  "author": "Tokimo Lab",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tokimo-lab/tokimo-ui.git"
+  },
+  "homepage": "https://github.com/tokimo-lab/tokimo-ui#readme",
+  "bugs": {
+    "url": "https://github.com/tokimo-lab/tokimo-ui/issues"
+  },
   "type": "module",
   "main": "src/index.ts",
   "types": "src/index.ts",
-  "files": [
-    "src"
-  ],
+  "files": ["src"],
   "exports": {
     ".": "./src/index.ts",
     "./icons": "./src/icons/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome check --write ."
   },
   "dependencies": {
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
     "@floating-ui/react": "^0.27.19",
-    "lucide-react": "^1.7.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "lucide-react": "^1.7.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "typescript": "^6.0.2"
   },
   "peerDependencies": {
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }
