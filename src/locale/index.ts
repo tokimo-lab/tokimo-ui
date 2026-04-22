@@ -5,6 +5,8 @@ import {
   useContext,
   useEffect,
 } from "react";
+import { ThemeProvider } from "../theme";
+import type { ThemeConfig } from "../theme/types";
 import { enUS } from "./en-US";
 import type { Locale } from "./types";
 
@@ -30,24 +32,38 @@ export function getGlobalLocale(): Locale {
 }
 
 export interface ConfigProviderProps {
+  /** Locale for built-in UI strings. Defaults to `enUS`. */
   locale?: Locale;
+  /**
+   * Theme configuration. When provided, mounts a `<ThemeProvider>` that
+   * manages dark mode + accent color and exposes `useTheme()`.
+   */
+  theme?: ThemeConfig;
   children: ReactNode;
 }
 
 /**
- * Inject a `Locale` to all `@tokimo/ui` descendants.
+ * Inject locale and (optionally) theme to all `@tokimo/ui` descendants.
  *
- * Defaults to `enUS` when omitted. Per-component prop overrides always win
- * over the locale default.
+ * Per-component prop overrides always win over the locale default.
  */
 export function ConfigProvider({
   locale = enUS,
+  theme,
   children,
 }: ConfigProviderProps) {
   useEffect(() => {
     currentLocale = locale;
   }, [locale]);
-  return createElement(LocaleContext.Provider, { value: locale }, children);
+
+  const localeNode = createElement(
+    LocaleContext.Provider,
+    { value: locale },
+    children,
+  );
+
+  if (!theme) return localeNode;
+  return createElement(ThemeProvider, { ...theme }, localeNode);
 }
 
 export function useLocale(): Locale {

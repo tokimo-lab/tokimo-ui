@@ -176,6 +176,29 @@ export { ToastProvider, useToast } from "./Toast";
 export type { TooltipProps } from "./Tooltip";
 // ─── Overlay / Floating ───
 export { Tooltip } from "./Tooltip";
+// ─── Theme ───
+export type {
+  AccentColor,
+  Theme,
+  ThemeConfig,
+  ThemeContextValue,
+  ThemeMode,
+  ThemeStorage,
+} from "./theme";
+export {
+  applyAccentAttribute,
+  applyCustomAccentVars,
+  applyThemeClass,
+  cookieStorage,
+  detectSystemTheme,
+  getCustomHex,
+  isCustomAccent,
+  localStorageStorage,
+  noopStorage,
+  ThemeProvider,
+  useTheme,
+  useThemeOrNull,
+} from "./theme";
 // ─── Context ───
 export type { UIContextValue } from "./UIContext";
 export { UIContext, useUIContext } from "./UIContext";
