@@ -5,6 +5,8 @@ import {
   useContext,
   useEffect,
 } from "react";
+import { DateFormatProvider } from "../dateFormat";
+import type { DateFormatConfig } from "../dateFormat/types";
 import { ThemeProvider } from "../theme";
 import type { ThemeConfig } from "../theme/types";
 import { enUS } from "./en-US";
@@ -39,6 +41,13 @@ export interface ConfigProviderProps {
    * manages dark mode + accent color and exposes `useTheme()`.
    */
   theme?: ThemeConfig;
+  /**
+   * User-configurable date / time format templates. When provided, mounts a
+   * `<DateFormatProvider>` and exposes `useDateFormat()`. `DatePicker`,
+   * `TimePicker`, and `DateTimePicker` automatically consume these templates
+   * when no `format` prop is passed.
+   */
+  dateFormat?: DateFormatConfig;
   children: ReactNode;
 }
 
@@ -50,20 +59,26 @@ export interface ConfigProviderProps {
 export function ConfigProvider({
   locale = enUS,
   theme,
+  dateFormat,
   children,
 }: ConfigProviderProps) {
   useEffect(() => {
     currentLocale = locale;
   }, [locale]);
 
-  const localeNode = createElement(
+  let node: ReactNode = createElement(
     LocaleContext.Provider,
     { value: locale },
     children,
   );
 
-  if (!theme) return localeNode;
-  return createElement(ThemeProvider, { ...theme }, localeNode);
+  if (dateFormat) {
+    node = createElement(DateFormatProvider, { ...dateFormat }, node);
+  }
+  if (theme) {
+    node = createElement(ThemeProvider, { ...theme }, node);
+  }
+  return node;
 }
 
 export function useLocale(): Locale {

@@ -12,6 +12,7 @@ import {
 } from "@floating-ui/react";
 import { CalendarDays, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useDateFormatOrNull } from "../dateFormat";
 import { FloatingVibrancy } from "../FloatingVibrancy";
 import { useLocale } from "../locale";
 import { cn } from "../utils";
@@ -26,7 +27,10 @@ export interface DateTimePickerProps {
   defaultValue?: Date | null;
   /** Change callback — receives Date and formatted string */
   onChange?: (dateTime: Date | null, dateTimeString: string) => void;
-  /** Display format (default: "YYYY-MM-DD HH:mm:ss") */
+  /**
+   * Display format. Defaults to `useDateFormat()?.longFormat`, falling back
+   * to `"YYYY-MM-DD HH:mm:ss"` (or without seconds when `showSecond=false`).
+   */
   format?: string;
   /** Show seconds column (default: true) */
   showSecond?: boolean;
@@ -74,9 +78,12 @@ export function DateTimePicker({
   onOpenChange,
 }: DateTimePickerProps) {
   const locale = useLocale().DatePicker;
+  const dateCtx = useDateFormatOrNull();
   const placeholder = placeholderProp ?? locale.dateTimePlaceholder;
   const format =
-    formatProp ?? (showSecond ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD HH:mm");
+    formatProp ??
+    dateCtx?.longFormat ??
+    (showSecond ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD HH:mm");
 
   const [internalValue, setInternalValue] = useState<Date | null>(
     defaultValue ?? null,

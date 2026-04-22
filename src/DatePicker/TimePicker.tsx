@@ -12,6 +12,7 @@ import {
 } from "@floating-ui/react";
 import { Clock, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useDateFormatOrNull } from "../dateFormat";
 import { FloatingVibrancy } from "../FloatingVibrancy";
 import { useLocale } from "../locale";
 import { cn } from "../utils";
@@ -25,7 +26,10 @@ export interface TimePickerProps {
   defaultValue?: Date | null;
   /** Change callback — receives Date and formatted string */
   onChange?: (time: Date | null, timeString: string) => void;
-  /** Display format (default: "HH:mm:ss" or "HH:mm" when showSecond=false) */
+  /**
+   * Display format. Defaults to `useDateFormat()?.timeFormat`, falling back
+   * to `"HH:mm:ss"` (or `"HH:mm"` when `showSecond=false`).
+   */
   format?: string;
   /** Show seconds column (default: true) */
   showSecond?: boolean;
@@ -70,7 +74,9 @@ export function TimePicker({
   onOpenChange,
 }: TimePickerProps) {
   const locale = useLocale().DatePicker;
-  const format = formatProp ?? (showSecond ? "HH:mm:ss" : "HH:mm");
+  const dateCtx = useDateFormatOrNull();
+  const format =
+    formatProp ?? dateCtx?.timeFormat ?? (showSecond ? "HH:mm:ss" : "HH:mm");
   const placeholder = placeholderProp ?? locale.timePlaceholder;
 
   const [internalValue, setInternalValue] = useState<Date | null>(
