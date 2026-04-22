@@ -85,7 +85,7 @@ export function useVariableVirtualizer(
       for (const entry of entries) {
         const index = obs.get(entry.target);
         if (index == null) continue;
-        // Use border-box so wrapper margins/paddings are included; falls back
+        // Use border-box so wrapper paddings are included; falls back
         // to getBoundingClientRect on platforms without borderBoxSize.
         let size: number;
         const bbs = entry.borderBoxSize?.[0];
@@ -95,6 +95,11 @@ export function useVariableVirtualizer(
           const rect = (entry.target as HTMLElement).getBoundingClientRect();
           size = axis === "vertical" ? rect.height : rect.width;
         }
+        // Skip detached / display:none elements. When React unmounts a slot
+        // mid-scroll the browser still fires a final entry with size=0 on the
+        // detached node — accepting it would corrupt totalSize and make the
+        // scrollbar thumb wobble. Keep the last-known measurement instead.
+        if (size <= 0 || !(entry.target as HTMLElement).isConnected) continue;
         // Round to avoid sub-pixel churn.
         const rounded = Math.round(size * 100) / 100;
         const prev = m.get(index);
@@ -181,10 +186,18 @@ export function useVariableVirtualizer(
           } else {
             obs.set(el, index);
           }
+        } else {
+          // Slot is unmounting (scrolled out of view). Stop observing the
+          // detached node — otherwise the browser fires a final size=0 entry
+          // that corrupts totalSize. Keep the cached measurement so the
+          // remount still places at the same offset.
+          for (const [prevEl, prevIdx] of obs) {
+            if (prevIdx === index) {
+              ro.unobserve(prevEl);
+              obs.delete(prevEl);
+            }
+          }
         }
-        // Intentionally do NOT unobserve on unmount — slots unmount when they
-        // scroll out of view but we keep the measurement cached. Cleanup runs
-        // on hook unmount via the effect above.
       };
       cache.set(index, cb);
       return cb;
