@@ -1,13 +1,14 @@
 /**
- * User-configurable date / time format templates (dayjs-style tokens:
- * `YYYY MM DD HH mm ss`).
+ * User-configurable date / time format templates (dayjs tokens — the full
+ * set: `YYYY MMM DD dddd HH mm ss A` etc).
  *
- * The UI lib only stores the strings and exposes setters; actual formatting
- * is delegated to the consumer (e.g. dayjs in the host app) so we don't pull
- * a date library into the bundle. `DatePicker` / `TimePicker` /
- * `DateTimePicker` consume `dateFormat` / `timeFormat` automatically when no
- * `format` prop is passed.
+ * The UI lib bundles dayjs (matching antd's approach) so `useDateFormat()`
+ * exposes ready-to-use `formatLong / formatDate / formatTime` helpers and
+ * `DatePicker / TimePicker / DateTimePicker` parse + render with full token
+ * support out of the box. Consumers don't need their own date library.
  */
+export type DateInput = Date | string | number | null | undefined;
+
 export interface DateFormatStorage {
   loadLong(): string | null;
   saveLong(value: string): void;
@@ -46,4 +47,10 @@ export interface DateFormatContextValue {
   setLongFormat: (fmt: string) => void;
   setDateFormat: (fmt: string) => void;
   setTimeFormat: (fmt: string) => void;
+  /** Format a value with the current `longFormat`. Empty string for invalid / nullish input. */
+  formatLong: (value: DateInput) => string;
+  /** Format a value with the current `dateFormat`. */
+  formatDate: (value: DateInput) => string;
+  /** Format a value with the current `timeFormat`. */
+  formatTime: (value: DateInput) => string;
 }

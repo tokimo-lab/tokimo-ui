@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import {
   createContext,
   createElement,
@@ -13,13 +15,22 @@ import type {
   DateFormatConfig,
   DateFormatContextValue,
   DateFormatStorage,
+  DateInput,
 } from "./types";
+
+dayjs.extend(customParseFormat);
 
 const DateFormatCtx = createContext<DateFormatContextValue | null>(null);
 
 const FALLBACK_LONG = "YYYY-MM-DD HH:mm:ss";
 const FALLBACK_DATE = "YYYY-MM-DD";
 const FALLBACK_TIME = "HH:mm:ss";
+
+function formatWith(value: DateInput, format: string): string {
+  if (value === null || value === undefined || value === "") return "";
+  const d = dayjs(value);
+  return d.isValid() ? d.format(format) : "";
+}
 
 function resolveStorage(
   s: DateFormatConfig["storage"],
@@ -85,6 +96,21 @@ export function DateFormatProvider({
     [longFormat, dateFormat, onChange],
   );
 
+  const formatLong = useCallback(
+    (value: DateInput) => formatWith(value, longFormat),
+    [longFormat],
+  );
+
+  const formatDate = useCallback(
+    (value: DateInput) => formatWith(value, dateFormat),
+    [dateFormat],
+  );
+
+  const formatTime = useCallback(
+    (value: DateInput) => formatWith(value, timeFormat),
+    [timeFormat],
+  );
+
   const value = useMemo<DateFormatContextValue>(
     () => ({
       longFormat,
@@ -93,6 +119,9 @@ export function DateFormatProvider({
       setLongFormat,
       setDateFormat,
       setTimeFormat,
+      formatLong,
+      formatDate,
+      formatTime,
     }),
     [
       longFormat,
@@ -101,6 +130,9 @@ export function DateFormatProvider({
       setLongFormat,
       setDateFormat,
       setTimeFormat,
+      formatLong,
+      formatDate,
+      formatTime,
     ],
   );
 
@@ -128,4 +160,5 @@ export type {
   DateFormatConfig,
   DateFormatContextValue,
   DateFormatStorage,
+  DateInput,
 } from "./types";
