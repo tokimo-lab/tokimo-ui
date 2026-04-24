@@ -41,7 +41,10 @@
     "@emoji-mart/react": "^1.1.1",
     "@floating-ui/react": "^0.27.19",
     "dayjs": "^1.11.20",
-    "lucide-react": "^1.7.0"
+    "lucide-react": "^1.7.0",
+    "material-icon-theme": "^5.32.0",
+    "mime": "^4.0.5",
+    "react-i18next": "^15.2.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.0",

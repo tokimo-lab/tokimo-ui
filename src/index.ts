@@ -222,3 +222,6 @@ export type { UploadChangeInfo, UploadFile, UploadProps } from "./Upload";
 export { Dragger, Upload } from "./Upload";
 // ─── Utilities ───
 export { cn } from "./utils";
+
+// ─── FileManager ───
+export * from "./FileManager";
