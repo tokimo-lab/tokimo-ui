@@ -156,13 +156,6 @@ export interface AppSidebarProps {
    * into the items area.
    */
   _onItemsHoverEnter?: () => void;
-  /**
-   * @internal — render the sidebar inline (no placeholder + absolute aside,
-   * no hover-expand). Used for nested item-list scenarios (e.g. mail folder
-   * list embedded inside a custom account+folder column) where the caller
-   * already controls the column width and stacking.
-   */
-  _inline?: boolean;
 }
 
 /** Width of the floating sidebar when visually collapsed (icon rail). */
@@ -176,14 +169,7 @@ export const FLOATING_SIDEBAR_COLLAPSED_WIDTH = 48;
 export const FLOATING_HOVER_DELAY_MS = 500;
 
 export function AppSidebar(props: AppSidebarProps) {
-  const { width = 188, collapsed, className, style, _inline } = props;
-
-  // Inline mode: bypass the placeholder + absolute aside pattern entirely
-  // and render directly in document flow. The caller is responsible for
-  // sizing the surrounding column. No hover-expand here.
-  if (_inline) {
-    return <InlineSidebar {...props} className={cn("h-full", className)} />;
-  }
+  const { width = 188, collapsed, className, style } = props;
 
   const [floatingHover, setFloatingHover] = useState(false);
   const [floatingInnerCollapsed, setFloatingInnerCollapsed] = useState(
