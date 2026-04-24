@@ -276,12 +276,16 @@ export function AppSidebar(props: AppSidebarProps) {
     return (
       <div
         className={cn(
-          "absolute inset-y-0 left-0 z-10 flex flex-col overflow-hidden select-none",
+          // Base z-10; bumps to z-30 while hover-expanded so the preview
+          // overlays any nested floating sidebar (e.g. SecondaryMasterDetailLayout).
+          "absolute inset-y-0 left-0 flex flex-col overflow-hidden select-none",
+          hoverExpand ? "z-30" : "z-10",
           "border-r border-border-base",
-          // Frosted-glass overlay when hover-expanded (uses shared glass token,
-          // same as Card/Modal/Drawer); solid sidebar background otherwise.
+          // Frosted-glass overlay when hover-expanded (mirrors Modal/Drawer
+          // hand-written glass palette since project has no shared GlassPanel
+          // primitive yet); solid sidebar background otherwise.
           hoverExpand
-            ? "bg-surface-glass backdrop-blur-glass shadow-2xl"
+            ? "bg-white/85 dark:bg-black/70 backdrop-blur-2xl shadow-2xl"
             : "bg-[var(--sidebar-bg)]",
           "transition-[width] duration-200 ease-out",
           className,
