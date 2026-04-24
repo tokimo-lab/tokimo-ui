@@ -146,6 +146,13 @@ export interface AppSidebarProps {
 /** Width of the floating sidebar when visually collapsed (icon rail). */
 export const FLOATING_SIDEBAR_COLLAPSED_WIDTH = 48;
 
+/**
+ * How long (ms) the pointer must stay still over a collapsed floating sidebar
+ * before the hover preview expands. Mousemove resets the timer, so sliding
+ * through never triggers it — only deliberate dwell does.
+ */
+export const FLOATING_HOVER_DELAY_MS = 2000;
+
 export function AppSidebar(props: AppSidebarProps) {
   const {
     width = 188,
@@ -233,6 +240,27 @@ export function AppSidebar(props: AppSidebarProps) {
     }
   }, [collapsed]);
 
+  // ── Floating hover-preview: dwell-delay before expanding ──
+  // Requirement: hover doesn't immediately open the preview pane. Only after
+  // the pointer stays (≈ stationary) over the rail for FLOATING_HOVER_DELAY ms
+  // does the preview expand. Any mousemove resets the timer, so "just sliding
+  // through" never triggers the preview. Leaving the rail cancels it.
+  const floatingDwellTimerRef = useRef<number | null>(null);
+  const clearFloatingDwell = () => {
+    if (floatingDwellTimerRef.current != null) {
+      window.clearTimeout(floatingDwellTimerRef.current);
+      floatingDwellTimerRef.current = null;
+    }
+  };
+  const scheduleFloatingDwell = () => {
+    clearFloatingDwell();
+    floatingDwellTimerRef.current = window.setTimeout(() => {
+      floatingDwellTimerRef.current = null;
+      setFloatingHover(true);
+    }, FLOATING_HOVER_DELAY_MS);
+  };
+  useEffect(() => clearFloatingDwell, []);
+
   // ── Floating mode: sync inner collapsed state with width transition ──
   // On manual toggle (collapsed prop changes), we swap the inner layout
   // between standard-expanded and rail. To avoid the inner content snapping
@@ -260,12 +288,23 @@ export function AppSidebar(props: AppSidebarProps) {
       ? width
       : FLOATING_SIDEBAR_COLLAPSED_WIDTH;
     const handleEnter =
-      collapseMode === "hoverable"
-        ? () => setFloatingHover(true)
+      collapseMode === "hoverable" && !floatingHover
+        ? scheduleFloatingDwell
         : undefined;
     const handleLeave =
       collapseMode === "hoverable"
-        ? () => setFloatingHover(false)
+        ? () => {
+            clearFloatingDwell();
+            setFloatingHover(false);
+          }
+        : undefined;
+    // Mousemove resets the dwell timer: any motion means "still deciding, not
+    // committed". Only bind while the preview is closed — once expanded the
+    // CSS width transition causes spurious mousemove events under the pointer
+    // which would immediately re-arm the timer (harmless but wasteful).
+    const handleMove =
+      collapseMode === "hoverable" && !!collapsed && !floatingHover
+        ? scheduleFloatingDwell
         : undefined;
     // When hover-expanded, moving the pointer onto the toggle button causes
     // setFloatingHover(false). Re-opening the preview when the user moves
@@ -293,6 +332,7 @@ export function AppSidebar(props: AppSidebarProps) {
         style={{ width: effectiveWidth, ...style }}
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
+        onMouseMove={handleMove}
       >
         <AppSidebar
           {...props}
@@ -303,12 +343,15 @@ export function AppSidebar(props: AppSidebarProps) {
           _floatingHoverExpanded={hoverExpand}
           _onToggleHoverEnter={
             collapseMode === "hoverable"
-              ? () => setFloatingHover(false)
+              ? () => {
+                  clearFloatingDwell();
+                  setFloatingHover(false);
+                }
               : undefined
           }
           _onItemsHoverEnter={
             collapseMode === "hoverable"
-              ? () => setFloatingHover(true)
+              ? scheduleFloatingDwell
               : undefined
           }
           className="h-full border-0 border-r-0"
