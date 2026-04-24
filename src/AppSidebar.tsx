@@ -445,8 +445,6 @@ function InlineSidebar(props: AppSidebarProps) {
     const railWidth = _floatingHoverExpanded
       ? width
       : FLOATING_SIDEBAR_COLLAPSED_WIDTH;
-    const headerHeight = headerIcon ? 48 : 0;
-    const scrollAreaPaddingTop = topInset ?? 8;
     return (
       <div
         className={cn(
@@ -456,21 +454,6 @@ function InlineSidebar(props: AppSidebarProps) {
         )}
         style={{ width: railWidth, ...style }}
       >
-        {/* Sliding accent indicator — rendered at sidebar root to hug left edge */}
-        {indicator && (
-          <span
-            className="pointer-events-none absolute left-0 z-20 w-[3px] rounded-r-full bg-[var(--accent)]"
-            style={{
-              top:
-                headerHeight +
-                scrollAreaPaddingTop +
-                indicator.top +
-                (indicator.height - 28) / 2,
-              height: 28,
-              transition: canAnimate.current ? "top 200ms ease-out" : "none",
-            }}
-          />
-        )}
         {headerIcon && (
           <div
             className={cn(
@@ -500,10 +483,7 @@ function InlineSidebar(props: AppSidebarProps) {
         ) : (
           <ScrollArea
             direction="vertical"
-            className={cn(
-              "flex-1 pt-2",
-              _floatingHoverExpanded ? "px-2" : "px-1",
-            )}
+            className={cn("flex-1 pt-2", _floatingHoverExpanded && "px-2")}
             style={topInset ? { paddingTop: topInset } : undefined}
           >
             <div
@@ -514,6 +494,21 @@ function InlineSidebar(props: AppSidebarProps) {
                 _floatingHoverExpanded ? "items-stretch" : "items-center",
               )}
             >
+              {/* Sliding accent indicator — lives inside the scroll content so
+                  it scrolls with the items. Negative left offset (-px-1 of the
+                  ScrollArea) pulls it back to the rail's left edge. */}
+              {indicator && !_floatingHoverExpanded && (
+                <span
+                  className="pointer-events-none absolute left-0 z-20 w-[3px] rounded-r-full bg-[var(--accent)]"
+                  style={{
+                    top: indicator.top + (indicator.height - 28) / 2,
+                    height: 28,
+                    transition: canAnimate.current
+                      ? "top 200ms ease-out"
+                      : "none",
+                  }}
+                />
+              )}
               {sections.map((section, si) => {
                 if (section.items.length === 0) return null;
                 const hasPrevNonEmpty = sections
