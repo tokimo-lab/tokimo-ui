@@ -1,9 +1,40 @@
 /**
  * AppSidebar — shared left-sidebar navigation component.
  *
+ * Self-contained floating sidebar with built-in placeholder.
+ *
+ * Renders TWO sibling elements wrapped in a fragment:
+ *   1. A placeholder `<div>` that participates in the document flow and
+ *      smoothly transitions its width between collapsed (48 px) and
+ *      expanded (`width`, default 188 px). This is what gives the rest of
+ *      the page its "the sidebar takes N px" layout.
+ *   2. An absolutely-positioned `<aside>` (`absolute inset-y-0 left-0`)
+ *      containing the actual rail / hover-flyout UI. This element is what
+ *      visibly grows on hover-expand without pushing the page content.
+ *
+ * Caller responsibility:
+ *   - The parent that hosts `<AppSidebar />` MUST be `position: relative`,
+ *     otherwise the floating aside will escape to the nearest positioned
+ *     ancestor.
+ *   - Use a flex/grid parent and let content fill the remaining space; do
+ *     **not** compute `marginLeft` / `gridTemplateColumns` from `collapsed`
+ *     anymore — the placeholder handles that automatically.
+ *
+ * Recommended layout:
+ *   ```tsx
+ *   <div className="relative flex h-full">
+ *     <AppSidebar collapsed={...} onToggleCollapsed={...} sections={...} />
+ *     <div className="flex-1 min-w-0">{content}</div>
+ *   </div>
+ *   ```
+ *
+ * Behavior is permanently floating + hoverable: when `collapsed`, dwelling
+ * over the rail for {@link FLOATING_HOVER_DELAY_MS} ms expands a frosted
+ * preview; mousemove resets the timer so sliding through never triggers it.
+ *
  * Active indicator slides between items with animation.
- * Supports section labels (小字隔开), two-line items with subtitle,
- * header/footer slots, and trailing extra content.
+ * Supports section labels, two-line items with subtitle, header/footer
+ * slots, and trailing extra content.
  */
 
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
@@ -54,10 +85,9 @@ export interface AppSidebarProps {
    */
   headerIcon?: ReactNode;
   /**
-   * Title text rendered next to `headerIcon` when a floating hoverable sidebar
-   * is expanded on hover. Kept separate from `header` so the icon can stay
-   * anchored in the 48px rail column (preventing a shift between rail and
-   * hover-expanded states).
+   * Title text rendered next to `headerIcon` while the rail is hover-expanded.
+   * Kept separate from `header` so the icon can stay anchored in the 48 px
+   * rail column (preventing a shift between rail and hover-expanded states).
    */
   headerTitle?: ReactNode;
   /** Navigation sections */
@@ -75,13 +105,6 @@ export interface AppSidebarProps {
   /** When true, renders a 48 px icon-only sidebar with tooltips */
   collapsed?: boolean;
   /**
-   * Collapse behavior:
-   * - "static" (default): rail stays collapsed, no hover interaction
-   * - "hoverable": on hover over the collapsed rail, floats a full-width flyout
-   *   over the right-side content (absolute-positioned, does NOT push layout)
-   */
-  collapseMode?: "static" | "hoverable";
-  /**
    * If provided, a bottom toggle button is rendered in the footer area.
    * The callback receives no arguments; the consumer is expected to flip
    * the `collapsed` prop externally.
@@ -91,17 +114,20 @@ export interface AppSidebarProps {
   collapseLabel?: string;
   /** Tooltip text for the toggle button (collapsed mode) */
   expandLabel?: string;
+  /** ClassName applied to the absolute floating aside */
   className?: string;
-  /** CSS custom properties or other inline styles on the container */
+  /** Inline style applied to the absolute floating aside */
   style?: React.CSSProperties;
   /**
-   * @internal — used by hover-flyout mode to render the inner expanded sidebar
-   * without its own bg, so the flyout's frosted-glass container provides it.
+   * @internal — used by the hover-preview wrapper to render the inner
+   * sidebar without its own bg, so the wrapper's frosted-glass / solid
+   * surface provides it.
    */
   _transparentBg?: boolean;
   /**
-   * @internal — used by hover-flyout mode to suppress the footer toggle button
-   * inside the flyout (the toggle stays on the underlying 48px rail).
+   * @internal — used by the hover-preview wrapper to suppress the footer
+   * toggle button inside the inner render (the toggle stays on the
+   * underlying 48 px rail position).
    */
   _hideToggle?: boolean;
   /**
@@ -113,7 +139,7 @@ export interface AppSidebarProps {
   /**
    * @internal — used by floating mode to render the collapsed rail with
    * labels revealed next to each icon during hover-expand. Items keep their
-   * collapsed-state selection style (3px accent bar + centered icon) while
+   * collapsed-state selection style (3 px accent bar + centered icon) while
    * labels fade in on the right.
    */
   _floatingHoverExpanded?: boolean;
@@ -130,17 +156,6 @@ export interface AppSidebarProps {
    * into the items area.
    */
   _onItemsHoverEnter?: () => void;
-  /**
-   * Layout mode:
-   * - "inline" (default): sidebar occupies layout space as a flex/grid child.
-   * - "floating": sidebar is absolutely positioned (`inset-y-0 left-0`), does
-   *   not occupy layout space. Parent must be `position: relative` and apply
-   *   its own `margin-left` to content. Width smoothly transitions between
-   *   48px (collapsed) and `width` (expanded). When combined with
-   *   `collapseMode="hoverable"` + `collapsed`, hovering the rail expands
-   *   the sidebar over content without pushing layout.
-   */
-  layoutMode?: "inline" | "floating";
 }
 
 /** Width of the floating sidebar when visually collapsed (icon rail). */
@@ -154,6 +169,128 @@ export const FLOATING_SIDEBAR_COLLAPSED_WIDTH = 48;
 export const FLOATING_HOVER_DELAY_MS = 500;
 
 export function AppSidebar(props: AppSidebarProps) {
+  const { width = 188, collapsed, className, style } = props;
+
+  const [floatingHover, setFloatingHover] = useState(false);
+  const [floatingInnerCollapsed, setFloatingInnerCollapsed] = useState(
+    collapsed ?? false,
+  );
+
+  // ── Hover-preview: dwell-delay before expanding ──
+  // Hover doesn't immediately open the preview pane. Only after the pointer
+  // stays (≈ stationary) over the rail for FLOATING_HOVER_DELAY_MS does it
+  // expand. Any mousemove resets the timer, so "just sliding through" never
+  // triggers the preview. Leaving the rail cancels it.
+  const floatingDwellTimerRef = useRef<number | null>(null);
+  const clearFloatingDwell = () => {
+    if (floatingDwellTimerRef.current != null) {
+      window.clearTimeout(floatingDwellTimerRef.current);
+      floatingDwellTimerRef.current = null;
+    }
+  };
+  const scheduleFloatingDwell = () => {
+    clearFloatingDwell();
+    floatingDwellTimerRef.current = window.setTimeout(() => {
+      floatingDwellTimerRef.current = null;
+      setFloatingHover(true);
+    }, FLOATING_HOVER_DELAY_MS);
+  };
+  useEffect(() => clearFloatingDwell, []);
+
+  // ── Sync inner collapsed state with width transition ──
+  // On manual toggle (collapsed prop changes), we swap the inner layout
+  // between standard-expanded and rail. To avoid the inner content snapping
+  // during the 200 ms wrapper width transition, delay the retract swap.
+  // Hover-expand does NOT swap layouts — it keeps the rail and just reveals
+  // labels via `_floatingHoverExpanded`, so no delay is needed there.
+  const floatingManuallyExpanded = !collapsed;
+  useEffect(() => {
+    const target = !floatingManuallyExpanded;
+    if (target === floatingInnerCollapsed) return;
+    if (target) {
+      const t = setTimeout(() => setFloatingInnerCollapsed(true), 200);
+      return () => clearTimeout(t);
+    }
+    setFloatingInnerCollapsed(false);
+  }, [floatingManuallyExpanded, floatingInnerCollapsed]);
+
+  const hoverExpand = !!collapsed && floatingHover;
+  const visuallyExpanded = !collapsed || hoverExpand;
+  const effectiveWidth = visuallyExpanded
+    ? width
+    : FLOATING_SIDEBAR_COLLAPSED_WIDTH;
+  // Placeholder occupies the rail's "permanent" width (does NOT widen on
+  // hover-expand — that overlay should sit over the content area, not push it).
+  const placeholderWidth = collapsed ? FLOATING_SIDEBAR_COLLAPSED_WIDTH : width;
+
+  const handleEnter = !floatingHover ? scheduleFloatingDwell : undefined;
+  const handleLeave = () => {
+    clearFloatingDwell();
+    setFloatingHover(false);
+  };
+  // Mousemove resets the dwell timer: any motion means "still deciding, not
+  // committed". Only bind while the preview is closed — once expanded the CSS
+  // width transition causes spurious mousemove events under the pointer which
+  // would immediately re-arm the timer (harmless but wasteful).
+  const handleMove =
+    !!collapsed && !floatingHover ? scheduleFloatingDwell : undefined;
+
+  return (
+    <>
+      {/* Placeholder — participates in document flow, sizes the layout. */}
+      <div
+        aria-hidden
+        className="shrink-0 transition-[width] duration-200 ease-out"
+        style={{ width: placeholderWidth }}
+      />
+      {/* Floating aside — absolutely positioned over the parent (which MUST
+          be position: relative). Smoothly grows on hover-expand without
+          pushing the placeholder or page content. */}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: hover wrapper for dwell-delay preview */}
+      <div
+        className={cn(
+          // Base z-10; bumps to z-30 while hover-expanded so the preview
+          // overlays nested floating sidebars (e.g. SecondaryMasterDetailLayout).
+          "absolute inset-y-0 left-0 flex flex-col overflow-hidden select-none",
+          hoverExpand ? "z-30" : "z-10",
+          "border-r border-border-base",
+          // Frosted-glass overlay when hover-expanded (mirrors Modal/Drawer
+          // hand-written glass palette since project has no shared GlassPanel
+          // primitive yet); solid sidebar background otherwise.
+          hoverExpand
+            ? "bg-white/85 dark:bg-black/70 backdrop-blur-2xl shadow-2xl"
+            : "bg-[var(--sidebar-bg)]",
+          "transition-[width] duration-200 ease-out",
+          className,
+        )}
+        style={{ width: effectiveWidth, ...style }}
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
+        onMouseMove={handleMove}
+      >
+        <InlineSidebar
+          {...props}
+          collapsed={floatingInnerCollapsed}
+          _transparentBg
+          _floatingHoverExpanded={hoverExpand}
+          _onToggleHoverEnter={() => {
+            clearFloatingDwell();
+            setFloatingHover(false);
+          }}
+          _onItemsHoverEnter={scheduleFloatingDwell}
+          className="h-full border-0 border-r-0"
+        />
+      </div>
+    </>
+  );
+}
+
+/**
+ * Inline (non-floating) sidebar render. Always laid out in normal flow,
+ * fills its container via `h-full`. Used as the inner element of the
+ * floating wrapper.
+ */
+function InlineSidebar(props: AppSidebarProps) {
   const {
     width = 188,
     header,
@@ -166,7 +303,6 @@ export function AppSidebar(props: AppSidebarProps) {
     loading,
     topInset,
     collapsed,
-    collapseMode = "static",
     onToggleCollapsed,
     collapseLabel = "Collapse",
     expandLabel = "Expand",
@@ -178,13 +314,8 @@ export function AppSidebar(props: AppSidebarProps) {
     _floatingHoverExpanded,
     _onToggleHoverEnter,
     _onItemsHoverEnter,
-    layoutMode = "inline",
   } = props;
-  const [flyoutOpen, setFlyoutOpen] = useState(false);
-  const [floatingHover, setFloatingHover] = useState(false);
-  const [floatingInnerCollapsed, setFloatingInnerCollapsed] = useState(
-    collapsed ?? false,
-  );
+
   const itemsRef = useRef<HTMLDivElement>(null);
   const canAnimate = useRef(false);
   const [indicator, setIndicator] = useState<{
@@ -240,228 +371,10 @@ export function AppSidebar(props: AppSidebarProps) {
     }
   }, [collapsed]);
 
-  // ── Floating hover-preview: dwell-delay before expanding ──
-  // Requirement: hover doesn't immediately open the preview pane. Only after
-  // the pointer stays (≈ stationary) over the rail for FLOATING_HOVER_DELAY ms
-  // does the preview expand. Any mousemove resets the timer, so "just sliding
-  // through" never triggers the preview. Leaving the rail cancels it.
-  const floatingDwellTimerRef = useRef<number | null>(null);
-  const clearFloatingDwell = () => {
-    if (floatingDwellTimerRef.current != null) {
-      window.clearTimeout(floatingDwellTimerRef.current);
-      floatingDwellTimerRef.current = null;
-    }
-  };
-  const scheduleFloatingDwell = () => {
-    clearFloatingDwell();
-    floatingDwellTimerRef.current = window.setTimeout(() => {
-      floatingDwellTimerRef.current = null;
-      setFloatingHover(true);
-    }, FLOATING_HOVER_DELAY_MS);
-  };
-  useEffect(() => clearFloatingDwell, []);
-
-  // ── Floating mode: sync inner collapsed state with width transition ──
-  // On manual toggle (collapsed prop changes), we swap the inner layout
-  // between standard-expanded and rail. To avoid the inner content snapping
-  // during the 200ms wrapper width transition, delay the retract swap.
-  // Hover-expand does NOT swap layouts — it keeps the rail and just reveals
-  // labels via `_floatingHoverExpanded`, so no delay is needed there.
-  const floatingManuallyExpanded = !collapsed;
-  useEffect(() => {
-    if (layoutMode !== "floating") return;
-    const target = !floatingManuallyExpanded;
-    if (target === floatingInnerCollapsed) return;
-    if (target) {
-      const t = setTimeout(() => setFloatingInnerCollapsed(true), 200);
-      return () => clearTimeout(t);
-    }
-    setFloatingInnerCollapsed(false);
-  }, [layoutMode, floatingManuallyExpanded, floatingInnerCollapsed]);
-
-  // ── Floating mode: absolute-positioned sidebar with width transition ──
-  if (layoutMode === "floating") {
-    const hoverExpand =
-      !!collapsed && collapseMode === "hoverable" && floatingHover;
-    const visuallyExpanded = !collapsed || hoverExpand;
-    const effectiveWidth = visuallyExpanded
-      ? width
-      : FLOATING_SIDEBAR_COLLAPSED_WIDTH;
-    const handleEnter =
-      collapseMode === "hoverable" && !floatingHover
-        ? scheduleFloatingDwell
-        : undefined;
-    const handleLeave =
-      collapseMode === "hoverable"
-        ? () => {
-            clearFloatingDwell();
-            setFloatingHover(false);
-          }
-        : undefined;
-    // Mousemove resets the dwell timer: any motion means "still deciding, not
-    // committed". Only bind while the preview is closed — once expanded the
-    // CSS width transition causes spurious mousemove events under the pointer
-    // which would immediately re-arm the timer (harmless but wasteful).
-    const handleMove =
-      collapseMode === "hoverable" && !!collapsed && !floatingHover
-        ? scheduleFloatingDwell
-        : undefined;
-    // When hover-expanded, moving the pointer onto the toggle button causes
-    // setFloatingHover(false). Re-opening the preview when the user moves
-    // back to the items/header region is handled by binding onMouseEnter
-    // to those specific zones (see `_onItemsHoverEnter` below). We avoid
-    // onMouseMove on the wrapper because CSS width transitions cause the
-    // element under the pointer to oscillate, producing jitter.
-    return (
-      <div
-        className={cn(
-          // Base z-10; bumps to z-30 while hover-expanded so the preview
-          // overlays any nested floating sidebar (e.g. SecondaryMasterDetailLayout).
-          "absolute inset-y-0 left-0 flex flex-col overflow-hidden select-none",
-          hoverExpand ? "z-30" : "z-10",
-          "border-r border-border-base",
-          // Frosted-glass overlay when hover-expanded (mirrors Modal/Drawer
-          // hand-written glass palette since project has no shared GlassPanel
-          // primitive yet); solid sidebar background otherwise.
-          hoverExpand
-            ? "bg-white/85 dark:bg-black/70 backdrop-blur-2xl shadow-2xl"
-            : "bg-[var(--sidebar-bg)]",
-          "transition-[width] duration-200 ease-out",
-          className,
-        )}
-        style={{ width: effectiveWidth, ...style }}
-        onMouseEnter={handleEnter}
-        onMouseLeave={handleLeave}
-        onMouseMove={handleMove}
-      >
-        <AppSidebar
-          {...props}
-          layoutMode="inline"
-          collapsed={floatingInnerCollapsed}
-          collapseMode="static"
-          _transparentBg
-          _floatingHoverExpanded={hoverExpand}
-          _onToggleHoverEnter={
-            collapseMode === "hoverable"
-              ? () => {
-                  clearFloatingDwell();
-                  setFloatingHover(false);
-                }
-              : undefined
-          }
-          _onItemsHoverEnter={
-            collapseMode === "hoverable"
-              ? scheduleFloatingDwell
-              : undefined
-          }
-          className="h-full border-0 border-r-0"
-        />
-      </div>
-    );
-  }
-
-  // ── Hover-flyout mode: render collapsed rail + full-cover flyout overlay ──
-  //
-  // Tencent Cloud pattern:
-  //   - Rail (collapsed, 48px) has an "expand" button (PanelLeftOpen) at the bottom.
-  //   - Hovering over the ITEMS area opens the flyout (fully covers the rail).
-  //   - Hovering over the TOGGLE area does NOT open the flyout — this lets the
-  //     user click the expand button directly without the flyout flashing in/out.
-  //   - The flyout has its own icon-only dismiss button at the same bottom
-  //     position which, when hovered, retracts the flyout to reveal the rail.
-  if (collapseMode === "hoverable" && collapsed) {
-    const flyoutDismissBtn = (
-      <button
-        type="button"
-        onMouseEnter={() => setFlyoutOpen(false)}
-        onClick={() => setFlyoutOpen(false)}
-        title={expandLabel}
-        className={cn(
-          "flex h-9 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-fg-muted transition-colors",
-          "hover:bg-black/[0.06] hover:text-fg-base dark:hover:bg-white/[0.06]",
-        )}
-      >
-        <PanelLeftClose size={16} />
-      </button>
-    );
-
-    const flyoutInjectedFooter = (
-      <>
-        {footer}
-        {flyoutDismissBtn}
-      </>
-    );
-
-    // Render rail toggle OUTSIDE the items-hover zone so it doesn't open flyout.
-    const railToggleExternal = onToggleCollapsed ? (
-      <div className="shrink-0 border-t border-r border-t-black/[0.06] border-r-border-base bg-[var(--sidebar-bg)] px-2 py-2 dark:border-t-white/[0.08]">
-        <button
-          type="button"
-          onClick={onToggleCollapsed}
-          title={expandLabel}
-          className={cn(
-            "flex h-9 w-full cursor-pointer items-center justify-center rounded-lg text-fg-muted transition-colors",
-            "hover:bg-black/[0.06] hover:text-fg-base dark:hover:bg-white/[0.06]",
-          )}
-        >
-          <PanelLeftOpen size={16} />
-        </button>
-      </div>
-    ) : null;
-
-    return (
-      <div
-        className="relative flex h-full shrink-0 flex-col"
-        style={{ width: 48 }}
-        onMouseLeave={() => setFlyoutOpen(false)}
-      >
-        {/* Items zone — ONLY this area opens the flyout */}
-        {/* biome-ignore lint/a11y/noStaticElementInteractions: non-interactive wrapper used only for hover open */}
-        <div
-          className="relative min-h-0 flex-1"
-          onMouseEnter={() => setFlyoutOpen(true)}
-        >
-          <AppSidebar
-            {...props}
-            collapseMode="static"
-            _hideToggle
-            className="h-full"
-          />
-        </div>
-        {/* Toggle zone — does NOT open flyout; user can click it directly */}
-        {railToggleExternal}
-        {/* Flyout — full-cover overlay (items + toggle area); always rendered
-            so CSS transition can animate enter/exit */}
-        <div
-          className={cn(
-            "absolute inset-0 z-40 overflow-hidden border-r border-border-base shadow-2xl",
-            "bg-white/85 dark:bg-black/70 backdrop-blur-2xl",
-            "transition-[opacity,transform] duration-200 ease-out",
-            flyoutOpen
-              ? "translate-x-0 opacity-100"
-              : "pointer-events-none -translate-x-3 opacity-0",
-          )}
-          style={{ width }}
-          aria-hidden={!flyoutOpen}
-        >
-          <AppSidebar
-            {...props}
-            collapsed={false}
-            collapseMode="static"
-            _transparentBg
-            _hideToggle
-            footer={flyoutInjectedFooter}
-            className="h-full"
-          />
-        </div>
-      </div>
-    );
-  }
-
   // Compose footer with toggle button when onToggleCollapsed is provided
   const showToggleIconOnly = collapsed || _iconOnlyToggle;
   // In hover-expanded mode, pretend we're "open" visually: show the close-icon,
-  // but keep the icon in the 48px left column so its position is identical to
+  // but keep the icon in the 48 px left column so its position is identical to
   // the rail's toggle button (prevents the icon from jumping when hover retracts).
   const toggleButton =
     onToggleCollapsed && !_hideToggle ? (
@@ -540,9 +453,7 @@ export function AppSidebar(props: AppSidebarProps) {
                 indicator.top +
                 (indicator.height - 28) / 2,
               height: 28,
-              transition: canAnimate.current
-                ? "top 200ms ease-out"
-                : "none",
+              transition: canAnimate.current ? "top 200ms ease-out" : "none",
             }}
           />
         )}
@@ -599,9 +510,7 @@ export function AppSidebar(props: AppSidebarProps) {
                     key={section.key ?? `s-${si}`}
                     className={cn(
                       "flex w-full flex-col",
-                      _floatingHoverExpanded
-                        ? "items-stretch"
-                        : "items-center",
+                      _floatingHoverExpanded ? "items-stretch" : "items-center",
                     )}
                   >
                     {hasPrevNonEmpty && (
