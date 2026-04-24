@@ -278,10 +278,10 @@ export function AppSidebar(props: AppSidebarProps) {
         className={cn(
           "absolute inset-y-0 left-0 z-10 flex flex-col overflow-hidden select-none",
           "border-r border-border-base",
-          // Frosted-glass overlay when hover-expanded (mirrors old flyout style),
-          // normal sidebar background otherwise.
+          // Frosted-glass overlay when hover-expanded (uses shared glass token,
+          // same as Card/Modal/Drawer); solid sidebar background otherwise.
           hoverExpand
-            ? "bg-white/85 dark:bg-black/70 backdrop-blur-2xl shadow-2xl"
+            ? "bg-surface-glass backdrop-blur-glass shadow-2xl"
             : "bg-[var(--sidebar-bg)]",
           "transition-[width] duration-200 ease-out",
           className,
