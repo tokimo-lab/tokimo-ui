@@ -175,6 +175,8 @@ export type { SpinProps } from "./Spin";
 export { Spin } from "./Spin";
 export type { StatisticProps } from "./Statistic";
 export { Statistic } from "./Statistic";
+export type { StickySaveBarProps } from "./StickySaveBar";
+export { StickySaveBar } from "./StickySaveBar";
 export type { SwitchProps } from "./Switch";
 export { Switch } from "./Switch";
 export type { TableColumn, TableColumnsType, TableProps } from "./Table";
