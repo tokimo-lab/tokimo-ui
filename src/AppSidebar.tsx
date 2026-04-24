@@ -64,6 +64,14 @@ export interface AppSidebarItem {
   /** Rich content rendered below the main label row (e.g., charts, badges) */
   content?: ReactNode;
   onContextMenu?: (e: React.MouseEvent) => void;
+  /**
+   * Force this item into the active visual state, independent of `activeKey`.
+   * Useful when a section represents an "always-on" current selection that runs
+   * in parallel with another section's primary navigation (e.g. the current
+   * mail account showing alongside the current folder). Items marked this way
+   * render a static left accent bar instead of the global sliding indicator.
+   */
+  active?: boolean;
 }
 
 export interface AppSidebarSection {
@@ -71,6 +79,45 @@ export interface AppSidebarSection {
   /** Small uppercase header text separating groups */
   label?: string;
   items: AppSidebarItem[];
+  /**
+   * Preset visual size. `default` = 16 px icon + 32 px row (existing look),
+   * `tall` = 28 px icon + 44 px row (suitable for avatar/account rows).
+   * Per-section overrides via `iconSize` / `itemHeight` take precedence.
+   */
+  variant?: "default" | "tall";
+  /** Override icon-slot size in px. Wins over variant default. */
+  iconSize?: number;
+  /** Override per-item row height in px. Wins over variant default. */
+  itemHeight?: number;
+}
+
+export interface AppSidebarFooterAction {
+  key: string;
+  icon: ReactNode;
+  /** Used as tooltip + a11y label. */
+  label: string;
+  onClick: () => void;
+  /** `primary` gets accent fill; `default` is subtle hover. */
+  variant?: "default" | "primary";
+}
+
+const SECTION_VARIANT_METRICS: Record<
+  NonNullable<AppSidebarSection["variant"]>,
+  { iconSize: number; itemHeight: number }
+> = {
+  default: { iconSize: 16, itemHeight: 32 },
+  tall: { iconSize: 28, itemHeight: 44 },
+};
+
+function resolveSectionMetrics(section: AppSidebarSection): {
+  iconSize: number;
+  itemHeight: number;
+} {
+  const preset = SECTION_VARIANT_METRICS[section.variant ?? "default"];
+  return {
+    iconSize: section.iconSize ?? preset.iconSize,
+    itemHeight: section.itemHeight ?? preset.itemHeight,
+  };
 }
 
 export interface AppSidebarProps {
@@ -98,6 +145,16 @@ export interface AppSidebarProps {
   onSelect?: (key: string) => void;
   /** Footer content rendered inside the standard footer wrapper */
   footer?: ReactNode;
+  /**
+   * Footer action buttons. When provided, the footer area renders the
+   * actions row (collapsed: vertical stack of 36 px icon buttons; expanded:
+   * horizontal row aligned left) followed by the collapse toggle (right
+   * side in expanded mode, bottom in collapsed mode).
+   *
+   * Mutually exclusive with `footer` — supplying both will use
+   * `footerActions` and emit a dev warning.
+   */
+  footerActions?: AppSidebarFooterAction[];
   /** Extra top padding (px) added above the nav items — use for macOS traffic-light inset */
   topInset?: number;
   /** Show a centered spinner instead of items */
@@ -300,6 +357,7 @@ function InlineSidebar(props: AppSidebarProps) {
     activeKey,
     onSelect,
     footer,
+    footerActions,
     loading,
     topInset,
     collapsed,
@@ -418,13 +476,86 @@ function InlineSidebar(props: AppSidebarProps) {
       </button>
     ) : null;
 
-  const effectiveFooter =
-    footer || toggleButton ? (
+  const effectiveFooter = (() => {
+    const hasActions = !!footerActions && footerActions.length > 0;
+    if (hasActions && footer) {
+      // dev-time hint via console; silent in prod
+      console.warn(
+        "[AppSidebar] `footer` and `footerActions` are mutually exclusive — `footerActions` takes precedence.",
+      );
+    }
+    if (hasActions) {
+      // In rail (collapsed, not hover) → vertical stack. Otherwise → horizontal row.
+      const isRow = _floatingHoverExpanded || !collapsed;
+      const compactToggle =
+        onToggleCollapsed && !_hideToggle ? (
+          <Tooltip
+            title={collapsed ? expandLabel : collapseLabel}
+            placement={isRow ? "top" : "right"}
+          >
+            <button
+              type="button"
+              data-sidebar-toggle
+              onClick={onToggleCollapsed}
+              onMouseEnter={
+                _floatingHoverExpanded && _onToggleHoverEnter
+                  ? _onToggleHoverEnter
+                  : undefined
+              }
+              className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-black/[0.06] hover:text-fg-base dark:hover:bg-white/[0.06]"
+            >
+              {_floatingHoverExpanded || !collapsed ? (
+                <PanelLeftClose size={16} />
+              ) : (
+                <PanelLeftOpen size={16} />
+              )}
+            </button>
+          </Tooltip>
+        ) : null;
+      return (
+        <div
+          className={cn(
+            "flex gap-1",
+            isRow ? "items-center" : "flex-col items-stretch",
+          )}
+        >
+          {footerActions.map((action) => (
+            <Tooltip
+              key={action.key}
+              title={action.label}
+              placement={isRow ? "top" : "right"}
+            >
+              <button
+                type="button"
+                onClick={action.onClick}
+                aria-label={action.label}
+                className={cn(
+                  "flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors",
+                  action.variant === "primary"
+                    ? "bg-[var(--accent)] text-white hover:opacity-90"
+                    : "text-fg-muted hover:bg-black/[0.06] hover:text-fg-base dark:hover:bg-white/[0.06]",
+                )}
+              >
+                {action.icon}
+              </button>
+            </Tooltip>
+          ))}
+          {compactToggle && (
+            <>
+              {isRow && <div className="flex-1" />}
+              {compactToggle}
+            </>
+          )}
+        </div>
+      );
+    }
+    return footer || toggleButton ? (
       <div className="flex flex-col gap-1">
         {footer}
         {toggleButton}
       </div>
     ) : null;
+  })();
 
   // ── Collapsed (icon-only) mode ────────────────────────────────────
   if (collapsed) {
@@ -500,6 +631,7 @@ function InlineSidebar(props: AppSidebarProps) {
                 const hasPrevNonEmpty = sections
                   .slice(0, si)
                   .some((s) => s.items.length > 0);
+                const metrics = resolveSectionMetrics(section);
                 return (
                   <div
                     key={section.key ?? `s-${si}`}
@@ -517,17 +649,30 @@ function InlineSidebar(props: AppSidebarProps) {
                       />
                     )}
                     {section.items.map((item) => {
-                      const isActive = activeKey === item.key;
+                      // `item.active` (explicit) wins over the global `activeKey` match.
+                      // Explicitly-active items render a static accent bar instead of
+                      // contributing to the sliding indicator (only one section's
+                      // selection animates at a time).
+                      const explicitActive = item.active === true;
+                      const isActive = explicitActive || activeKey === item.key;
+                      // Rail icon button is at least 36 px so the hit-target
+                      // remains comfortable; tall variants grow beyond that.
+                      const railSize = Math.max(36, metrics.itemHeight);
                       const rowButton = (
                         <button
                           type="button"
                           onClick={() => onSelect?.(item.key)}
                           onContextMenu={item.onContextMenu}
+                          style={
+                            _floatingHoverExpanded
+                              ? { height: metrics.itemHeight }
+                              : { height: railSize, width: railSize }
+                          }
                           className={cn(
                             "group flex cursor-pointer items-center rounded-lg transition-colors",
                             _floatingHoverExpanded
-                              ? "h-9 w-full"
-                              : "h-9 w-9 justify-center",
+                              ? "w-full"
+                              : "justify-center",
                             isActive
                               ? _floatingHoverExpanded
                                 ? "text-fg-primary"
@@ -540,7 +685,10 @@ function InlineSidebar(props: AppSidebarProps) {
                         >
                           {_floatingHoverExpanded ? (
                             <>
-                              <span className="flex w-8 shrink-0 items-center justify-center">
+                              <span
+                                className="flex shrink-0 items-center justify-center"
+                                style={{ width: Math.max(32, metrics.iconSize + 4) }}
+                              >
                                 {item.collapsedIcon ?? item.icon}
                               </span>
                               <span
@@ -566,6 +714,20 @@ function InlineSidebar(props: AppSidebarProps) {
                             _floatingHoverExpanded ? "w-full" : "",
                           )}
                         >
+                          {/* Static accent bar for `item.active` items. The
+                              global sliding indicator only follows `activeKey`,
+                              so explicitly-active items (parallel selection
+                              like the current mail account) get their own bar. */}
+                          {explicitActive && (
+                            <span
+                              className={cn(
+                                "pointer-events-none absolute z-20 w-[3px] rounded-r-full bg-[var(--accent)]",
+                                _floatingHoverExpanded
+                                  ? "top-1/2 left-0 h-[60%] -translate-y-1/2"
+                                  : "top-1/2 -left-0.5 h-7 -translate-y-1/2",
+                              )}
+                            />
+                          )}
                           {rowButton}
                           {item.extra && (
                             <span
@@ -653,28 +815,32 @@ function InlineSidebar(props: AppSidebarProps) {
                 }}
               />
             )}
-            {sections.map((section, si) => (
-              <div key={section.key ?? `s-${si}`}>
-                {section.label && (
-                  <div
-                    className={cn(
-                      "mb-1 px-3 text-[11px] font-medium uppercase tracking-wider text-fg-muted",
-                      si > 0 && "mt-3",
-                    )}
-                  >
-                    {section.label}
-                  </div>
-                )}
-                {section.items.map((item) => (
-                  <SidebarItemButton
-                    key={item.key}
-                    item={item}
-                    isActive={activeKey === item.key}
-                    onSelect={onSelect}
-                  />
-                ))}
-              </div>
-            ))}
+            {sections.map((section, si) => {
+              const metrics = resolveSectionMetrics(section);
+              return (
+                <div key={section.key ?? `s-${si}`}>
+                  {section.label && (
+                    <div
+                      className={cn(
+                        "mb-1 px-3 text-[11px] font-medium uppercase tracking-wider text-fg-muted",
+                        si > 0 && "mt-3",
+                      )}
+                    >
+                      {section.label}
+                    </div>
+                  )}
+                  {section.items.map((item) => (
+                    <SidebarItemButton
+                      key={item.key}
+                      item={item}
+                      isActive={activeKey === item.key}
+                      onSelect={onSelect}
+                      metrics={metrics}
+                    />
+                  ))}
+                </div>
+              );
+            })}
           </div>
         </ScrollArea>
       )}
@@ -692,25 +858,49 @@ function SidebarItemButton({
   item,
   isActive,
   onSelect,
+  metrics,
 }: {
   item: AppSidebarItem;
   isActive: boolean;
   onSelect?: (key: string) => void;
+  metrics: { iconSize: number; itemHeight: number };
 }) {
   const hasContent = !!item.content;
 
+  // Default variant keeps original look (px-3 py-2.5 ≈ 36 px row).
+  // Larger metrics override via inline style for height + icon container.
+  const useDefaultMetrics = metrics.iconSize === 16 && metrics.itemHeight === 32;
+
   const itemClasses = cn(
-    "mb-0.5 flex w-full cursor-pointer rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
+    "mb-0.5 flex w-full cursor-pointer rounded-lg text-left text-sm transition-colors",
+    useDefaultMetrics ? "px-3 py-2.5" : "px-2.5",
     hasContent ? "flex-col" : "items-center gap-2.5",
     isActive
       ? "text-fg-primary font-medium"
       : "text-fg-muted hover:bg-black/[0.06] dark:hover:bg-white/[0.06] [&_[data-app-icon]]:opacity-60 hover:[&_[data-app-icon]]:opacity-100",
     item.extra != null && "group/sidebar-item",
   );
+  const itemStyle = useDefaultMetrics
+    ? undefined
+    : ({ minHeight: metrics.itemHeight } as React.CSSProperties);
+
+  const iconWrapStyle = useDefaultMetrics
+    ? undefined
+    : ({
+        width: metrics.iconSize,
+        height: metrics.iconSize,
+      } as React.CSSProperties);
 
   const mainRow = (
     <>
-      {item.icon && <span className="shrink-0">{item.icon}</span>}
+      {item.icon && (
+        <span
+          className="flex shrink-0 items-center justify-center"
+          style={iconWrapStyle}
+        >
+          {item.icon}
+        </span>
+      )}
       {item.subtitle ? (
         <div className="min-w-0 flex-1">
           <span className="block truncate leading-tight">{item.label}</span>
@@ -752,6 +942,7 @@ function SidebarItemButton({
         }}
         onContextMenu={item.onContextMenu}
         className={itemClasses}
+        style={itemStyle}
       >
         {fullContent}
       </div>
@@ -772,6 +963,7 @@ function SidebarItemButton({
       onClick={() => onSelect?.(item.key)}
       onContextMenu={item.onContextMenu}
       className={itemClasses}
+      style={itemStyle}
     >
       {fullContent}
     </button>
