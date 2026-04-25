@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./banner.png" alt="Tokimo UI" />
+</p>
+
 # @tokimo/ui
 
 A React 19 component library extracted from [Tokimo](https://github.com/tokimo-lab/tokimo) — a web desktop OS. Built with Tailwind CSS v4, Floating UI, and Lucide icons. **Zero third-party UI framework dependency.**
