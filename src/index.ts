@@ -155,8 +155,6 @@ export type {
   SegmentedControlProps,
 } from "./SegmentedControl";
 export { SegmentedControl } from "./SegmentedControl";
-export type { SegmentedToggleProps } from "./SegmentedToggle";
-export { SegmentedToggle } from "./SegmentedToggle";
 export type { SelectOption, SelectProps } from "./Select";
 // ─── Complex components ───
 export { Select, selectTriggerClassName } from "./Select";

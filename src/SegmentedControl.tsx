@@ -7,12 +7,16 @@ import {
 } from "react";
 import { cn } from "./utils";
 
-export interface SegmentedControlOption<T extends string | number = string> {
+export interface SegmentedControlOption<
+  T extends string | number | boolean = string,
+> {
   label: React.ReactNode;
   value: T;
 }
 
-export interface SegmentedControlProps<T extends string | number = string> {
+export interface SegmentedControlProps<
+  T extends string | number | boolean = string,
+> {
   value?: T;
   onChange?: (value: T) => void;
   options: SegmentedControlOption<T>[];
@@ -20,7 +24,9 @@ export interface SegmentedControlProps<T extends string | number = string> {
   className?: string;
 }
 
-export function SegmentedControl<T extends string | number = string>({
+export function SegmentedControl<
+  T extends string | number | boolean = string,
+>({
   value,
   onChange,
   options,
@@ -114,7 +120,7 @@ export function SegmentedControl<T extends string | number = string>({
         const isActive = opt.value === value;
         return (
           <button
-            key={opt.value}
+            key={String(opt.value)}
             type="button"
             data-segmented-key={String(opt.value)}
             className={cn(
