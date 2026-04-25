@@ -292,6 +292,8 @@ export interface ScrollbarTracksProps {
   showY: boolean;
   showX: boolean;
   visible: boolean;
+  /** Visual size of the scrollbar thumb. @default "normal" (6px) */
+  thumbSize?: "thin" | "normal";
   trackYRef: RefObject<HTMLDivElement | null>;
   trackXRef: RefObject<HTMLDivElement | null>;
   thumbYRef: RefObject<HTMLDivElement | null>;
@@ -308,6 +310,7 @@ const THUMB_CLS =
 export const ScrollbarTracks = memo(function ScrollbarTracks(
   p: ScrollbarTracksProps,
 ) {
+  const thin = p.thumbSize === "thin";
   return (
     <>
       {p.showY && (
@@ -319,9 +322,10 @@ export const ScrollbarTracks = memo(function ScrollbarTracks(
           aria-valuenow={0}
           tabIndex={-1}
           className={cn(
-            "absolute right-0.5 top-0.5 w-[3px] rounded-full transition-opacity duration-150 z-10",
+            "absolute right-0.5 top-0.5 rounded-full transition-opacity duration-150 z-10",
+            thin ? "w-[3px]" : "w-1.5",
             p.visible ? "opacity-100" : "opacity-0 pointer-events-none",
-            p.showX ? "bottom-2" : "bottom-0.5",
+            p.showX ? (thin ? "bottom-2" : "bottom-2.5") : "bottom-0.5",
           )}
           onClick={p.onTrackYClick}
           onKeyDown={noop}
@@ -343,9 +347,10 @@ export const ScrollbarTracks = memo(function ScrollbarTracks(
           aria-valuenow={0}
           tabIndex={-1}
           className={cn(
-            "absolute bottom-0.5 left-0.5 h-[3px] rounded-full transition-opacity duration-150 z-10",
+            "absolute bottom-0.5 left-0.5 rounded-full transition-opacity duration-150 z-10",
+            thin ? "h-[3px]" : "h-1.5",
             p.visible ? "opacity-100" : "opacity-0 pointer-events-none",
-            p.showY ? "right-2" : "right-0.5",
+            p.showY ? (thin ? "right-2" : "right-2.5") : "right-0.5",
           )}
           onClick={p.onTrackXClick}
           onKeyDown={noop}

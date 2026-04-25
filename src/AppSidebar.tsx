@@ -850,6 +850,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
         ) : (
           <ScrollArea
             direction="vertical"
+            thumbSize={_floatingHoverExpanded ? "normal" : "thin"}
             className="flex-1 pt-2"
             style={topInset ? { paddingTop: topInset } : undefined}
           >

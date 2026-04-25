@@ -35,6 +35,8 @@ export interface ScrollAreaProps
   innerClassName?: string;
   /** Hide the scrollbar tracks entirely (still scrollable). @default false */
   hideScrollbar?: boolean;
+  /** Visual size of the scrollbar thumb. @default "normal" (6px) */
+  thumbSize?: "thin" | "normal";
   /**
    * Reserve symmetric padding on both edges equal to scrollbar width **only
    * when the content actually overflows**. Prevents the overlay scrollbar
@@ -105,6 +107,7 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
       thumbMinSize = 24,
       innerClassName,
       hideScrollbar = false,
+      thumbSize = "normal",
       scrollbarGutter = false,
       onScrollChange,
       itemCount,
@@ -635,6 +638,7 @@ export const ScrollArea = forwardRef<ScrollAreaRef, ScrollAreaProps>(
             showY={overflow.y}
             showX={overflow.x}
             visible={sb.visible}
+            thumbSize={thumbSize}
             trackYRef={sb.trackYRef}
             trackXRef={sb.trackXRef}
             thumbYRef={sb.thumbYRef}
