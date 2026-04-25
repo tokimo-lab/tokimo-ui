@@ -463,7 +463,12 @@ export function AppSidebar(props: AppSidebarProps) {
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
         onMouseMove={handleMove}
-        onWheel={handleWheel}
+        // CRITICAL: capture phase, not bubble. ScrollArea inside InlineSidebar
+        // attaches a native non-passive wheel listener that calls
+        // stopPropagation() to keep the page from scrolling — so a normal
+        // onWheel on this wrapper would never fire. Capture-phase delegation
+        // runs BEFORE the inner bubble listener, so we still see the event.
+        onWheelCapture={handleWheel}
       >
         <InlineSidebar
           {...props}
