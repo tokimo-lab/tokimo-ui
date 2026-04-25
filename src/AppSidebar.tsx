@@ -289,6 +289,13 @@ export function AppSidebar(props: AppSidebarProps) {
   // into collapsed=true. Real intentional dwell still works after the grace.
   const lastCollapsedAtRef = useRef(0);
   const COLLAPSE_GRACE_MS = 800;
+  // Suppress hover-preview while the user is actively scrolling inside the
+  // rail. Wheel-driven scroll causes the layout under the cursor to shift,
+  // which fires mousemove/mouseover even though the user hasn't moved the
+  // pointer — exactly like an intentional dwell. Set a small grace window
+  // after each wheel event so the dwell timer stays disarmed.
+  const lastWheelAtRef = useRef(0);
+  const WHEEL_GRACE_MS = 350;
   // Detect prop transitions during render (synchronous, no useEffect race
   // window). Ref mutations during render are allowed by React and idempotent
   // under StrictMode's double-render. This runs BEFORE commit, so any
@@ -316,6 +323,7 @@ export function AppSidebar(props: AppSidebarProps) {
   const scheduleFloatingDwell = useCallback(() => {
     if (suppressHoverUntilLeaveRef.current) return;
     if (Date.now() - lastCollapsedAtRef.current < COLLAPSE_GRACE_MS) return;
+    if (Date.now() - lastWheelAtRef.current < WHEEL_GRACE_MS) return;
     clearFloatingDwell();
     floatingDwellTimerRef.current = window.setTimeout(() => {
       floatingDwellTimerRef.current = null;
@@ -324,6 +332,7 @@ export function AppSidebar(props: AppSidebarProps) {
       // timer was already running because they were hovering the rail).
       if (suppressHoverUntilLeaveRef.current) return;
       if (Date.now() - lastCollapsedAtRef.current < COLLAPSE_GRACE_MS) return;
+      if (Date.now() - lastWheelAtRef.current < WHEEL_GRACE_MS) return;
       setFloatingHover(true);
     }, FLOATING_HOVER_DELAY_MS);
   }, [clearFloatingDwell]);
@@ -385,6 +394,19 @@ export function AppSidebar(props: AppSidebarProps) {
     setFloatingHover(false);
   }, [clearFloatingDwell]);
 
+  // Capture wheel events anywhere in the rail so the dwell timer is
+  // cancelled and disarmed for WHEEL_GRACE_MS. Without this, scrolling a
+  // long folder list while collapsed would cause layout shifts under the
+  // stationary cursor that the browser reports as mousemove → spurious
+  // hover-expand.
+  const handleWheel = useCallback(() => {
+    lastWheelAtRef.current = Date.now();
+    if (floatingDwellTimerRef.current != null) {
+      window.clearTimeout(floatingDwellTimerRef.current);
+      floatingDwellTimerRef.current = null;
+    }
+  }, []);
+
   // Inner collapsed mirrors the prop directly. Previously a 200 ms deferred
   // swap kept the inner layout in "expanded" mode while the wrapper width
   // animated from `width` → 48, which produced a clipped/distorted "preview"
@@ -433,6 +455,7 @@ export function AppSidebar(props: AppSidebarProps) {
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
         onMouseMove={handleMove}
+        onWheel={handleWheel}
       >
         <InlineSidebar
           {...props}
