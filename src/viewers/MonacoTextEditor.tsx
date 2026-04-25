@@ -20,7 +20,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Button } from "./Button";
+import { Button } from "../Button";
 
 const Editor = lazy(() =>
   import("@monaco-editor/react").then((m) => ({ default: m.default })),

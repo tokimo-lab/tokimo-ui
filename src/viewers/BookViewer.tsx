@@ -21,7 +21,7 @@ import {
   Sun,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Spin } from "./Spin";
+import { Spin } from "../Spin";
 
 /* ── Public types ─────────────────────────────────── */
 

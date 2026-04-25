@@ -13,20 +13,12 @@ export type {
   AppSidebarSection,
 } from "./AppSidebar";
 export { AppSidebar } from "./AppSidebar";
-export type {
-  AudioPlayerMediaSession,
-  AudioPlayerMediaSource,
-} from "./AudioPlayer";
-export { AudioPlayer } from "./AudioPlayer";
 export type { AutoCompleteOption, AutoCompleteProps } from "./AutoComplete";
 export { AutoComplete } from "./AutoComplete";
 export type { AvatarProps } from "./Avatar";
 export { Avatar } from "./Avatar";
 export type { BadgeProps } from "./Badge";
 export { Badge } from "./Badge";
-// ─── Viewer components (decoupled) ───
-export type { BookChapterContent, BookViewerProps } from "./BookViewer";
-export { BookViewer } from "./BookViewer";
 export type { ButtonProps } from "./Button";
 // ─── Base components ───
 export { Button } from "./Button";
@@ -87,13 +79,6 @@ export type { EmojiPickerProps } from "./EmojiPicker";
 export { EmojiPicker } from "./EmojiPicker";
 export type { EmptyProps } from "./Empty";
 export { Empty } from "./Empty";
-export type {
-  EpubBook,
-  EpubSpineItem,
-  EpubTocItem,
-  EpubViewerProps,
-} from "./EpubViewer";
-export { EpubViewer } from "./EpubViewer";
 // ─── FileManager ───
 export * from "./FileManager";
 export { FloatingVibrancy } from "./FloatingVibrancy";
@@ -105,13 +90,8 @@ export {
   useFormContext,
   useWatch,
 } from "./Form";
-export type { HexViewerProps } from "./HexViewer";
-export { HexViewer } from "./HexViewer";
-export type { HtmlPreviewProps } from "./HtmlPreview";
-export { HtmlPreview } from "./HtmlPreview";
 export type { ImageProps } from "./Image";
 export { Image } from "./Image";
-export { ImagePreview, ToolBtn } from "./ImagePreview";
 export type { InlineEmojiPickerProps } from "./InlineEmojiPicker";
 export { InlineEmojiPicker } from "./InlineEmojiPicker";
 export type { InputProps } from "./Input";
@@ -142,14 +122,10 @@ export {
   setActiveModalContainer,
   useConfirm,
 } from "./Modal";
-export type { MonacoTextEditorProps } from "./MonacoTextEditor";
-export { MonacoTextEditor } from "./MonacoTextEditor";
 export type { PaginationProps } from "./Pagination";
 export { Pagination } from "./Pagination";
 export type { PathBarProps } from "./PathBar";
 export { PathBar } from "./PathBar";
-export type { PdfViewMode } from "./PdfEmbed";
-export { PdfEmbed } from "./PdfEmbed";
 export type {
   PillTab,
   PillTabBarProps,
@@ -247,4 +223,28 @@ export type { UploadChangeInfo, UploadFile, UploadProps } from "./Upload";
 export { Dragger, Upload } from "./Upload";
 // ─── Utilities ───
 export { cn } from "./utils";
-export { VideoPreview } from "./VideoPreview";
+export type {
+  AudioPlayerMediaSession,
+  AudioPlayerMediaSource,
+} from "./viewers/AudioPlayer";
+export { AudioPlayer } from "./viewers/AudioPlayer";
+// ─── Viewer components (decoupled) ───
+export type { BookChapterContent, BookViewerProps } from "./viewers/BookViewer";
+export { BookViewer } from "./viewers/BookViewer";
+export type {
+  EpubBook,
+  EpubSpineItem,
+  EpubTocItem,
+  EpubViewerProps,
+} from "./viewers/EpubViewer";
+export { EpubViewer } from "./viewers/EpubViewer";
+export type { HexViewerProps } from "./viewers/HexViewer";
+export { HexViewer } from "./viewers/HexViewer";
+export type { HtmlPreviewProps } from "./viewers/HtmlPreview";
+export { HtmlPreview } from "./viewers/HtmlPreview";
+export { ImagePreview, ToolBtn } from "./viewers/ImagePreview";
+export type { MonacoTextEditorProps } from "./viewers/MonacoTextEditor";
+export { MonacoTextEditor } from "./viewers/MonacoTextEditor";
+export type { PdfViewMode } from "./viewers/PdfEmbed";
+export { PdfEmbed } from "./viewers/PdfEmbed";
+export { VideoPreview } from "./viewers/VideoPreview";

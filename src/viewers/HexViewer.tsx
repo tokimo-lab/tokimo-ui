@@ -9,7 +9,7 @@
 
 import { ChevronLeft, ChevronRight, SkipBack, SkipForward } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Spin } from "./Spin";
+import { Spin } from "../Spin";
 
 const BYTES_PER_ROW = 16;
 /** Rows per page — 64 rows × 16 bytes = 1024 bytes per page. */

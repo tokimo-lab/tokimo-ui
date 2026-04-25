@@ -17,7 +17,7 @@ import {
   Plus,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ScrollArea } from "./ScrollArea";
+import { ScrollArea } from "../ScrollArea";
 
 /* ── Public types (re-exported for callers to build parsers) ─────────────── */
 
