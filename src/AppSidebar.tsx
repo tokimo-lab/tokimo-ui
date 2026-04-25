@@ -158,9 +158,12 @@ export interface AppSidebarProps {
     | ((ctx: { collapsed: boolean; previewExpanded: boolean }) => ReactNode);
   /**
    * Footer action buttons. When provided, the footer area renders the
-   * actions row (collapsed: vertical stack of 36 px icon buttons; expanded:
-   * horizontal row aligned left) followed by the collapse toggle (right
-   * side in expanded mode, bottom in collapsed mode).
+   * actions in one of three layouts depending on sidebar state:
+   *   - rail (collapsed, no hover): vertical 36×36 icon stack + collapse
+   *   - hover-preview (collapsed + hover-expanded): full-width icon+label
+   *     rows that match the items list look during the preview
+   *   - expanded (truly open): horizontal icon-only toolbar with the
+   *     collapse toggle pushed to the right edge
    *
    * Mutually exclusive with `footer` — supplying both will use
    * `footerActions` and emit a dev warning.
@@ -591,64 +594,119 @@ function InlineSidebarInner(props: AppSidebarProps) {
       );
     }
     if (hasActions) {
-      // In rail (collapsed, not hover) → vertical stack. Otherwise → horizontal row.
-      const isRow = _floatingHoverExpanded || !collapsed;
+      // 3 layouts:
+      //   - "rail"      → collapsed, not hover-expanded: 36×36 vertical icon stack
+      //   - "labelRow"  → collapsed + hover-expanded: full-width icon+label rows
+      //                   (matches the items list look during hover preview)
+      //   - "row"       → fully expanded: horizontal icon-only toolbar + collapse on right
+      const layout: "rail" | "labelRow" | "row" = !collapsed
+        ? "row"
+        : _floatingHoverExpanded
+          ? "labelRow"
+          : "rail";
+
+      const toggleIcon =
+        layout === "rail" ? (
+          <PanelLeftOpen size={16} />
+        ) : (
+          <PanelLeftClose size={16} />
+        );
+      const toggleTooltipPlacement = layout === "row" ? "top" : "right";
+
       const compactToggle =
         onToggleCollapsed && !_hideToggle ? (
-          <Tooltip
-            title={collapsed ? expandLabel : collapseLabel}
-            placement={isRow ? "top" : "right"}
-          >
+          layout === "labelRow" ? (
             <button
               type="button"
               data-sidebar-toggle
               onClick={onToggleCollapsed}
               onMouseEnter={
-                _floatingHoverExpanded && _onToggleHoverEnter
-                  ? _onToggleHoverEnter
-                  : undefined
+                _onToggleHoverEnter ? _onToggleHoverEnter : undefined
               }
-              className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-black/[0.06] hover:text-fg-base dark:hover:bg-white/[0.06]"
+              className="flex h-9 w-full shrink-0 cursor-pointer items-center gap-2 rounded-lg px-2 text-fg-muted transition-colors hover:bg-black/[0.06] hover:text-fg-base dark:hover:bg-white/[0.06]"
             >
-              {_floatingHoverExpanded || !collapsed ? (
-                <PanelLeftClose size={16} />
-              ) : (
-                <PanelLeftOpen size={16} />
-              )}
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center">
+                {toggleIcon}
+              </span>
+              <span className="min-w-0 flex-1 truncate text-left text-sm">
+                {collapseLabel}
+              </span>
             </button>
-          </Tooltip>
+          ) : (
+            <Tooltip
+              title={collapsed ? expandLabel : collapseLabel}
+              placement={toggleTooltipPlacement}
+            >
+              <button
+                type="button"
+                data-sidebar-toggle
+                onClick={onToggleCollapsed}
+                onMouseEnter={
+                  _floatingHoverExpanded && _onToggleHoverEnter
+                    ? _onToggleHoverEnter
+                    : undefined
+                }
+                className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-fg-muted transition-colors hover:bg-black/[0.06] hover:text-fg-base dark:hover:bg-white/[0.06]"
+              >
+                {toggleIcon}
+              </button>
+            </Tooltip>
+          )
         ) : null;
+
       return (
         <div
           className={cn(
             "flex gap-1",
-            isRow ? "items-center" : "flex-col items-stretch",
+            layout === "row" ? "items-center" : "flex-col items-stretch",
           )}
         >
-          {footerActions.map((action) => (
-            <Tooltip
-              key={action.key}
-              title={action.label}
-              placement={isRow ? "top" : "right"}
-            >
+          {footerActions.map((action) =>
+            layout === "labelRow" ? (
               <button
+                key={action.key}
                 type="button"
                 onClick={action.onClick}
                 aria-label={action.label}
                 className={cn(
-                  "flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors",
+                  "flex h-9 w-full shrink-0 cursor-pointer items-center gap-2 rounded-lg px-2 transition-colors",
                   action.variant === "primary"
                     ? "bg-[var(--accent)] text-white hover:opacity-90"
                     : "text-fg-muted hover:bg-black/[0.06] hover:text-fg-base dark:hover:bg-white/[0.06]",
                 )}
               >
-                {action.icon}
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center">
+                  {action.icon}
+                </span>
+                <span className="min-w-0 flex-1 truncate text-left text-sm">
+                  {action.label}
+                </span>
               </button>
-            </Tooltip>
-          ))}
+            ) : (
+              <Tooltip
+                key={action.key}
+                title={action.label}
+                placement={layout === "row" ? "top" : "right"}
+              >
+                <button
+                  type="button"
+                  onClick={action.onClick}
+                  aria-label={action.label}
+                  className={cn(
+                    "flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors",
+                    action.variant === "primary"
+                      ? "bg-[var(--accent)] text-white hover:opacity-90"
+                      : "text-fg-muted hover:bg-black/[0.06] hover:text-fg-base dark:hover:bg-white/[0.06]",
+                  )}
+                >
+                  {action.icon}
+                </button>
+              </Tooltip>
+            ),
+          )}
           {compactToggle && (
             <>
-              {isRow && <div className="flex-1" />}
+              {layout === "row" && <div className="flex-1" />}
               {compactToggle}
             </>
           )}
