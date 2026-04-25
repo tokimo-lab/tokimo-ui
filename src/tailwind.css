@@ -1,0 +1,87 @@
+/* @tokimo/ui — Tailwind v4 integration entry.
+ *
+ * Wires up the Tokimo design system to Tailwind v4 utility classes.
+ * Imported by both the shell host (packages/web) and third-party app
+ * bundles (via bundle.css), so utility class semantics, dark mode, and
+ * accent tokens stay perfectly in sync across the boundary.
+ *
+ * Two parts:
+ *
+ *   1. `@theme` maps Tokimo CSS variables (defined in theme.css) onto
+ *      Tailwind utility namespaces — e.g. `bg-accent` → `var(--accent)`,
+ *      `text-fg-primary` → `var(--text-primary)`. Because these point
+ *      at runtime CSS vars, theme switching at the
+ *      `<html data-accent="…">` / `<html class="dark">` level still
+ *      cascades to every consumer.
+ *
+ *   2. `@custom-variant dark (.dark &)` pins v4's `dark:` variant to a
+ *      high-specificity selector. Two reasons it must be set this way:
+ *
+ *        • The shell toggles `<html class="dark">` for manual light/dark
+ *          switching. v4's default `dark:` falls back to
+ *          `@media (prefers-color-scheme: dark)`, which would desync
+ *          from the shell's manual toggle.
+ *
+ *        • `(.dark &)` compiles to `.dark .foo` (specificity (0,2,0)),
+ *          which beats any plain utility (specificity (0,1,0)) within
+ *          the same `@layer utilities`. This protects the host from
+ *          third-party bundles that re-define utilities like
+ *          `.bg-white/90`: even if a bundle's CSS is injected after
+ *          the host's, the host's `dark:bg-…` rules still win in dark
+ *          mode.
+ *
+ * Usage:
+ *   @import "tailwindcss";              // host: full v4 entry
+ *   @import "@tokimo/ui/tailwind.css";  // shared mapping + dark variant
+ *
+ *   …or via @tokimo/ui/bundle.css for third-party app bundles.
+ *
+ * Pure design tokens (with no Tailwind dependency) still live in
+ * theme.css and remain safe to use outside Tailwind. */
+@import "./theme.css";
+
+@theme {
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-subtle-hover: var(--accent-subtle-hover);
+  --color-accent-muted: var(--accent-muted);
+  --color-accent-text: var(--accent-text);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-accent-secondary-text: var(--accent-secondary-text);
+
+  --color-surface-base: var(--bg-base);
+  --color-surface-elevated: var(--bg-elevated);
+  --color-surface-glass: var(--bg-glass);
+  --color-surface-glass-hover: var(--bg-glass-hover);
+
+  --color-border-base: var(--border-base);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-hover: var(--border-hover);
+
+  --color-fg-primary: var(--text-primary);
+  --color-fg-secondary: var(--text-secondary);
+  --color-fg-muted: var(--text-muted);
+  --color-fg-disabled: var(--text-disabled);
+
+  --color-fill-tertiary: var(--fill-tertiary);
+  --color-fill-secondary: var(--fill-secondary);
+
+  --backdrop-blur-glass: var(--glass-blur);
+
+  --background-image-gradient-accent: linear-gradient(
+    135deg,
+    var(--gradient-from),
+    var(--gradient-to)
+  );
+}
+
+@custom-variant dark (.dark &);
+
+/* Scan @tokimo/ui's own components — `@source` paths in v4 are
+ * resolved relative to the file that declares them, so this works
+ * regardless of where @tokimo/ui is installed (workspace symlink in
+ * the monorepo, or `node_modules/@tokimo/ui` for third-party apps).
+ * Consumers no longer need to spell out brittle `../../../ui/src`
+ * paths from their own CSS. */
+@source "./**/*.{ts,tsx}";

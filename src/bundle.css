@@ -1,0 +1,26 @@
+/* @tokimo/ui — Tailwind v4 entry for third-party Tokimo app bundles.
+ *
+ * One-line setup for an app's main CSS. Differs from the host's setup
+ * in two ways: skips Tailwind's preflight (the shell already applies
+ * it globally), and explicitly layers the utilities (without
+ * `layer(utilities)`, the bundle would emit unlayered rules that
+ * outrank ANY layered host rule regardless of specificity, breaking
+ * the shell's `dark:`-based toasts when bundle CSS injects after host
+ * CSS).
+ *
+ * Usage in an app's index.css:
+ *
+ *   @import "@tokimo/ui/bundle.css";
+ *
+ *   @source "./**​/*.{ts,tsx}";   // your own app source
+ *
+ * `@tokimo/ui`'s own component sources are auto-scanned via tailwind.css
+ * — consumers never need to spell out paths into the UI library.
+ *
+ * Everything else (design tokens, accent palettes, dark variant,
+ * utility class → token mapping) comes from `tailwind.css` so the
+ * shell host and bundle stay byte-for-byte consistent. */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "./tailwind.css";
