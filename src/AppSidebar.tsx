@@ -394,13 +394,18 @@ export function AppSidebar(props: AppSidebarProps) {
     setFloatingHover(false);
   }, [clearFloatingDwell]);
 
-  // Capture wheel events anywhere in the rail so the dwell timer is
-  // cancelled and disarmed for WHEEL_GRACE_MS. Without this, scrolling a
-  // long folder list while collapsed would cause layout shifts under the
-  // stationary cursor that the browser reports as mousemove → spurious
-  // hover-expand.
+  // Any wheel event inside the rail signals "I'm scrolling, not deciding
+  // to expand". Cancel the in-flight dwell timer AND latch the suppress
+  // flag so subsequent mousemove events (caused by the layout shifting
+  // under the stationary cursor while scrolling) cannot re-arm the timer.
+  // The flag is cleared in handleLeave when the cursor actually exits the
+  // rail, so the user only needs to move out and back in to re-enable
+  // hover-expand. WHEEL_GRACE_MS alone is insufficient because a brief
+  // pause between back-and-forth scrolls can exceed it, letting the timer
+  // re-arm mid-scroll.
   const handleWheel = useCallback(() => {
     lastWheelAtRef.current = Date.now();
+    suppressHoverUntilLeaveRef.current = true;
     if (floatingDwellTimerRef.current != null) {
       window.clearTimeout(floatingDwellTimerRef.current);
       floatingDwellTimerRef.current = null;
