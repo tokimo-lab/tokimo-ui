@@ -395,14 +395,16 @@ export function AppSidebar(props: AppSidebarProps) {
   }, [clearFloatingDwell]);
 
   // Any wheel event inside the rail signals "I'm scrolling, not deciding
-  // to expand". Cancel the in-flight dwell timer AND latch the suppress
-  // flag so subsequent mousemove events (caused by the layout shifting
-  // under the stationary cursor while scrolling) cannot re-arm the timer.
-  // The flag is cleared in handleLeave when the cursor actually exits the
-  // rail, so the user only needs to move out and back in to re-enable
-  // hover-expand. WHEEL_GRACE_MS alone is insufficient because a brief
-  // pause between back-and-forth scrolls can exceed it, letting the timer
-  // re-arm mid-scroll.
+  // to expand". Three things to do:
+  //   1. Cancel any in-flight dwell timer (pre-expansion case).
+  //   2. Latch suppressHoverUntilLeaveRef so subsequent mousemove cannot
+  //      re-arm the timer (mid-scroll mousemove storm from layout shifts).
+  //   3. If the rail is ALREADY hover-expanded, retract it. Humans typically
+  //      stop the cursor first and then start scrolling — by the time the
+  //      first wheel event fires the 600ms dwell may have already elapsed
+  //      and the rail is open. Snap back.
+  // The flag is cleared in handleLeave when the cursor exits the rail, so
+  // re-entering the rail re-enables hover-expand.
   const handleWheel = useCallback(() => {
     lastWheelAtRef.current = Date.now();
     suppressHoverUntilLeaveRef.current = true;
@@ -410,6 +412,7 @@ export function AppSidebar(props: AppSidebarProps) {
       window.clearTimeout(floatingDwellTimerRef.current);
       floatingDwellTimerRef.current = null;
     }
+    setFloatingHover(false);
   }, []);
 
   // Inner collapsed mirrors the prop directly. Previously a 200 ms deferred
