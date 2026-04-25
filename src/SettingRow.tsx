@@ -17,6 +17,15 @@ export interface SettingRowProps {
   /** Right-hand control (Switch, Select, Slider, etc.). */
   children: ReactNode;
   className?: string;
+  /**
+   * Layout orientation.
+   * - `"horizontal"` (default): label/desc on the left, control on the right.
+   *   Use for compact controls (Switch, Select, Slider, small Input).
+   * - `"vertical"`: label/desc on top, control fills the full row below.
+   *   Use for wide controls (long Input, Textarea, URL lists, code editors)
+   *   or when the control wraps embedded `<Form.Item>`-style fields.
+   */
+  orientation?: "horizontal" | "vertical";
 }
 
 export function SettingRow({
@@ -24,7 +33,31 @@ export function SettingRow({
   desc,
   children,
   className,
+  orientation = "horizontal",
 }: SettingRowProps) {
+  if (orientation === "vertical") {
+    return (
+      <div
+        className={cn(
+          "py-3 border-b border-black/[0.04] dark:border-white/[0.06] last:border-b-0",
+          className,
+        )}
+      >
+        <div className="mb-2 select-none">
+          <div className="text-sm font-medium text-fg-primary leading-tight">
+            {label}
+          </div>
+          {desc != null && desc !== "" && (
+            <div className="text-xs text-fg-muted mt-1 leading-relaxed">
+              {desc}
+            </div>
+          )}
+        </div>
+        <div className="w-full">{children}</div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(
@@ -60,6 +93,18 @@ export interface SettingGroupProps {
   desc?: ReactNode;
   children: ReactNode;
   className?: string;
+  /**
+   * Visual variant.
+   * - `"plain"` (default): no outer container; rows share only a top border.
+   *   This is the canonical Windows-11-style "recessive" look used in system
+   *   settings. Groups are visually separated via whitespace between groups.
+   * - `"card"`: wraps the group in a rounded bordered card with padding.
+   *   Use sparingly — only when a group must stand out (e.g. inside a page
+   *   that mixes narrative sections with a single emphasised setting block).
+   *   Do NOT wrap every group in a card; that re-introduces the old
+   *   AntD-card style which this unification is removing.
+   */
+  variant?: "plain" | "card";
 }
 
 export function SettingGroup({
@@ -67,19 +112,41 @@ export function SettingGroup({
   desc,
   children,
   className,
+  variant = "plain",
 }: SettingGroupProps) {
-  return (
-    <div className={className}>
-      {title != null && title !== "" && (
-        <div className="mb-2">
+  const header =
+    (title != null && title !== "") || (desc != null && desc !== "") ? (
+      <div className="mb-2">
+        {title != null && title !== "" && (
           <h3 className="text-sm font-semibold text-fg-primary leading-tight">
             {title}
           </h3>
-          {desc != null && desc !== "" && (
-            <p className="text-xs text-fg-muted mt-1 leading-relaxed">{desc}</p>
-          )}
+        )}
+        {desc != null && desc !== "" && (
+          <p className="text-xs text-fg-muted mt-1 leading-relaxed">{desc}</p>
+        )}
+      </div>
+    ) : null;
+
+  if (variant === "card") {
+    return (
+      <div
+        className={cn(
+          "rounded-xl border border-black/[0.06] dark:border-white/[0.08] bg-white/50 dark:bg-white/[0.02] p-5",
+          className,
+        )}
+      >
+        {header}
+        <div className="border-t border-black/[0.04] dark:border-white/[0.06]">
+          {children}
         </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={className}>
+      {header}
       <div className="border-t border-black/[0.04] dark:border-white/[0.06]">
         {children}
       </div>

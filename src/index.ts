@@ -7,6 +7,7 @@
 export type { AlertProps } from "./Alert";
 export { Alert } from "./Alert";
 export type {
+  AppSidebarFooterAction,
   AppSidebarItem,
   AppSidebarProps,
   AppSidebarSection,
@@ -175,6 +176,8 @@ export type { SpinProps } from "./Spin";
 export { Spin } from "./Spin";
 export type { StatisticProps } from "./Statistic";
 export { Statistic } from "./Statistic";
+export type { StickySaveBarProps } from "./StickySaveBar";
+export { StickySaveBar } from "./StickySaveBar";
 export type { SwitchProps } from "./Switch";
 export { Switch } from "./Switch";
 export type { TableColumn, TableColumnsType, TableProps } from "./Table";
@@ -220,3 +223,6 @@ export type { UploadChangeInfo, UploadFile, UploadProps } from "./Upload";
 export { Dragger, Upload } from "./Upload";
 // ─── Utilities ───
 export { cn } from "./utils";
+
+// ─── FileManager ───
+export * from "./FileManager";
