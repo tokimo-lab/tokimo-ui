@@ -24,6 +24,9 @@ export type { AvatarProps } from "./Avatar";
 export { Avatar } from "./Avatar";
 export type { BadgeProps } from "./Badge";
 export { Badge } from "./Badge";
+// ─── Viewer components (decoupled) ───
+export type { BookChapterContent, BookViewerProps } from "./BookViewer";
+export { BookViewer } from "./BookViewer";
 export type { ButtonProps } from "./Button";
 // ─── Base components ───
 export { Button } from "./Button";
@@ -84,6 +87,13 @@ export type { EmojiPickerProps } from "./EmojiPicker";
 export { EmojiPicker } from "./EmojiPicker";
 export type { EmptyProps } from "./Empty";
 export { Empty } from "./Empty";
+export type {
+  EpubBook,
+  EpubSpineItem,
+  EpubTocItem,
+  EpubViewerProps,
+} from "./EpubViewer";
+export { EpubViewer } from "./EpubViewer";
 // ─── FileManager ───
 export * from "./FileManager";
 export { FloatingVibrancy } from "./FloatingVibrancy";
@@ -95,6 +105,10 @@ export {
   useFormContext,
   useWatch,
 } from "./Form";
+export type { HexViewerProps } from "./HexViewer";
+export { HexViewer } from "./HexViewer";
+export type { HtmlPreviewProps } from "./HtmlPreview";
+export { HtmlPreview } from "./HtmlPreview";
 export type { ImageProps } from "./Image";
 export { Image } from "./Image";
 export { ImagePreview, ToolBtn } from "./ImagePreview";
@@ -128,6 +142,8 @@ export {
   setActiveModalContainer,
   useConfirm,
 } from "./Modal";
+export type { MonacoTextEditorProps } from "./MonacoTextEditor";
+export { MonacoTextEditor } from "./MonacoTextEditor";
 export type { PaginationProps } from "./Pagination";
 export { Pagination } from "./Pagination";
 export type { PathBarProps } from "./PathBar";
