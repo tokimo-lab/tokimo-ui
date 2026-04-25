@@ -258,7 +258,7 @@ export const FLOATING_SIDEBAR_PREVIEW_WIDTH = 240;
  * before the hover preview expands. Mousemove resets the timer, so sliding
  * through never triggers it — only deliberate dwell does.
  */
-export const FLOATING_HOVER_DELAY_MS = 500;
+export const FLOATING_HOVER_DELAY_MS = 700;
 
 export function AppSidebar(props: AppSidebarProps) {
   const { width = 188, collapsed, className, style } = props;
