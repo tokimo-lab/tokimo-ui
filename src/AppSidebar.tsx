@@ -40,6 +40,8 @@
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import {
   type ReactNode,
+  memo,
+  useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -143,8 +145,17 @@ export interface AppSidebarProps {
   activeKey?: string;
   /** Called when an item is clicked */
   onSelect?: (key: string) => void;
-  /** Footer content rendered inside the standard footer wrapper */
-  footer?: ReactNode;
+  /**
+   * Footer content rendered inside the standard footer wrapper.
+   *
+   * Can be a static node, or a render-function that receives the current
+   * sidebar visual state. Using the function form lets consumers swap
+   * footer layout when the collapsed sidebar expands into hover-preview
+   * (e.g. icon-only column → icon+label row).
+   */
+  footer?:
+    | ReactNode
+    | ((ctx: { collapsed: boolean; previewExpanded: boolean }) => ReactNode);
   /**
    * Footer action buttons. When provided, the footer area renders the
    * actions row (collapsed: vertical stack of 36 px icon buttons; expanded:
@@ -219,6 +230,13 @@ export interface AppSidebarProps {
 export const FLOATING_SIDEBAR_COLLAPSED_WIDTH = 48;
 
 /**
+ * Fixed width (px) of the hover-preview flyout. Hard-coded so the preview
+ * pane is consistent across apps, regardless of each consumer's preferred
+ * `width` for the fully-expanded inline sidebar.
+ */
+export const FLOATING_SIDEBAR_PREVIEW_WIDTH = 240;
+
+/**
  * How long (ms) the pointer must stay still over a collapsed floating sidebar
  * before the hover preview expands. Mousemove resets the timer, so sliding
  * through never triggers it — only deliberate dwell does.
@@ -229,9 +247,6 @@ export function AppSidebar(props: AppSidebarProps) {
   const { width = 188, collapsed, className, style } = props;
 
   const [floatingHover, setFloatingHover] = useState(false);
-  const [floatingInnerCollapsed, setFloatingInnerCollapsed] = useState(
-    collapsed ?? false,
-  );
 
   // ── Hover-preview: dwell-delay before expanding ──
   // Hover doesn't immediately open the preview pane. Only after the pointer
@@ -239,58 +254,129 @@ export function AppSidebar(props: AppSidebarProps) {
   // expand. Any mousemove resets the timer, so "just sliding through" never
   // triggers the preview. Leaving the rail cancels it.
   const floatingDwellTimerRef = useRef<number | null>(null);
-  const clearFloatingDwell = () => {
+  const clearFloatingDwell = useCallback(() => {
     if (floatingDwellTimerRef.current != null) {
       window.clearTimeout(floatingDwellTimerRef.current);
       floatingDwellTimerRef.current = null;
     }
-  };
-  const scheduleFloatingDwell = () => {
+  }, []);
+
+  // Suppress hover-preview right after a manual collapse: when the user
+  // clicks the toggle to retract, their pointer is still hovering the rail —
+  // we don't want the preview to auto-open 500 ms later as if they had been
+  // dwelling intentionally. Re-arm only after the pointer leaves the rail.
+  const suppressHoverUntilLeaveRef = useRef(false);
+  // Belt-and-suspenders: even if the suppress ref somehow gets reset
+  // (e.g., a stray mouseleave during the layout shift), refuse to schedule
+  // the dwell timer for COLLAPSE_GRACE_MS after the most recent transition
+  // into collapsed=true. Real intentional dwell still works after the grace.
+  const lastCollapsedAtRef = useRef(0);
+  const COLLAPSE_GRACE_MS = 800;
+  // Detect prop transitions during render (synchronous, no useEffect race
+  // window). Ref mutations during render are allowed by React and idempotent
+  // under StrictMode's double-render. This runs BEFORE commit, so any
+  // mousemove fired by the upcoming layout shift will already see the
+  // suppress flag set.
+  const prevCollapsedPropRef = useRef(collapsed);
+  if (prevCollapsedPropRef.current !== collapsed) {
+    if (collapsed) {
+      suppressHoverUntilLeaveRef.current = true;
+      lastCollapsedAtRef.current = Date.now();
+      if (floatingDwellTimerRef.current != null) {
+        window.clearTimeout(floatingDwellTimerRef.current);
+        floatingDwellTimerRef.current = null;
+      }
+      // CRITICAL: if the hover-preview was already expanded when the user
+      // clicked to collapse, leaving floatingHover=true makes the sidebar
+      // *stay* visually expanded — looks like the click did nothing. Reset
+      // synchronously here. setState during render is allowed for this
+      // derived-from-prop pattern (and is idempotent under StrictMode).
+      setFloatingHover(false);
+    }
+    prevCollapsedPropRef.current = collapsed;
+  }
+
+  const scheduleFloatingDwell = useCallback(() => {
+    if (suppressHoverUntilLeaveRef.current) return;
+    if (Date.now() - lastCollapsedAtRef.current < COLLAPSE_GRACE_MS) return;
     clearFloatingDwell();
     floatingDwellTimerRef.current = window.setTimeout(() => {
       floatingDwellTimerRef.current = null;
+      // Re-check at fire time: the suppress flag may have been set after
+      // this timer was scheduled (e.g., user clicked toggle while a dwell
+      // timer was already running because they were hovering the rail).
+      if (suppressHoverUntilLeaveRef.current) return;
+      if (Date.now() - lastCollapsedAtRef.current < COLLAPSE_GRACE_MS) return;
       setFloatingHover(true);
     }, FLOATING_HOVER_DELAY_MS);
-  };
-  useEffect(() => clearFloatingDwell, []);
+  }, [clearFloatingDwell]);
+  useEffect(() => clearFloatingDwell, [clearFloatingDwell]);
 
-  // ── Sync inner collapsed state with width transition ──
-  // On manual toggle (collapsed prop changes), we swap the inner layout
-  // between standard-expanded and rail. To avoid the inner content snapping
-  // during the 200 ms wrapper width transition, delay the retract swap.
-  // Hover-expand does NOT swap layouts — it keeps the rail and just reveals
-  // labels via `_floatingHoverExpanded`, so no delay is needed there.
-  const floatingManuallyExpanded = !collapsed;
-  useEffect(() => {
-    const target = !floatingManuallyExpanded;
-    if (target === floatingInnerCollapsed) return;
-    if (target) {
-      const t = setTimeout(() => setFloatingInnerCollapsed(true), 200);
-      return () => clearTimeout(t);
+  // Wrap the consumer's onToggleCollapsed so that *clicking to collapse*
+  // synchronously sets the suppress flag and cancels any in-flight dwell
+  // timer in the same JS turn. Doing this in a useEffect would race with
+  // the mousemove events fired immediately after the click (when the layout
+  // shifts under a stationary pointer), which would re-schedule the dwell.
+  //
+  // IMPORTANT: only override when the consumer actually provided a callback.
+  // Some consumers (e.g. ChatSidebar) embed their own toggle button inside
+  // `footer` and intentionally omit `onToggleCollapsed` so InlineSidebar
+  // does NOT render an additional default toggle. Passing a wrapped function
+  // unconditionally would force the default toggle to appear, producing a
+  // duplicate.
+  const userOnToggleCollapsed = props.onToggleCollapsed;
+  const wrappedOnToggleCollapsed = useCallback(() => {
+    if (!collapsed) {
+      suppressHoverUntilLeaveRef.current = true;
+      clearFloatingDwell();
+      setFloatingHover(false);
     }
-    setFloatingInnerCollapsed(false);
-  }, [floatingManuallyExpanded, floatingInnerCollapsed]);
+    userOnToggleCollapsed?.();
+  }, [collapsed, userOnToggleCollapsed, clearFloatingDwell]);
+  const effectiveOnToggleCollapsed = userOnToggleCollapsed
+    ? wrappedOnToggleCollapsed
+    : undefined;
 
   const hoverExpand = !!collapsed && floatingHover;
   const visuallyExpanded = !collapsed || hoverExpand;
-  const effectiveWidth = visuallyExpanded
-    ? width
-    : FLOATING_SIDEBAR_COLLAPSED_WIDTH;
+  const effectiveWidth = hoverExpand
+    ? FLOATING_SIDEBAR_PREVIEW_WIDTH
+    : visuallyExpanded
+      ? width
+      : FLOATING_SIDEBAR_COLLAPSED_WIDTH;
   // Placeholder occupies the rail's "permanent" width (does NOT widen on
   // hover-expand — that overlay should sit over the content area, not push it).
   const placeholderWidth = collapsed ? FLOATING_SIDEBAR_COLLAPSED_WIDTH : width;
 
   const handleEnter = !floatingHover ? scheduleFloatingDwell : undefined;
-  const handleLeave = () => {
+  const handleLeave = useCallback(() => {
     clearFloatingDwell();
     setFloatingHover(false);
-  };
+    // User actually left the rail — re-enable auto hover-preview for the
+    // next time they come back.
+    suppressHoverUntilLeaveRef.current = false;
+  }, [clearFloatingDwell]);
   // Mousemove resets the dwell timer: any motion means "still deciding, not
   // committed". Only bind while the preview is closed — once expanded the CSS
   // width transition causes spurious mousemove events under the pointer which
   // would immediately re-arm the timer (harmless but wasteful).
   const handleMove =
     !!collapsed && !floatingHover ? scheduleFloatingDwell : undefined;
+
+  const handleToggleHoverEnter = useCallback(() => {
+    clearFloatingDwell();
+    setFloatingHover(false);
+  }, [clearFloatingDwell]);
+
+  // Inner collapsed mirrors the prop directly. Previously a 200 ms deferred
+  // swap kept the inner layout in "expanded" mode while the wrapper width
+  // animated from `width` → 48, which produced a clipped/distorted "preview"
+  // visual during the transition (the source of the perceived lag and the
+  // "why is the expanded view flashing on collapse?" UX bug). With instant
+  // swap: rail layout snaps to the left edge immediately, the wrapper width
+  // animates from `width` → 48 around it (right edge shrinks in cleanly),
+  // and only one render happens per toggle.
+  const innerCollapsed = collapsed ?? false;
 
   return (
     <>
@@ -311,29 +397,33 @@ export function AppSidebar(props: AppSidebarProps) {
           "absolute inset-y-0 left-0 flex flex-col overflow-hidden select-none",
           hoverExpand ? "z-30" : "z-10",
           "border-r border-border-base",
-          // Frosted-glass overlay when hover-expanded (mirrors Modal/Drawer
-          // hand-written glass palette since project has no shared GlassPanel
-          // primitive yet); solid sidebar background otherwise.
+          // Hover-preview reuses the host window's titlebar background
+          // (semi-transparent rgba) so the flyout matches the chrome that
+          // sits above it. Add backdrop blur so text below doesn't bleed
+          // through the translucent layer.
           hoverExpand
-            ? "bg-white/85 dark:bg-black/70 backdrop-blur-2xl shadow-2xl"
+            ? "bg-[var(--titlebar-bg,var(--sidebar-bg))] backdrop-blur-2xl"
             : "bg-[var(--sidebar-bg)]",
           "transition-[width] duration-200 ease-out",
           className,
         )}
-        style={{ width: effectiveWidth, ...style }}
+        style={{
+          width: effectiveWidth,
+          willChange: "width",
+          contain: "layout paint",
+          ...style,
+        }}
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
         onMouseMove={handleMove}
       >
         <InlineSidebar
           {...props}
-          collapsed={floatingInnerCollapsed}
+          onToggleCollapsed={effectiveOnToggleCollapsed}
+          collapsed={innerCollapsed}
           _transparentBg
           _floatingHoverExpanded={hoverExpand}
-          _onToggleHoverEnter={() => {
-            clearFloatingDwell();
-            setFloatingHover(false);
-          }}
+          _onToggleHoverEnter={handleToggleHoverEnter}
           _onItemsHoverEnter={scheduleFloatingDwell}
           className="h-full border-0 border-r-0"
         />
@@ -346,8 +436,16 @@ export function AppSidebar(props: AppSidebarProps) {
  * Inline (non-floating) sidebar render. Always laid out in normal flow,
  * fills its container via `h-full`. Used as the inner element of the
  * floating wrapper.
+ *
+ * Wrapped in `memo` so toggling hover-preview state on the outer wrapper
+ * (which only changes the wrapper's width / z-index / background) doesn't
+ * re-render the entire item tree of every consumer (Photo / Video / Music /
+ * Docs sidebars can hold dozens to hundreds of items). Callbacks from the
+ * outer `AppSidebar` are memoized via `useCallback` to keep this effective.
  */
-function InlineSidebar(props: AppSidebarProps) {
+const InlineSidebar = memo(InlineSidebarInner);
+
+function InlineSidebarInner(props: AppSidebarProps) {
   const {
     width = 188,
     header,
@@ -356,7 +454,7 @@ function InlineSidebar(props: AppSidebarProps) {
     sections,
     activeKey,
     onSelect,
-    footer,
+    footer: footerProp,
     footerActions,
     loading,
     topInset,
@@ -476,6 +574,14 @@ function InlineSidebar(props: AppSidebarProps) {
       </button>
     ) : null;
 
+  const footer =
+    typeof footerProp === "function"
+      ? footerProp({
+          collapsed: !!collapsed,
+          previewExpanded: !!_floatingHoverExpanded,
+        })
+      : footerProp;
+
   const effectiveFooter = (() => {
     const hasActions = !!footerActions && footerActions.length > 0;
     if (hasActions && footer) {
@@ -560,7 +666,7 @@ function InlineSidebar(props: AppSidebarProps) {
   // ── Collapsed (icon-only) mode ────────────────────────────────────
   if (collapsed) {
     const railWidth = _floatingHoverExpanded
-      ? width
+      ? FLOATING_SIDEBAR_PREVIEW_WIDTH
       : FLOATING_SIDEBAR_COLLAPSED_WIDTH;
     return (
       <div
@@ -575,19 +681,14 @@ function InlineSidebar(props: AppSidebarProps) {
           <div
             className={cn(
               "flex h-[48px] shrink-0 items-center border-b border-black/[0.06] dark:border-white/[0.08]",
-              _floatingHoverExpanded ? "px-2" : "justify-center px-2",
+              "justify-start px-0",
             )}
           >
-            <div
-              className={cn(
-                "flex shrink-0 items-center justify-center",
-                _floatingHoverExpanded ? "w-8" : "w-12",
-              )}
-            >
+            <div className="flex w-12 shrink-0 items-center justify-center">
               {headerIcon}
             </div>
             {_floatingHoverExpanded && headerTitle && (
-              <div className="min-w-0 flex-1 truncate pr-3 pl-1.5 text-sm font-medium text-fg-primary">
+              <div className="min-w-0 flex-1 truncate pr-3 pl-1 text-sm font-medium text-fg-primary">
                 {headerTitle}
               </div>
             )}
@@ -600,21 +701,18 @@ function InlineSidebar(props: AppSidebarProps) {
         ) : (
           <ScrollArea
             direction="vertical"
-            className={cn("flex-1 pt-2", _floatingHoverExpanded && "px-2")}
+            className="flex-1 pt-2"
             style={topInset ? { paddingTop: topInset } : undefined}
           >
             <div
               ref={itemsRef}
               onMouseEnter={_onItemsHoverEnter}
-              className={cn(
-                "relative flex w-full flex-col gap-0.5",
-                _floatingHoverExpanded ? "items-stretch" : "items-center",
-              )}
+              className="relative flex w-full flex-col items-stretch gap-0.5"
             >
               {/* Sliding accent indicator — lives inside the scroll content so
-                  it scrolls with the items. Negative left offset (-px-1 of the
-                  ScrollArea) pulls it back to the rail's left edge. */}
-              {indicator && !_floatingHoverExpanded && (
+                  it scrolls with the items. Stays at left edge in both rail
+                  and preview modes since icons don't move. */}
+              {indicator && (
                 <span
                   className="pointer-events-none absolute left-0 z-20 w-[3px] rounded-r-full bg-[var(--accent)]"
                   style={{
@@ -635,44 +733,27 @@ function InlineSidebar(props: AppSidebarProps) {
                 return (
                   <div
                     key={section.key ?? `s-${si}`}
-                    className={cn(
-                      "flex w-full flex-col",
-                      _floatingHoverExpanded ? "items-stretch" : "items-center",
-                    )}
+                    className="flex w-full flex-col items-stretch"
                   >
                     {hasPrevNonEmpty && (
-                      <div
-                        className={cn(
-                          "my-1 border-t border-black/[0.08] dark:border-white/[0.08]",
-                          _floatingHoverExpanded ? "mx-3" : "w-6",
-                        )}
-                      />
+                      <div className="my-1 mx-3 border-t border-black/[0.08] dark:border-white/[0.08]" />
                     )}
                     {section.items.map((item) => {
-                      // `item.active` (explicit) wins over the global `activeKey` match.
-                      // Explicitly-active items render a static accent bar instead of
-                      // contributing to the sliding indicator (only one section's
-                      // selection animates at a time).
                       const explicitActive = item.active === true;
                       const isActive = explicitActive || activeKey === item.key;
                       // Rail icon button is at least 36 px so the hit-target
                       // remains comfortable; tall variants grow beyond that.
+                      // Used in both rail and preview modes so heights stay
+                      // identical (only width animates).
                       const railSize = Math.max(36, metrics.itemHeight);
                       const rowButton = (
                         <button
                           type="button"
                           onClick={() => onSelect?.(item.key)}
                           onContextMenu={item.onContextMenu}
-                          style={
-                            _floatingHoverExpanded
-                              ? { height: metrics.itemHeight }
-                              : { height: railSize, width: railSize }
-                          }
+                          style={{ height: railSize }}
                           className={cn(
-                            "group flex cursor-pointer items-center rounded-lg transition-colors",
-                            _floatingHoverExpanded
-                              ? "w-full"
-                              : "justify-center",
+                            "group flex w-full cursor-pointer items-center justify-start rounded-lg transition-colors",
                             isActive
                               ? _floatingHoverExpanded
                                 ? "text-fg-primary"
@@ -683,25 +764,26 @@ function InlineSidebar(props: AppSidebarProps) {
                                 ),
                           )}
                         >
-                          {_floatingHoverExpanded ? (
-                            <>
-                              <span
-                                className="flex shrink-0 items-center justify-center"
-                                style={{ width: Math.max(32, metrics.iconSize + 4) }}
-                              >
-                                {item.collapsedIcon ?? item.icon}
-                              </span>
-                              <span
-                                className={cn(
-                                  "min-w-0 flex-1 truncate pl-1.5 pr-3 text-left text-sm",
-                                  isActive ? "font-medium" : "",
-                                )}
-                              >
-                                {item.label}
-                              </span>
-                            </>
-                          ) : (
-                            (item.collapsedIcon ?? item.icon)
+                          {/* Fixed-width icon column matching the rail width
+                              so icons stay at the SAME x-position whether the
+                              wrapper is collapsed (48 wide) or hover-expanded
+                              (full width). Width animates only — icon does not
+                              shift. */}
+                          <span
+                            className="flex shrink-0 items-center justify-center"
+                            style={{ width: FLOATING_SIDEBAR_COLLAPSED_WIDTH }}
+                          >
+                            {item.collapsedIcon ?? item.icon}
+                          </span>
+                          {_floatingHoverExpanded && (
+                            <span
+                              className={cn(
+                                "min-w-0 flex-1 truncate pr-3 text-left text-sm",
+                                isActive ? "font-medium" : "",
+                              )}
+                            >
+                              {item.label}
+                            </span>
                           )}
                         </button>
                       );
@@ -709,24 +791,10 @@ function InlineSidebar(props: AppSidebarProps) {
                         <div
                           key={item.key}
                           data-sidebar-key={item.key}
-                          className={cn(
-                            "relative flex items-center",
-                            _floatingHoverExpanded ? "w-full" : "",
-                          )}
+                          className="relative flex w-full items-center"
                         >
-                          {/* Static accent bar for `item.active` items. The
-                              global sliding indicator only follows `activeKey`,
-                              so explicitly-active items (parallel selection
-                              like the current mail account) get their own bar. */}
                           {explicitActive && (
-                            <span
-                              className={cn(
-                                "pointer-events-none absolute z-20 w-[3px] rounded-r-full bg-[var(--accent)]",
-                                _floatingHoverExpanded
-                                  ? "top-1/2 left-0 h-[60%] -translate-y-1/2"
-                                  : "top-1/2 -left-0.5 h-7 -translate-y-1/2",
-                              )}
-                            />
+                            <span className="pointer-events-none absolute top-1/2 left-0 z-20 h-7 w-[3px] -translate-y-1/2 rounded-r-full bg-[var(--accent)]" />
                           )}
                           {rowButton}
                           {item.extra && (
@@ -734,8 +802,8 @@ function InlineSidebar(props: AppSidebarProps) {
                               className={cn(
                                 "pointer-events-none",
                                 _floatingHoverExpanded
-                                  ? "absolute top-1 right-3"
-                                  : "absolute -top-1 -right-1",
+                                  ? "absolute top-1/2 right-3 -translate-y-1/2"
+                                  : "absolute top-1 right-1",
                               )}
                             >
                               {item.extra}
@@ -763,12 +831,7 @@ function InlineSidebar(props: AppSidebarProps) {
         )}
 
         {effectiveFooter && (
-          <div
-            className={cn(
-              "shrink-0 border-t border-black/[0.06] py-1 dark:border-white/[0.08]",
-              _floatingHoverExpanded ? "px-2" : "px-1",
-            )}
-          >
+          <div className="shrink-0 border-t border-black/[0.06] py-1 px-1 dark:border-white/[0.08]">
             {effectiveFooter}
           </div>
         )}
