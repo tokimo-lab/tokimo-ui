@@ -13,6 +13,11 @@ export type {
   AppSidebarSection,
 } from "./AppSidebar";
 export { AppSidebar } from "./AppSidebar";
+export type {
+  AudioPlayerMediaSession,
+  AudioPlayerMediaSource,
+} from "./AudioPlayer";
+export { AudioPlayer } from "./AudioPlayer";
 export type { AutoCompleteOption, AutoCompleteProps } from "./AutoComplete";
 export { AutoComplete } from "./AutoComplete";
 export type { AvatarProps } from "./Avatar";
@@ -92,6 +97,7 @@ export {
 } from "./Form";
 export type { ImageProps } from "./Image";
 export { Image } from "./Image";
+export { ImagePreview, ToolBtn } from "./ImagePreview";
 export type { InlineEmojiPickerProps } from "./InlineEmojiPicker";
 export { InlineEmojiPicker } from "./InlineEmojiPicker";
 export type { InputProps } from "./Input";
@@ -126,6 +132,8 @@ export type { PaginationProps } from "./Pagination";
 export { Pagination } from "./Pagination";
 export type { PathBarProps } from "./PathBar";
 export { PathBar } from "./PathBar";
+export type { PdfViewMode } from "./PdfEmbed";
+export { PdfEmbed } from "./PdfEmbed";
 export type {
   PillTab,
   PillTabBarProps,
@@ -223,3 +231,4 @@ export type { UploadChangeInfo, UploadFile, UploadProps } from "./Upload";
 export { Dragger, Upload } from "./Upload";
 // ─── Utilities ───
 export { cn } from "./utils";
+export { VideoPreview } from "./VideoPreview";
