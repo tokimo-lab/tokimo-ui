@@ -394,25 +394,37 @@ export function AppSidebar(props: AppSidebarProps) {
     setFloatingHover(false);
   }, [clearFloatingDwell]);
 
-  // Any wheel event inside the rail signals "I'm scrolling, not deciding
-  // to expand". Three things to do:
-  //   1. Cancel any in-flight dwell timer (pre-expansion case).
-  //   2. Latch suppressHoverUntilLeaveRef so subsequent mousemove cannot
-  //      re-arm the timer (mid-scroll mousemove storm from layout shifts).
-  //   3. If the rail is ALREADY hover-expanded, retract it. Humans typically
-  //      stop the cursor first and then start scrolling — by the time the
-  //      first wheel event fires the 600ms dwell may have already elapsed
-  //      and the rail is open. Snap back.
-  // The flag is cleared in handleLeave when the cursor exits the rail, so
-  // re-entering the rail re-enables hover-expand.
+  // Wheel handling — two requirements from real-user testing:
+  //   (a) Mid-scroll: never trigger hover-expand. Wheel-driven layout shifts
+  //       fire a mousemove storm under the stationary cursor, which would
+  //       otherwise re-arm the dwell timer.
+  //   (b) Already hover-expanded: do NOT retract. The user is intentionally
+  //       interacting with the open rail (e.g. scrolling a long folder list
+  //       inside the preview). Retracting would feel hostile.
+  //   (c) Post-scroll: 500 ms after the last wheel event, the rail should
+  //       hover-expand on its own — assuming the cursor is still inside.
+  //       The user expects "I scrolled, then waited briefly, sidebar opens".
+  //
+  // Implementation: handleWheel cancels any pending dwell timer and sets a
+  // single-shot "post-wheel" timer for WHEEL_REARM_MS. Each new wheel
+  // resets that timer, so the timer fires exactly once after the wheel
+  // events stop. handleLeave already cancels this timer ref, so leaving
+  // the rail mid-scroll cleans up correctly.
+  const WHEEL_REARM_MS = 500;
   const handleWheel = useCallback(() => {
     lastWheelAtRef.current = Date.now();
-    suppressHoverUntilLeaveRef.current = true;
     if (floatingDwellTimerRef.current != null) {
       window.clearTimeout(floatingDwellTimerRef.current);
       floatingDwellTimerRef.current = null;
     }
-    setFloatingHover(false);
+    floatingDwellTimerRef.current = window.setTimeout(() => {
+      floatingDwellTimerRef.current = null;
+      // Re-check at fire time. Don't expand if user manually collapsed
+      // mid-scroll, or if the cursor is no longer inside.
+      if (suppressHoverUntilLeaveRef.current) return;
+      if (Date.now() - lastCollapsedAtRef.current < COLLAPSE_GRACE_MS) return;
+      setFloatingHover(true);
+    }, WHEEL_REARM_MS);
   }, []);
 
   // Inner collapsed mirrors the prop directly. Previously a 200 ms deferred
