@@ -141,8 +141,19 @@ export interface AppSidebarProps {
   headerTitle?: ReactNode;
   /** Navigation sections */
   sections: AppSidebarSection[];
-  /** Currently active item key */
-  activeKey?: string;
+  /**
+   * Currently active item key.
+   * - `string` → that single item is "primary selected" and gets the
+   *   animated sliding accent indicator + bold text.
+   * - `string[]` → multi-selection. When the array length is 1 the
+   *   behaviour matches single-string (sliding indicator). When length
+   *   is ≥2 the sliding indicator is suppressed and every matching item
+   *   instead renders its own static left accent bar + bold text — same
+   *   visual as `item.active = true`. Use this for "show two related
+   *   selections at once" cases (e.g. mail account + folder both
+   *   highlighted).
+   */
+  activeKey?: string | string[];
   /** Called when an item is clicked */
   onSelect?: (key: string) => void;
   /**
@@ -475,6 +486,16 @@ function InlineSidebarInner(props: AppSidebarProps) {
     _onItemsHoverEnter,
   } = props;
 
+  // Normalize activeKey: accept string | string[] for multi-selection.
+  // The set is recomputed each render — cheap, O(items selected).
+  const activeKeySet = Array.isArray(activeKey)
+    ? new Set(activeKey)
+    : activeKey != null
+      ? new Set([activeKey])
+      : null;
+  const isActiveKey = (key: string): boolean =>
+    activeKeySet ? activeKeySet.has(key) : false;
+
   const itemsRef = useRef<HTMLDivElement>(null);
   const canAnimate = useRef(false);
   const [indicator, setIndicator] = useState<{
@@ -489,14 +510,23 @@ function InlineSidebarInner(props: AppSidebarProps) {
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: sectionFingerprint triggers recalculation when items change (e.g. search filter)
   useLayoutEffect(() => {
-    if (!activeKey || !itemsRef.current) {
+    // Sliding indicator only renders when there is exactly one active key.
+    // Multi-selection (length ≥ 2) falls back to per-item static bars so we
+    // don't have to teach the indicator to be in two places at once.
+    const singleActiveKey =
+      typeof activeKey === "string"
+        ? activeKey
+        : Array.isArray(activeKey) && activeKey.length === 1
+          ? activeKey[0]
+          : null;
+    if (!singleActiveKey || !itemsRef.current) {
       setIndicator(null);
       return;
     }
     const container = itemsRef.current;
     let activeEl: HTMLElement | null = null;
     for (const el of container.querySelectorAll("[data-sidebar-key]")) {
-      if (el.getAttribute("data-sidebar-key") === activeKey) {
+      if (el.getAttribute("data-sidebar-key") === singleActiveKey) {
         activeEl = el as HTMLElement;
         break;
       }
@@ -797,8 +827,18 @@ function InlineSidebarInner(props: AppSidebarProps) {
                       <div className="my-1 mx-3 border-t border-black/[0.08] dark:border-white/[0.08]" />
                     )}
                     {section.items.map((item) => {
+                      const matchedActive = isActiveKey(item.key);
                       const explicitActive = item.active === true;
-                      const isActive = explicitActive || activeKey === item.key;
+                      const isActive = explicitActive || matchedActive;
+                      // When activeKey is an array of length ≥2, suppress the
+                      // sliding indicator and render the same static accent bar
+                      // that `item.active = true` produces — so multi-selection
+                      // looks identical to manually-marked items.
+                      const renderStaticAccent =
+                        explicitActive ||
+                        (matchedActive &&
+                          Array.isArray(activeKey) &&
+                          activeKey.length >= 2);
                       // Rail icon button is at least 36 px so the hit-target
                       // remains comfortable; tall variants grow beyond that.
                       // Used in both rail and preview modes so heights stay
@@ -851,7 +891,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
                           data-sidebar-key={item.key}
                           className="relative flex w-full items-center"
                         >
-                          {explicitActive && (
+                          {renderStaticAccent && (
                             <span className="pointer-events-none absolute top-1/2 left-0 z-20 h-7 w-[3px] -translate-y-1/2 rounded-r-full bg-[var(--accent)]" />
                           )}
                           {rowButton}
@@ -954,7 +994,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
                     <SidebarItemButton
                       key={item.key}
                       item={item}
-                      isActive={activeKey === item.key}
+                      isActive={isActiveKey(item.key)}
                       onSelect={onSelect}
                       metrics={metrics}
                     />
