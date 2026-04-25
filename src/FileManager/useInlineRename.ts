@@ -60,7 +60,9 @@ export function useInlineRename({
   const isControlled =
     controlledRenaming !== undefined && controlledSetRenaming !== undefined;
   const [internalRenaming, setInternalRenaming] = useState<string | null>(null);
-  const renaming = isControlled ? (controlledRenaming ?? null) : internalRenaming;
+  const renaming = isControlled
+    ? (controlledRenaming ?? null)
+    : internalRenaming;
   const setRenaming = useCallback(
     (path: string | null) => {
       if (isControlled) controlledSetRenaming?.(path);

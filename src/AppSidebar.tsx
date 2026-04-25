@@ -39,8 +39,8 @@
 
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import {
-  type ReactNode,
   memo,
+  type ReactNode,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -541,8 +541,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
   // Resolve the indicator anchor: explicit activeKey wins; otherwise if
   // exactly one entry exists in activeKeys, that one gets the sliding bar.
   const singleActiveKey =
-    activeKey ??
-    (activeKeys && activeKeys.length === 1 ? activeKeys[0] : null);
+    activeKey ?? (activeKeys && activeKeys.length === 1 ? activeKeys[0] : null);
 
   // Combined set of keys that should show static accent bars (everything
   // in activeKeys, plus activeKey when activeKeys also has entries — so
@@ -854,6 +853,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
             className="flex-1 pt-2"
             style={topInset ? { paddingTop: topInset } : undefined}
           >
+            {/* biome-ignore lint/a11y/noStaticElementInteractions: hover registers items area for indicator tracking */}
             <div
               ref={itemsRef}
               onMouseEnter={_onItemsHoverEnter}
@@ -904,6 +904,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
                       // identical (only width animates).
                       const railSize = Math.max(36, metrics.itemHeight);
                       const rowButton = (
+                        // biome-ignore lint/correctness/useJsxKeyInIterable: button is wrapped in keyed `row`/`Tooltip` element below
                         <button
                           type="button"
                           onClick={() => onSelect?.(item.key)}
@@ -1089,7 +1090,8 @@ function SidebarItemButton({
 
   // Default variant keeps original look (px-3 py-2.5 ≈ 36 px row).
   // Larger metrics override via inline style for height + icon container.
-  const useDefaultMetrics = metrics.iconSize === 16 && metrics.itemHeight === 32;
+  const useDefaultMetrics =
+    metrics.iconSize === 16 && metrics.itemHeight === 32;
 
   const itemClasses = cn(
     "mb-0.5 flex w-full cursor-pointer rounded-lg text-left text-sm transition-colors",

@@ -79,6 +79,8 @@ export type { EmojiPickerProps } from "./EmojiPicker";
 export { EmojiPicker } from "./EmojiPicker";
 export type { EmptyProps } from "./Empty";
 export { Empty } from "./Empty";
+// ─── FileManager ───
+export * from "./FileManager";
 export { FloatingVibrancy } from "./FloatingVibrancy";
 export type { FieldValues as FormFieldValues, FormInstance } from "./Form";
 export {
@@ -223,6 +225,3 @@ export type { UploadChangeInfo, UploadFile, UploadProps } from "./Upload";
 export { Dragger, Upload } from "./Upload";
 // ─── Utilities ───
 export { cn } from "./utils";
-
-// ─── FileManager ───
-export * from "./FileManager";

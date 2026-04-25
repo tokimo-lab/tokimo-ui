@@ -307,10 +307,14 @@ export interface ScrollbarTracksProps {
 const THUMB_CLS =
   "rounded-full bg-black/40 dark:bg-white/30 hover:bg-black/55 dark:hover:bg-white/45 cursor-pointer active:bg-black/60 dark:active:bg-white/50 transition-colors";
 
+const THUMB_CLS_THIN =
+  "rounded-full bg-black/15 dark:bg-white/15 hover:bg-black/30 dark:hover:bg-white/30 cursor-pointer active:bg-black/40 dark:active:bg-white/40 transition-colors";
+
 export const ScrollbarTracks = memo(function ScrollbarTracks(
   p: ScrollbarTracksProps,
 ) {
   const thin = p.thumbSize === "thin";
+  const thumbCls = thin ? THUMB_CLS_THIN : THUMB_CLS;
   return (
     <>
       {p.showY && (
@@ -333,7 +337,7 @@ export const ScrollbarTracks = memo(function ScrollbarTracks(
           {/* biome-ignore lint/a11y/noStaticElementInteractions: scrollbar thumb drag handle */}
           <div
             ref={p.thumbYRef}
-            className={cn("w-full", THUMB_CLS)}
+            className={cn("w-full", thumbCls)}
             onMouseDown={p.onThumbYDown}
           />
         </div>
@@ -358,7 +362,7 @@ export const ScrollbarTracks = memo(function ScrollbarTracks(
           {/* biome-ignore lint/a11y/noStaticElementInteractions: scrollbar thumb drag handle */}
           <div
             ref={p.thumbXRef}
-            className={cn("h-full", THUMB_CLS)}
+            className={cn("h-full", thumbCls)}
             onMouseDown={p.onThumbXDown}
           />
         </div>

@@ -61,6 +61,7 @@ export interface ModalProps {
     disabled?: boolean;
   };
   /** OK callback */
+  // biome-ignore lint/suspicious/noConfusingVoidType: callers may return void or a Promise
   onOk?: () => void | Promise<unknown>;
   /** Cancel / close callback */
   onCancel?: () => void;
@@ -487,6 +488,7 @@ export interface ConfirmConfig {
   content?: ReactNode;
   okText?: string;
   cancelText?: string;
+  // biome-ignore lint/suspicious/noConfusingVoidType: callers may return void or a Promise
   onOk?: () => void | Promise<unknown>;
   onCancel?: () => void;
   okButtonProps?: ModalProps["okButtonProps"];

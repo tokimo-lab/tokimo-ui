@@ -7,8 +7,8 @@ export { FileToolbar } from "./FileToolbar";
 export { MaterialFileIcon } from "./MaterialFileIcon";
 export * from "./types";
 export {
-  useInlineRename,
   type UseInlineRenameOptions,
   type UseInlineRenameReturn,
+  useInlineRename,
 } from "./useInlineRename";
 export { useMarqueeSelection } from "./useMarqueeSelection";
