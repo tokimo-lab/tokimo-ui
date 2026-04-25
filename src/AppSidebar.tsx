@@ -142,18 +142,21 @@ export interface AppSidebarProps {
   /** Navigation sections */
   sections: AppSidebarSection[];
   /**
-   * Currently active item key.
-   * - `string` → that single item is "primary selected" and gets the
-   *   animated sliding accent indicator + bold text.
-   * - `string[]` → multi-selection. When the array length is 1 the
-   *   behaviour matches single-string (sliding indicator). When length
-   *   is ≥2 the sliding indicator is suppressed and every matching item
-   *   instead renders its own static left accent bar + bold text — same
-   *   visual as `item.active = true`. Use this for "show two related
-   *   selections at once" cases (e.g. mail account + folder both
-   *   highlighted).
+   * Single primary-selected item key. Renders the animated sliding accent
+   * indicator + bold text. Use this for the canonical "current page".
    */
-  activeKey?: string | string[];
+  activeKey?: string;
+  /**
+   * Additional active item keys (multi-selection). Each matching item
+   * renders the same static left accent bar + bold text that
+   * `item.active = true` produces. The sliding indicator from `activeKey`
+   * is preserved alongside; if `activeKey` is unset and `activeKeys` has
+   * exactly one entry, that entry gets the sliding indicator instead.
+   *
+   * Use for "show two related selections at once" cases (e.g. mail account
+   * + folder both highlighted).
+   */
+  activeKeys?: string[];
   /** Called when an item is clicked */
   onSelect?: (key: string) => void;
   /**
@@ -467,6 +470,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
     headerTitle,
     sections,
     activeKey,
+    activeKeys,
     onSelect,
     footer: footerProp,
     footerActions,
@@ -486,15 +490,32 @@ function InlineSidebarInner(props: AppSidebarProps) {
     _onItemsHoverEnter,
   } = props;
 
-  // Normalize activeKey: accept string | string[] for multi-selection.
-  // The set is recomputed each render — cheap, O(items selected).
-  const activeKeySet = Array.isArray(activeKey)
-    ? new Set(activeKey)
-    : activeKey != null
-      ? new Set([activeKey])
-      : null;
+  // Resolve the indicator anchor: explicit activeKey wins; otherwise if
+  // exactly one entry exists in activeKeys, that one gets the sliding bar.
+  const singleActiveKey =
+    activeKey ??
+    (activeKeys && activeKeys.length === 1 ? activeKeys[0] : null);
+
+  // Combined set of keys that should show static accent bars (everything
+  // in activeKeys, plus activeKey when activeKeys also has entries — so
+  // both visually mark as "active"). When only activeKey is set and
+  // activeKeys is empty, no static bars render — only the sliding one.
+  const staticActiveKeys = new Set<string>();
+  if (activeKeys && activeKeys.length > 0) {
+    for (const k of activeKeys) staticActiveKeys.add(k);
+    // If activeKey is also set, it joins the static-bar set so multi-select
+    // visually includes the primary too.
+    if (activeKey != null) staticActiveKeys.add(activeKey);
+    // When length === 1 and activeKey unset, that single key uses the
+    // sliding indicator instead of a static bar.
+    if (activeKey == null && activeKeys.length === 1) {
+      staticActiveKeys.delete(activeKeys[0]);
+    }
+  }
+
   const isActiveKey = (key: string): boolean =>
-    activeKeySet ? activeKeySet.has(key) : false;
+    key === activeKey || (activeKeys?.includes(key) ?? false);
+  const isStaticActive = (key: string): boolean => staticActiveKeys.has(key);
 
   const itemsRef = useRef<HTMLDivElement>(null);
   const canAnimate = useRef(false);
@@ -510,15 +531,6 @@ function InlineSidebarInner(props: AppSidebarProps) {
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: sectionFingerprint triggers recalculation when items change (e.g. search filter)
   useLayoutEffect(() => {
-    // Sliding indicator only renders when there is exactly one active key.
-    // Multi-selection (length ≥ 2) falls back to per-item static bars so we
-    // don't have to teach the indicator to be in two places at once.
-    const singleActiveKey =
-      typeof activeKey === "string"
-        ? activeKey
-        : Array.isArray(activeKey) && activeKey.length === 1
-          ? activeKey[0]
-          : null;
     if (!singleActiveKey || !itemsRef.current) {
       setIndicator(null);
       return;
@@ -541,7 +553,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
       if (prev && prev.top === top && prev.height === height) return prev;
       return { top, height };
     });
-  }, [activeKey, sectionFingerprint, collapsed]);
+  }, [singleActiveKey, sectionFingerprint, collapsed]);
 
   // Enable slide animation after initial positioning
   useEffect(() => {
@@ -830,15 +842,12 @@ function InlineSidebarInner(props: AppSidebarProps) {
                       const matchedActive = isActiveKey(item.key);
                       const explicitActive = item.active === true;
                       const isActive = explicitActive || matchedActive;
-                      // When activeKey is an array of length ≥2, suppress the
-                      // sliding indicator and render the same static accent bar
-                      // that `item.active = true` produces — so multi-selection
-                      // looks identical to manually-marked items.
+                      // Static accent bar (same visual as item.active=true)
+                      // is shown for items in `activeKeys` that aren't the
+                      // sole sliding-indicator anchor — so secondary
+                      // selections stay visible alongside the primary one.
                       const renderStaticAccent =
-                        explicitActive ||
-                        (matchedActive &&
-                          Array.isArray(activeKey) &&
-                          activeKey.length >= 2);
+                        explicitActive || isStaticActive(item.key);
                       // Rail icon button is at least 36 px so the hit-target
                       // remains comfortable; tall variants grow beyond that.
                       // Used in both rail and preview modes so heights stay
