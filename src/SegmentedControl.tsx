@@ -24,9 +24,7 @@ export interface SegmentedControlProps<
   className?: string;
 }
 
-export function SegmentedControl<
-  T extends string | number | boolean = string,
->({
+export function SegmentedControl<T extends string | number | boolean = string>({
   value,
   onChange,
   options,
