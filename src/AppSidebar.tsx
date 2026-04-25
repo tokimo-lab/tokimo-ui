@@ -820,6 +820,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
       <div
         className={cn(
           "relative flex shrink-0 flex-col overflow-hidden border-r border-border-base select-none",
+          "transition-[width] duration-200 ease-out",
           _transparentBg ? "bg-transparent" : "bg-[var(--sidebar-bg)]",
           className,
         )}
