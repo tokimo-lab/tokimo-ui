@@ -505,8 +505,13 @@ export function Select({
             {...getFloatingProps()}
           >
             <div
+              style={{
+                backdropFilter: "blur(var(--window-blur, 24px))",
+                WebkitBackdropFilter: "blur(var(--window-blur, 24px))",
+                borderRadius: "var(--window-radius, 8px)",
+              }}
               className={cn(
-                "relative rounded-lg border shadow-lg overflow-hidden",
+                "relative border shadow-lg overflow-hidden",
                 "bg-white/90 dark:bg-[rgba(15,15,25,0.9)]",
                 "border-black/[0.06] dark:border-white/[0.08]",
                 popupClassName,
