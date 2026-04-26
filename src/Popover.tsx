@@ -141,37 +141,40 @@ export function Popover({
         <FloatingPortal>
           <div
             ref={refs.setFloating}
-            style={{
-              ...floatingStyles,
-              backdropFilter: "blur(var(--window-blur, 24px))",
-              WebkitBackdropFilter: "blur(var(--window-blur, 24px))",
-              borderRadius: "var(--window-radius, 10px)",
-            }}
-            className={
-              popupClassName ??
-              cn(
-                "z-[9999] overflow-hidden bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(15,15,25,calc(var(--window-opacity,85)/100))] border border-black/[0.06] dark:border-white/[0.08] shadow-lg p-3 max-w-xs",
-              )
-            }
+            style={floatingStyles}
+            className="z-[9999]"
             {...getFloatingProps()}
           >
-            <FloatingVibrancy />
-            {title ? (
-              <div className="relative font-medium text-sm text-[var(--text-primary)] mb-2">
-                {title}
-              </div>
-            ) : null}
-            {content ? (
-              <div
-                className={
-                  contentClassName != null
-                    ? cn("relative", contentClassName)
-                    : "relative text-sm text-[var(--text-secondary)]"
-                }
-              >
-                {content}
-              </div>
-            ) : null}
+            <div
+              style={{
+                borderRadius: "var(--window-radius, 10px)",
+                backdropFilter: "blur(var(--window-blur, 24px))",
+                WebkitBackdropFilter: "blur(var(--window-blur, 24px))",
+              }}
+              className={cn(
+                "relative overflow-hidden",
+                popupClassName ??
+                  "border shadow-lg bg-white/90 dark:bg-[rgba(15,15,25,0.9)] border-black/[0.06] dark:border-white/[0.08] p-3 max-w-xs",
+              )}
+            >
+              <FloatingVibrancy />
+              {title ? (
+                <div className="relative font-medium text-sm text-[var(--text-primary)] mb-2">
+                  {title}
+                </div>
+              ) : null}
+              {content ? (
+                <div
+                  className={
+                    contentClassName != null
+                      ? cn("relative", contentClassName)
+                      : "relative text-sm text-[var(--text-secondary)]"
+                  }
+                >
+                  {content}
+                </div>
+              ) : null}
+            </div>
           </div>
         </FloatingPortal>
       ) : null}

@@ -13,6 +13,7 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { Check, ChevronDown, Search, X } from "lucide-react";
+import { FloatingVibrancy } from "./FloatingVibrancy";
 import React, {
   type KeyboardEvent,
   type ReactNode,
@@ -21,7 +22,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { FloatingVibrancy } from "./FloatingVibrancy";
 import { useLocale } from "./locale";
 import { cn } from "./utils";
 
@@ -500,94 +500,97 @@ export function Select({
         <FloatingPortal>
           <div
             ref={refs.setFloating}
-            style={{
-              ...floatingStyles,
-              backdropFilter: "blur(var(--window-blur, 24px))",
-              WebkitBackdropFilter: "blur(var(--window-blur, 24px))",
-              borderRadius: "var(--window-radius, 8px)",
-            }}
-            className={cn(
-              "z-[9999] bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(15,15,25,calc(var(--window-opacity,85)/100))] border border-black/[0.06] dark:border-white/[0.08] shadow-lg overflow-hidden",
-              popupClassName,
-            )}
+            style={floatingStyles}
+            className="z-[9999]"
             {...getFloatingProps()}
           >
-            <FloatingVibrancy />
-            {showSearch && !isMultiple ? (
-              <div className="relative p-2 border-b border-black/[0.06] dark:border-white/[0.08]">
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-black/[0.03] dark:bg-white/[0.04] rounded">
-                  <Search className="h-3.5 w-3.5 text-[var(--text-muted)]" />
-                  <input
-                    ref={inputRef}
-                    className="flex-1 bg-transparent outline-none text-sm placeholder:text-[var(--text-muted)]"
-                    placeholder={localeSelect.searchPlaceholder}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onKeyDown={handleSearchKeyDown}
-                  />
-                </div>
-              </div>
-            ) : null}
             <div
-              ref={scrollContainerRef}
-              className="relative max-h-60 overflow-y-auto py-1"
+              className={cn(
+                "relative rounded-lg border shadow-lg overflow-hidden",
+                "bg-white/90 dark:bg-[rgba(15,15,25,0.9)]",
+                "border-black/[0.06] dark:border-white/[0.08]",
+                popupClassName,
+              )}
             >
-              {filtered.length === 0 ? (
-                <div className="px-3 py-4 text-center text-sm text-[var(--text-muted)]">
-                  {notFoundContent ?? localeSelect.notFoundContent}
+              <FloatingVibrancy />
+              {showSearch && !isMultiple ? (
+                <div className="relative p-2 border-b border-black/[0.06] dark:border-white/[0.08]">
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-black/[0.03] dark:bg-white/[0.04] rounded">
+                    <Search className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                    <input
+                      ref={inputRef}
+                      className="flex-1 bg-transparent outline-none text-sm placeholder:text-[var(--text-muted)]"
+                      placeholder={localeSelect.searchPlaceholder}
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      onKeyDown={handleSearchKeyDown}
+                    />
+                  </div>
                 </div>
-              ) : virtual ? (
-                <VirtualList
-                  items={filtered}
-                  scrollContainerRef={scrollContainerRef}
-                  itemHeight={ITEM_HEIGHT}
-                  maxHeight={MAX_HEIGHT}
-                  overscan={OVERSCAN}
-                  listRef={listRef}
-                  activeIndex={activeIndex}
-                  isSelected={isSelected}
-                  getItemProps={getItemProps}
-                  handleSelect={handleSelect}
-                />
-              ) : (
-                filtered.map((opt, i) => {
-                  const selected = isSelected(opt.value);
+              ) : null}
+              <div
+                ref={scrollContainerRef}
+                className="relative max-h-60 overflow-y-auto py-1"
+              >
+                {filtered.length === 0 ? (
+                  <div className="px-3 py-4 text-center text-sm text-[var(--text-muted)]">
+                    {notFoundContent ?? localeSelect.notFoundContent}
+                  </div>
+                ) : virtual ? (
+                  <VirtualList
+                    items={filtered}
+                    scrollContainerRef={scrollContainerRef}
+                    itemHeight={ITEM_HEIGHT}
+                    maxHeight={MAX_HEIGHT}
+                    overscan={OVERSCAN}
+                    listRef={listRef}
+                    activeIndex={activeIndex}
+                    isSelected={isSelected}
+                    getItemProps={getItemProps}
+                    handleSelect={handleSelect}
+                  />
+                ) : (
+                  filtered.map((opt, i) => {
+                    const selected = isSelected(opt.value);
 
-                  return (
-                    <div
-                      key={String(opt.value)}
-                      ref={(node) => {
-                        listRef.current[i] = node;
-                      }}
-                      className={cn(
-                        "flex items-start gap-2 px-3 py-2 text-sm cursor-pointer transition-colors",
-                        selected
-                          ? "text-[var(--accent)] bg-[var(--accent-subtle)]"
-                          : "text-[var(--text-primary)]",
-                        !selected &&
-                          activeIndex === i &&
-                          "bg-black/[0.04] dark:bg-white/[0.06]",
-                        opt.disabled && "opacity-50 cursor-not-allowed",
-                      )}
-                      {...getItemProps({
-                        onClick: () => {
-                          if (!opt.disabled) handleSelect(opt.value);
-                        },
-                      })}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="truncate">{opt.label}</div>
-                        {opt.description ? (
-                          <div className="mt-0.5 text-[11px] leading-tight text-[var(--text-muted)]">
-                            {opt.description}
-                          </div>
+                    return (
+                      <div
+                        key={String(opt.value)}
+                        ref={(node) => {
+                          listRef.current[i] = node;
+                        }}
+                        className={cn(
+                          "flex items-start gap-2 px-3 py-2 text-sm cursor-pointer transition-colors",
+                          selected
+                            ? "text-[var(--accent)] bg-[var(--accent-subtle)]"
+                            : "text-[var(--text-primary)]",
+                          !selected &&
+                            activeIndex === i &&
+                            "bg-black/[0.04] dark:bg-white/[0.06]",
+                          opt.disabled && "opacity-50 cursor-not-allowed",
+                        )}
+                        {...getItemProps({
+                          onClick: () => {
+                            if (!opt.disabled) handleSelect(opt.value);
+                          },
+                        })}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="truncate">{opt.label}</div>
+                          {opt.description ? (
+                            <div className="mt-0.5 text-[11px] leading-tight text-[var(--text-muted)]">
+                              {opt.description}
+                            </div>
+                          ) : null}
+                        </div>
+                        {selected ? (
+                          <Check className="h-4 w-4 shrink-0" />
                         ) : null}
                       </div>
-                      {selected ? <Check className="h-4 w-4 shrink-0" /> : null}
-                    </div>
-                  );
-                })
-              )}
+                    );
+                  })
+                )}
+              </div>
             </div>
           </div>
         </FloatingPortal>
