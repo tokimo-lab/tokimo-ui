@@ -72,9 +72,11 @@ export function HexViewer({ fileUrl, fileName }: HexViewerProps) {
   const [page, setPage] = useState(0);
   const [pageData, setPageData] = useState<Uint8Array | null>(null);
   const [totalSize, setTotalSize] = useState<number | null>(null);
+  const [rangeSupported, setRangeSupported] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const previousFileUrlRef = useRef(fileUrl);
 
   const fetchPage = useCallback(
     async (pageNum: number, signal?: AbortSignal) => {
@@ -94,15 +96,19 @@ export function HexViewer({ fileUrl, fileName }: HexViewerProps) {
 
       // Parse total size from Content-Range: bytes 0-1023/123456
       const contentRange = resp.headers.get("content-range");
+      if (resp.status === 206) {
+        setRangeSupported(true);
+      }
       if (contentRange) {
         const match = contentRange.match(/\/(\d+)/);
         if (match?.[1]) {
           setTotalSize(Number(match[1]));
         }
       } else if (resp.status === 200) {
-        // Only a full-file response can safely treat Content-Length as total size.
+        setRangeSupported(false);
         const cl = resp.headers.get("content-length");
         if (cl) setTotalSize(Number(cl));
+        return readFirstBytes(resp, PAGE_SIZE);
       }
 
       return new Uint8Array(await resp.arrayBuffer());
@@ -137,6 +143,15 @@ export function HexViewer({ fileUrl, fileName }: HexViewerProps) {
     return () => ac.abort();
   }, [fileUrl, fetchPage, page]);
 
+  useEffect(() => {
+    if (previousFileUrlRef.current === fileUrl) return;
+    previousFileUrlRef.current = fileUrl;
+    setRangeSupported(true);
+    setTotalSize(null);
+    setPageData(null);
+    setPage(0);
+  });
+
   // Scroll to top when page changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally re-run on page change
   useEffect(() => {
@@ -146,11 +161,14 @@ export function HexViewer({ fileUrl, fileName }: HexViewerProps) {
   const totalPages =
     totalSize !== null ? Math.ceil(totalSize / PAGE_SIZE) : null;
   const hasNext =
-    totalPages !== null
+    rangeSupported &&
+    (totalPages !== null
       ? page < totalPages - 1
-      : (pageData?.length ?? 0) >= PAGE_SIZE;
-  const hasPrev = page > 0;
+      : (pageData?.length ?? 0) >= PAGE_SIZE);
+  const hasPrev = rangeSupported && page > 0;
   const pageBaseOffset = page * PAGE_SIZE;
+  const partialFallback =
+    !rangeSupported && totalSize !== null && totalSize > PAGE_SIZE;
 
   // ── Offset jump ──
 
@@ -187,6 +205,12 @@ export function HexViewer({ fileUrl, fileName }: HexViewerProps) {
         {totalSize !== null && (
           <span className="text-xs text-[var(--text-tertiary)]">
             {formatByteCount(totalSize)}
+          </span>
+        )}
+
+        {partialFallback && (
+          <span className="rounded bg-amber-500/10 px-2 py-0.5 text-[10px] text-amber-600 dark:text-amber-300">
+            Range unavailable, showing first {formatByteCount(PAGE_SIZE)}
           </span>
         )}
 
@@ -474,6 +498,39 @@ function toAscii(byte: number): string {
   if (isPrintableAsciiByte(byte)) return String.fromCharCode(byte);
   if (byte === 0x20) return " ";
   return "·";
+}
+
+async function readFirstBytes(
+  resp: Response,
+  limit: number,
+): Promise<Uint8Array> {
+  if (!resp.body) {
+    return new Uint8Array(await resp.arrayBuffer()).slice(0, limit);
+  }
+
+  const reader = resp.body.getReader();
+  const out = new Uint8Array(limit);
+  let offset = 0;
+  let done = false;
+
+  while (offset < limit) {
+    const chunk = await reader.read();
+    if (chunk.done) {
+      done = true;
+      break;
+    }
+    const remaining = limit - offset;
+    const bytes = chunk.value.subarray(0, remaining);
+    out.set(bytes, offset);
+    offset += bytes.length;
+    if (chunk.value.length > remaining) break;
+  }
+
+  if (!done) {
+    await reader.cancel();
+  }
+
+  return out.slice(0, offset);
 }
 
 function getBaseTone(byte: number): ByteTone {
