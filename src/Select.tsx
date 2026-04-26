@@ -13,7 +13,6 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { Check, ChevronDown, Search, X } from "lucide-react";
-import { FloatingVibrancy } from "./FloatingVibrancy";
 import React, {
   type KeyboardEvent,
   type ReactNode,
@@ -22,6 +21,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { FloatingVibrancy } from "./FloatingVibrancy";
 import { useLocale } from "./locale";
 import { cn } from "./utils";
 
