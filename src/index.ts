@@ -223,28 +223,3 @@ export type { UploadChangeInfo, UploadFile, UploadProps } from "./Upload";
 export { Dragger, Upload } from "./Upload";
 // ─── Utilities ───
 export { cn } from "./utils";
-export type {
-  AudioPlayerMediaSession,
-  AudioPlayerMediaSource,
-} from "./viewers/AudioPlayer";
-export { AudioPlayer } from "./viewers/AudioPlayer";
-// ─── Viewer components (decoupled) ───
-export type { BookChapterContent, BookViewerProps } from "./viewers/BookViewer";
-export { BookViewer } from "./viewers/BookViewer";
-export type {
-  EpubBook,
-  EpubSpineItem,
-  EpubTocItem,
-  EpubViewerProps,
-} from "./viewers/EpubViewer";
-export { EpubViewer } from "./viewers/EpubViewer";
-export type { HexViewerProps } from "./viewers/HexViewer";
-export { HexViewer } from "./viewers/HexViewer";
-export type { HtmlPreviewProps } from "./viewers/HtmlPreview";
-export { HtmlPreview } from "./viewers/HtmlPreview";
-export { ImagePreview, ToolBtn } from "./viewers/ImagePreview";
-export type { MonacoTextEditorProps } from "./viewers/MonacoTextEditor";
-export { MonacoTextEditor } from "./viewers/MonacoTextEditor";
-export type { PdfViewMode } from "./viewers/PdfEmbed";
-export { PdfEmbed } from "./viewers/PdfEmbed";
-export { VideoPreview } from "./viewers/VideoPreview";
