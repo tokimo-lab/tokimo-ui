@@ -69,7 +69,7 @@ export interface AvatarProps {
   /** Explicit image url (highest priority). */
   src?: string;
   /** User object — resolves avatar URL + fallback initial internally. */
-  user?: AvatarUser;
+  user?: AvatarUser | null;
   /** Alt text */
   alt?: string;
   /** Size in pixels */
@@ -103,12 +103,15 @@ export function Avatar({
   const fontSize = Math.max(px * 0.45, 12);
 
   // Resolve src: explicit prop > user resolver
-  const resolvedSrc = src ?? (user && urlResolver ? urlResolver(user) : undefined);
+  const resolvedSrc =
+    src ?? (user && urlResolver ? urlResolver(user) : undefined);
 
   // Derive fallback from user when no children/icon provided
   const fallbackInitial =
     children ?? (user ? getAvatarInitial(user.name, user.email) : undefined);
-  const fallbackColor = user ? getAvatarColor(user.id ?? user.email) : undefined;
+  const fallbackColor = user
+    ? getAvatarColor(user.id ?? user.email)
+    : undefined;
 
   const [failed, setFailed] = useState(false);
 
