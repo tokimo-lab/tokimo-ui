@@ -16,7 +16,12 @@ export { AppSidebar } from "./AppSidebar";
 export type { AutoCompleteOption, AutoCompleteProps } from "./AutoComplete";
 export { AutoComplete } from "./AutoComplete";
 export type { AvatarProps } from "./Avatar";
-export { Avatar } from "./Avatar";
+export {
+  Avatar,
+  getAvatarColor,
+  getAvatarInitial,
+  setAvatarUrlResolver,
+} from "./Avatar";
 export type { BadgeProps } from "./Badge";
 export { Badge } from "./Badge";
 export type { ButtonProps } from "./Button";
