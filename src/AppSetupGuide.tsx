@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "./utils";
 
@@ -33,20 +34,6 @@ const ICON_BG: Record<AppAccentColor, string> = {
     "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400",
 };
 
-const BTN_BG: Record<AppAccentColor, string> = {
-  purple: "bg-purple-600 hover:bg-purple-700",
-  rose: "bg-rose-600 hover:bg-rose-700",
-  violet: "bg-violet-600 hover:bg-violet-700",
-  amber: "bg-amber-600 hover:bg-amber-700",
-  blue: "bg-blue-600 hover:bg-blue-700",
-  green: "bg-green-600 hover:bg-green-700",
-  cyan: "bg-cyan-600 hover:bg-cyan-700",
-  pink: "bg-pink-600 hover:bg-pink-700",
-  orange: "bg-orange-600 hover:bg-orange-700",
-  teal: "bg-teal-600 hover:bg-teal-700",
-  indigo: "bg-indigo-600 hover:bg-indigo-700",
-};
-
 export interface SetupGuideFeature {
   icon: LucideIcon;
   label: string;
@@ -54,7 +41,13 @@ export interface SetupGuideFeature {
 
 export interface AppSetupGuideProps {
   /** Path to the app's own icon image (e.g. "/page-icons/video.png"). */
-  imageSrc: string;
+  imageSrc?: string;
+  /** Lucide icon component. Used when `imageSrc` is not provided. */
+  icon?: LucideIcon;
+  /** Tailwind gradient classes for the icon background. */
+  gradientClassName?: string;
+  /** Show sparkle decoration on the icon (defaults to `true` in icon mode). */
+  showSparkle?: boolean;
   accentColor: AppAccentColor;
   title: string;
   description: string;
@@ -71,6 +64,9 @@ export interface AppSetupGuideProps {
 
 export function AppSetupGuide({
   imageSrc,
+  icon: Icon,
+  gradientClassName = "from-indigo-400 via-purple-500 to-pink-500",
+  showSparkle,
   accentColor,
   title,
   description,
@@ -82,46 +78,74 @@ export function AppSetupGuide({
   children,
   className,
 }: AppSetupGuideProps) {
+  const useIcon = !imageSrc && Icon;
+  const sparkle = useIcon ? (showSparkle ?? true) : false;
+
   return (
     <div
-      className={cn("flex h-full items-center justify-center px-6", className)}
+      className={cn(
+        "flex h-full w-full items-center justify-center overflow-auto bg-[var(--bg-glass)] px-8 py-12 backdrop-blur-xl",
+        className,
+      )}
     >
-      <div className="flex flex-col items-center gap-6 py-8 max-w-sm w-full">
+      <div className="flex w-full max-w-md flex-col items-center gap-10 text-center">
         {/* App icon */}
-        <div className="relative">
+        {imageSrc ? (
           <img
             src={imageSrc}
             alt=""
-            className="h-20 w-20 rounded-[22px] object-cover shadow-sm"
+            className="h-24 w-24 rounded-3xl object-cover shadow-[0_20px_60px_-15px_rgba(120,80,255,0.6)]"
           />
-        </div>
+        ) : useIcon ? (
+          <div
+            className={cn(
+              "relative flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br shadow-[0_20px_60px_-15px_rgba(120,80,255,0.6)]",
+              gradientClassName,
+            )}
+          >
+            <Icon size={44} className="text-white" strokeWidth={2.2} />
+            {sparkle && (
+              <Sparkles
+                size={18}
+                className="absolute -right-1 -top-1 text-amber-300"
+              />
+            )}
+          </div>
+        ) : null}
 
         {/* Title + tagline */}
-        <div className="text-center space-y-1.5">
-          <h2 className="text-xl font-bold text-fg-primary">{title}</h2>
-          <p className="text-sm text-fg-muted leading-relaxed">{description}</p>
+        <div className="flex flex-col items-center gap-3">
+          <h2 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+            {title}
+          </h2>
+          <p className="max-w-xs text-base leading-relaxed text-[var(--text-secondary)]">
+            {description}
+          </p>
         </div>
 
         {/* Feature list */}
-        <div className="w-full rounded-xl border border-black/[0.06] dark:border-white/[0.06] bg-black/[0.02] dark:bg-white/[0.03] px-5 py-4">
-          <div className="space-y-3">
-            {features.map((f) => {
-              const FeatureIcon = f.icon;
-              return (
-                <div key={f.label} className="flex items-center gap-3">
-                  <div
-                    className={cn(
-                      "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
-                      ICON_BG[accentColor],
-                    )}
-                  >
-                    <FeatureIcon className="h-3.5 w-3.5" />
-                  </div>
-                  <span className="text-sm text-fg-secondary">{f.label}</span>
+        <div className="flex w-full flex-col gap-3">
+          {features.map((f) => {
+            const FeatureIcon = f.icon;
+            return (
+              <div
+                key={f.label}
+                className="flex items-center gap-3 rounded-2xl bg-[var(--fill-tertiary)] px-4 py-3 text-left"
+              >
+                <div
+                  className={cn(
+                    "flex h-10 w-10 flex-none items-center justify-center rounded-xl",
+                    ICON_BG[accentColor],
+                  )}
+                >
+                  <FeatureIcon className="h-5 w-5" />
                 </div>
-              );
-            })}
-          </div>
+                <span className="text-sm leading-snug text-[var(--text-primary)]">
+                  {f.label}
+                </span>
+              </div>
+            );
+          })}
         </div>
 
         {/* Action button */}
@@ -129,8 +153,8 @@ export function AppSetupGuide({
           type="button"
           onClick={onAction}
           className={cn(
-            "inline-flex cursor-pointer items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:shadow-md active:scale-[0.98]",
-            buttonClassName ?? BTN_BG[accentColor],
+            "mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-white py-4 text-base font-semibold text-black transition-transform hover:scale-[1.02] active:scale-[0.98]",
+            buttonClassName,
           )}
         >
           {ActionIcon && <ActionIcon className="h-4 w-4" />}
