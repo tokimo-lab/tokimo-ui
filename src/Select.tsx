@@ -210,7 +210,7 @@ export function Select({
       sizeMiddleware({
         apply({ rects, elements }) {
           Object.assign(elements.floating.style, {
-            minWidth: `${rects.reference.width}px`,
+            width: `${rects.reference.width}px`,
           });
         },
       }),
