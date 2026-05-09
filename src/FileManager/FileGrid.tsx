@@ -1,4 +1,5 @@
 import { ArrowUp } from "lucide-react";
+import type { ReactNode } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
@@ -42,6 +43,8 @@ interface FileGridProps {
   showSource?: boolean;
   /** Called when user clicks the source column on an item */
   onSourceClick?: (node: FileNode) => void;
+  /** Custom icon renderer, overrides default MaterialFileIcon for every node */
+  renderIcon?: (node: FileNode) => ReactNode;
 }
 
 const GRID_ITEM_SIZE = 100;
@@ -73,6 +76,7 @@ export function FileGrid({
   isNarrow = false,
   showSource = false,
   onSourceClick,
+  renderIcon,
 }: FileGridProps) {
   const { t } = useTranslation();
   const parentRef = useRef<HTMLDivElement>(null);
@@ -203,6 +207,7 @@ export function FileGrid({
                       ? (e) => onDropToFolder(node, e)
                       : undefined
                   }
+                  renderIcon={renderIcon}
                 />
               </div>
             ) : null,
@@ -227,6 +232,7 @@ export function FileGrid({
       onRenameSubmit,
       onSourceClick,
       renaming,
+      renderIcon,
       selectedPaths,
       showPermissions,
       showSource,

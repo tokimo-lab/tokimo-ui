@@ -1,4 +1,5 @@
 import mime from "mime";
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { useDateFormat } from "../dateFormat";
 import { MaterialFileIcon } from "./MaterialFileIcon";
@@ -31,6 +32,8 @@ interface FileItemProps {
   onDragEnd?: () => void;
   onDrop?: (e: React.DragEvent) => void;
   isDragging?: boolean;
+  /** Custom icon renderer (overrides MaterialFileIcon). Per-node. */
+  renderIcon?: (node: FileNode) => ReactNode;
 }
 
 // ─── macOS Finder label colors ───
@@ -93,6 +96,7 @@ export function FileItem({
   onDragEnd,
   onDrop,
   isDragging,
+  renderIcon,
 }: FileItemProps) {
   const [isDropTarget, setIsDropTarget] = useState(false);
   const { dateFormat } = useDateFormat();
@@ -195,11 +199,15 @@ export function FileItem({
         onDrop={handleDrop}
       >
         <div className="w-12 h-12 flex items-center justify-center">
-          <MaterialFileIcon
-            name={node.name}
-            isDirectory={!!node.isDirectory}
-            size={48}
-          />
+          {renderIcon ? (
+            renderIcon(node)
+          ) : (
+            <MaterialFileIcon
+              name={node.name}
+              isDirectory={!!node.isDirectory}
+              size={48}
+            />
+          )}
         </div>
         <div className="w-full flex items-center justify-center gap-1">
           {label ? <LabelDot label={label} /> : null}
@@ -270,11 +278,15 @@ export function FileItem({
       onDrop={handleDrop}
     >
       <span className="shrink-0">
-        <MaterialFileIcon
-          name={node.name}
-          isDirectory={!!node.isDirectory}
-          size={16}
-        />
+        {renderIcon ? (
+          renderIcon(node)
+        ) : (
+          <MaterialFileIcon
+            name={node.name}
+            isDirectory={!!node.isDirectory}
+            size={16}
+          />
+        )}
       </span>
       <span className="flex-1 min-w-0 relative">
         {renaming ? (
