@@ -205,10 +205,13 @@ export function Dropdown({
   return (
     <>
       {isValidElement(children)
-        ? cloneElement(children as ReactElement<Record<string, unknown>>, {
-            ref: refs.setReference,
-            ...getReferenceProps(),
-          })
+        ? cloneElement(
+            children as ReactElement<Record<string, unknown>>,
+            getReferenceProps({
+              ...(children.props as Record<string, unknown>),
+              ref: refs.setReference,
+            }),
+          )
         : children}
       {isMounted ? (
         <FloatingPortal>
