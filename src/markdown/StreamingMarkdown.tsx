@@ -72,7 +72,7 @@ const MemoBlock = memo(
  */
 export function StreamingMarkdown({
   content,
-  variant = "compact",
+  variant = "comfortable",
   extensions,
   components,
   className,
