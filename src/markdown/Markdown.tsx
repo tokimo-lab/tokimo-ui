@@ -36,7 +36,12 @@ export function Markdown({
     <div className={cn("tk-md", `tk-md-${variant}`, className)}>
       {blocks.map((b, i) => (
         <span key={b.key} className="tk-md-block-wrap">
-          {renderBlock(b.token, { components, streaming: false }, i)}
+          {renderBlock(
+            b.token,
+            { components, streaming: false },
+            i,
+            b.sourceLine,
+          )}
         </span>
       ))}
     </div>

@@ -14,9 +14,11 @@ function escapeHtml(s: string): string {
 export const CodeBlock = memo(function CodeBlock({
   token,
   streaming,
+  sourceLine,
 }: {
   token: Tokens.Code;
   streaming?: boolean;
+  sourceLine?: number;
 }) {
   const code = token.text ?? "";
   const lang = (token.lang ?? "").trim();
@@ -47,7 +49,7 @@ export const CodeBlock = memo(function CodeBlock({
   }, [code, lang, streaming]);
 
   return (
-    <div className="tk-md-code-block group">
+    <div className="tk-md-code-block group" data-source-line={sourceLine}>
       <div className="tk-md-code-header">
         <span className="tk-md-code-lang">{lang || "text"}</span>
         <button

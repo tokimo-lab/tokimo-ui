@@ -6,12 +6,14 @@ import type { MarkdownComponents } from "../core/types";
 export function Table({
   token,
   ctx,
+  sourceLine,
 }: {
   token: Tokens.Table;
   ctx?: { components?: MarkdownComponents };
+  sourceLine?: number;
 }) {
   return (
-    <div className="tk-md-table-wrap">
+    <div className="tk-md-table-wrap" data-source-line={sourceLine}>
       <table className="tk-md-table">
         <thead>
           <tr>

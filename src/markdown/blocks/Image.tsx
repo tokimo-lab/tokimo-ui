@@ -1,6 +1,12 @@
 import type { Tokens } from "marked";
 
-export function Image({ token }: { token: Tokens.Image }) {
+export function Image({
+  token,
+  sourceLine,
+}: {
+  token: Tokens.Image;
+  sourceLine?: number;
+}) {
   return (
     <img
       src={token.href}
@@ -8,6 +14,7 @@ export function Image({ token }: { token: Tokens.Image }) {
       title={token.title ?? undefined}
       loading="lazy"
       className="tk-md-image"
+      data-source-line={sourceLine}
     />
   );
 }

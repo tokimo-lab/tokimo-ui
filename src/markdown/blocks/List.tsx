@@ -7,9 +7,11 @@ import { renderInline } from "../core/render-inline";
 export function List({
   token,
   ctx,
+  sourceLine,
 }: {
   token: Tokens.List;
   ctx: RenderBlockContext;
+  sourceLine?: number;
 }) {
   const Tag = token.ordered ? "ol" : "ul";
   const startAttr =
@@ -20,6 +22,7 @@ export function List({
   return (
     <Tag
       className={`tk-md-list ${token.ordered ? "tk-md-list-ordered" : "tk-md-list-unordered"}`}
+      data-source-line={sourceLine}
       {...startAttr}
     >
       {token.items.map((item, i) => (

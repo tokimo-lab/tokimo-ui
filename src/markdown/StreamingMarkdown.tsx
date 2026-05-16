@@ -23,6 +23,7 @@ interface MemoBlockProps {
   isLast: boolean;
   streaming: boolean;
   index: number;
+  sourceLine: number;
 }
 
 const MemoBlock = memo(
@@ -32,6 +33,7 @@ const MemoBlock = memo(
     isLast,
     streaming,
     index,
+    sourceLine,
   }: MemoBlockProps) {
     return (
       <span className="tk-md-block-wrap">
@@ -39,6 +41,7 @@ const MemoBlock = memo(
           token,
           { components, streaming: isLast && streaming },
           index,
+          sourceLine,
         )}
       </span>
     );
@@ -55,7 +58,8 @@ const MemoBlock = memo(
       prev.isLast === next.isLast &&
       prev.streaming === next.streaming &&
       prev.components === next.components &&
-      prev.index === next.index
+      prev.index === next.index &&
+      prev.sourceLine === next.sourceLine
     );
   },
 );
@@ -91,6 +95,7 @@ export function StreamingMarkdown({
           isLast={i === lastIndex}
           streaming={streaming}
           index={i}
+          sourceLine={b.sourceLine}
         />
       ))}
     </div>
