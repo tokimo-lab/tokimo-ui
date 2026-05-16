@@ -129,6 +129,19 @@ export {
   setActiveModalContainer,
   useConfirm,
 } from "./Modal";
+export type {
+  MarkdownComponents,
+  MarkdownProps,
+  MarkdownVariant,
+  MarkedExtension,
+  RendererExtension,
+  StreamingMarkdownProps,
+  Token,
+  TokenizerAndRendererExtension,
+  TokenizerExtension,
+  Tokens,
+} from "./markdown";
+export { Markdown, StreamingMarkdown } from "./markdown";
 export type { PaginationProps } from "./Pagination";
 export { Pagination } from "./Pagination";
 export type { PathBarProps } from "./PathBar";

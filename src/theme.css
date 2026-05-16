@@ -432,3 +432,7 @@
   --gradient-from: var(--custom-gradient-from);
   --gradient-to: var(--custom-gradient-to);
 }
+
+/* ── Markdown component styles ── */
+@import "./markdown/theme.css";
+
