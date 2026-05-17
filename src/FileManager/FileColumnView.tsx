@@ -101,7 +101,7 @@ export function FileColumnView({
   onLeafPathChange,
   fetchDirectory,
   acceptsExternalDrop,
-  // NOTE: onExternalDropToDir reserved for future external drop handling, currently unused
+  // biome-ignore lint/correctness/noUnusedFunctionParameters: reserved for future external drop handling
   onExternalDropToDir,
   onItemClick,
   onItemDoubleClick,
