@@ -228,7 +228,7 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
           ref={refs.setReference}
           {...getReferenceProps()}
           className={cn(
-            "flex items-center rounded-md border transition-colors focus-within:ring-2",
+            "flex items-center rounded-md border bg-[var(--input-bg)] transition-colors focus-within:ring-2",
             wrapperSizeClass,
             borderClass,
             disabled &&
