@@ -103,7 +103,7 @@ export interface ModalProps {
   /** After open animation callback */
   afterOpenChange?: (open: boolean) => void;
   /** Portal target — when provided the modal renders inside this element with absolute positioning instead of fullscreen */
-  container?: RefObject<HTMLElement | null>;
+  container?: HTMLElement | null;
 }
 
 const THIN_SCROLLBAR: CSSProperties = {
@@ -255,8 +255,8 @@ export function Modal({
   const cancelText = cancelTextProp ?? locale.cancelText;
   const destroyOnClose = destroyOnCloseProp ?? destroyOnHidden ?? false;
   const contentRef = useRef<HTMLDivElement>(null);
-  const ctxContainer = useContext(ModalContainerContext);
-  const resolvedContainer = container ?? ctxContainer;
+  const contextContainer = useContext(ModalContainerContext);
+  const resolvedContainer = container ?? contextContainer?.current ?? null;
 
   /* Track whether mousedown started on the mask itself (not on dialog content) */
   const mouseDownOnMask = useRef(false);
@@ -319,7 +319,7 @@ export function Modal({
 
   // Body scroll lock — skip when rendering inside a container
   useEffect(() => {
-    if (visible && !resolvedContainer?.current) {
+    if (visible && !resolvedContainer) {
       const prev = document.body.style.overflow;
       document.body.style.overflow = "hidden";
       return () => {
@@ -358,8 +358,8 @@ export function Modal({
 
   const renderedFooter = footer === null ? null : (footer ?? defaultFooter);
 
-  const isInline = !!resolvedContainer?.current;
-  const portalTarget = resolvedContainer?.current ?? document.body;
+  const isInline = !!resolvedContainer;
+  const portalTarget = resolvedContainer ?? document.body;
 
   return createPortal(
     // biome-ignore lint/a11y/noStaticElementInteractions: overlay mask click-to-dismiss
