@@ -82,8 +82,9 @@ export {
 } from "./dateFormat";
 export type { DragHandleProps, UseDndOptions, UseDndReturn } from "./dnd";
 export { DragHandle, useDnd } from "./dnd";
-export type { EmojiPickerProps } from "./EmojiPicker";
-export { EmojiPicker } from "./EmojiPicker";
+// TODO: emoji-mart 依赖未正确解析，暂时禁用
+// export type { EmojiPickerProps } from "./EmojiPicker";
+// export { EmojiPicker } from "./EmojiPicker";
 export type { EmptyProps } from "./Empty";
 export { Empty } from "./Empty";
 // ─── FileManager ───
@@ -99,8 +100,9 @@ export {
 } from "./Form";
 export type { ImageProps } from "./Image";
 export { Image } from "./Image";
-export type { InlineEmojiPickerProps } from "./InlineEmojiPicker";
-export { InlineEmojiPicker } from "./InlineEmojiPicker";
+// TODO: emoji-mart 依赖未正确解析，暂时禁用
+// export type { InlineEmojiPickerProps } from "./InlineEmojiPicker";
+// export { InlineEmojiPicker } from "./InlineEmojiPicker";
 export type { InputProps } from "./Input";
 export { Input, Password, SearchInput, TextArea } from "./Input";
 export type { InputNumberProps } from "./InputNumber";
