@@ -84,84 +84,86 @@ export function AppSetupGuide({
   return (
     <div
       className={cn(
-        "flex h-full w-full items-center justify-center overflow-auto bg-[var(--bg-glass)] px-8 py-12 backdrop-blur-xl",
+        "h-full w-full overflow-auto bg-[var(--bg-glass)] backdrop-blur-xl",
         className,
       )}
     >
-      <div className="flex w-full max-w-md flex-col items-center gap-10 text-center">
-        {/* App icon */}
-        {imageSrc ? (
-          <img
-            src={imageSrc}
-            alt=""
-            className="h-24 w-24 rounded-3xl object-cover shadow-[0_20px_60px_-15px_rgba(120,80,255,0.6)]"
-          />
-        ) : useIcon ? (
-          <div
+      <div className="flex min-h-full w-full items-center justify-center px-8 py-12">
+        <div className="flex w-full max-w-md flex-col items-center gap-10 text-center">
+          {/* App icon */}
+          {imageSrc ? (
+            <img
+              src={imageSrc}
+              alt=""
+              className="h-24 w-24 rounded-3xl object-cover shadow-[0_20px_60px_-15px_rgba(120,80,255,0.6)]"
+            />
+          ) : useIcon ? (
+            <div
+              className={cn(
+                "relative flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br shadow-[0_20px_60px_-15px_rgba(120,80,255,0.6)]",
+                gradientClassName,
+              )}
+            >
+              <Icon size={44} className="text-white" strokeWidth={2.2} />
+              {sparkle && (
+                <Sparkles
+                  size={18}
+                  className="absolute -right-1 -top-1 text-amber-300"
+                />
+              )}
+            </div>
+          ) : null}
+
+          {/* Title + tagline */}
+          <div className="flex flex-col items-center gap-3">
+            <h2 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+              {title}
+            </h2>
+            <p className="max-w-xs text-base leading-relaxed text-[var(--text-secondary)]">
+              {description}
+            </p>
+          </div>
+
+          {/* Feature list */}
+          <div className="flex w-full flex-col gap-3">
+            {features.map((f) => {
+              const FeatureIcon = f.icon;
+              return (
+                <div
+                  key={f.label}
+                  className="flex items-center gap-3 rounded-2xl bg-[var(--fill-tertiary)] px-4 py-3 text-left"
+                >
+                  <div
+                    className={cn(
+                      "flex h-10 w-10 flex-none items-center justify-center rounded-xl",
+                      ICON_BG[accentColor],
+                    )}
+                  >
+                    <FeatureIcon className="h-5 w-5" />
+                  </div>
+                  <span className="text-sm leading-snug text-[var(--text-primary)]">
+                    {f.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Action button */}
+          <button
+            type="button"
+            onClick={onAction}
             className={cn(
-              "relative flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br shadow-[0_20px_60px_-15px_rgba(120,80,255,0.6)]",
-              gradientClassName,
+              "mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-white py-4 text-base font-semibold text-black transition-transform hover:scale-[1.02] active:scale-[0.98]",
+              buttonClassName,
             )}
           >
-            <Icon size={44} className="text-white" strokeWidth={2.2} />
-            {sparkle && (
-              <Sparkles
-                size={18}
-                className="absolute -right-1 -top-1 text-amber-300"
-              />
-            )}
-          </div>
-        ) : null}
+            {ActionIcon && <ActionIcon className="h-4 w-4" />}
+            {actionLabel}
+          </button>
 
-        {/* Title + tagline */}
-        <div className="flex flex-col items-center gap-3">
-          <h2 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">
-            {title}
-          </h2>
-          <p className="max-w-xs text-base leading-relaxed text-[var(--text-secondary)]">
-            {description}
-          </p>
+          {children}
         </div>
-
-        {/* Feature list */}
-        <div className="flex w-full flex-col gap-3">
-          {features.map((f) => {
-            const FeatureIcon = f.icon;
-            return (
-              <div
-                key={f.label}
-                className="flex items-center gap-3 rounded-2xl bg-[var(--fill-tertiary)] px-4 py-3 text-left"
-              >
-                <div
-                  className={cn(
-                    "flex h-10 w-10 flex-none items-center justify-center rounded-xl",
-                    ICON_BG[accentColor],
-                  )}
-                >
-                  <FeatureIcon className="h-5 w-5" />
-                </div>
-                <span className="text-sm leading-snug text-[var(--text-primary)]">
-                  {f.label}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Action button */}
-        <button
-          type="button"
-          onClick={onAction}
-          className={cn(
-            "mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-white py-4 text-base font-semibold text-black transition-transform hover:scale-[1.02] active:scale-[0.98]",
-            buttonClassName,
-          )}
-        >
-          {ActionIcon && <ActionIcon className="h-4 w-4" />}
-          {actionLabel}
-        </button>
-
-        {children}
       </div>
     </div>
   );
