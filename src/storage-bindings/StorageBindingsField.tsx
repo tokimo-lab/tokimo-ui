@@ -151,8 +151,14 @@ export default function StorageBindingsField({
 
   const update = (index: number, patch: Partial<VideoBinding>) => {
     const next = [...bindings];
-    next[index] = { ...next[index], ...patch };
-    if ("sourceId" in patch) next[index].rootPath = "";
+    const prev = next[index];
+    next[index] = { ...prev, ...patch };
+    // Reset path only when the source itself changes — `StorageBindingForm`
+    // always spreads the full value into onChange, so `"sourceId" in patch`
+    // alone is not a reliable "source switched" signal.
+    if ("sourceId" in patch && patch.sourceId !== prev.sourceId) {
+      next[index].rootPath = "";
+    }
     sync(next);
   };
 
