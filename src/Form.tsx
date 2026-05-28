@@ -571,7 +571,7 @@ Form.Item = function FormItem({
   };
 
   return (
-    <div className={cn("w-full", className)} style={style}>
+    <div className={cn("mb-5 w-full last:mb-0", className)} style={style}>
       {label ? (
         <div className="mb-2 flex items-center gap-1.5">
           <label
