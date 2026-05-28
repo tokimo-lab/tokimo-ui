@@ -165,6 +165,19 @@ export type { PosterCardProps } from "./PosterCard";
 export { PosterCard } from "./PosterCard";
 export type { ProgressProps } from "./Progress";
 export { Progress } from "./Progress";
+export type {
+  FileBrowserVfsApi,
+  FileStatAdapter,
+  FsEntry,
+  FsStat,
+  PathSelectorBrowseArgs,
+  VfsBrowseResult,
+} from "./path-selector";
+export {
+  EntryList,
+  FileBrowserWindow,
+  PathSelector,
+} from "./path-selector";
 export type { ScrollAreaProps, ScrollAreaRef } from "./ScrollArea";
 export { ScrollArea } from "./ScrollArea";
 export type {
@@ -203,9 +216,18 @@ export type { StickySaveBarProps } from "./StickySaveBar";
 export { StickySaveBar } from "./StickySaveBar";
 export type { SwitchProps } from "./Switch";
 export { Switch } from "./Switch";
-export type { StorageBinding, VfsSource } from "./storage-bindings";
+export type {
+  StorageBinding,
+  StorageBindingFormProps,
+  StorageBindingValue,
+  VfsDto,
+  VideoBinding,
+} from "./storage-bindings";
 // ─── Storage Bindings ───
-export { StorageBindingsField } from "./storage-bindings";
+export {
+  StorageBindingForm,
+  StorageBindingsField,
+} from "./storage-bindings";
 export type { TableColumn, TableColumnsType, TableProps } from "./Table";
 export { Table } from "./Table";
 export type { TabItem, TabsProps } from "./Tabs";

@@ -48,7 +48,8 @@
     "lucide-react": "^1.7.0",
     "material-icon-theme": "^5.32.0",
     "mime": "^4.0.5",
-    "react-i18next": "^15.2.1"
+    "react-i18next": "^15.2.1",
+    "@tanstack/react-virtual": "^3.13.23"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.9",

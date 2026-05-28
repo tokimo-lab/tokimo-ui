@@ -1,171 +1,233 @@
-import { Trash2 } from "lucide-react";
+import { CheckCircle, FolderOpen, HardDrive } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../Button";
-import { Card } from "../Card";
+import { Form } from "../Form";
 import { Input } from "../Input";
-import { Select } from "../Select";
+import { DeleteOutlined, PlusOutlined } from "../icons";
+import type { PathSelectorBrowseArgs } from "../path-selector/PathSelector";
+import { Tag } from "../Tag";
+import { cn } from "../utils";
+import StorageBindingForm, { type VfsDto } from "./StorageBindingForm";
 
-export interface StorageBinding {
+export type VideoBinding = {
+  _key: number;
   sourceId: string;
   rootPath: string;
-  isDefaultDownload?: boolean;
-}
+  isDefaultDownload: boolean;
+};
 
-export interface VfsSource {
-  id: string;
-  name: string;
-  type: string;
-}
+/** Alias for the same shape — preferred name going forward. */
+export type StorageBinding = VideoBinding;
 
-export interface StorageBindingsFieldProps {
-  value: StorageBinding[];
-  onChange: (value: StorageBinding[]) => void;
-  sources: VfsSource[];
-  mode?: "single" | "multi";
-  hideDefaultToggle?: boolean;
-}
-
-export function StorageBindingsField({
-  value,
-  onChange,
+function BindingCard({
+  binding,
+  index,
   sources,
-  mode = "multi",
+  onUpdate,
+  onRemove,
+  onSetDefault,
   hideDefaultToggle = false,
-}: StorageBindingsFieldProps) {
-  const handleAdd = () => {
-    const newBinding: StorageBinding = {
-      sourceId: sources[0]?.id || "",
-      rootPath: "/",
-      isDefaultDownload: false,
-    };
-    onChange([...value, newBinding]);
-  };
-
-  const handleRemove = (index: number) => {
-    onChange(value.filter((_, i) => i !== index));
-  };
-
-  const handleUpdate = (index: number, updates: Partial<StorageBinding>) => {
-    onChange(
-      value.map((binding, i) =>
-        i === index ? { ...binding, ...updates } : binding,
-      ),
-    );
-  };
-
-  const handleSetDefault = (index: number) => {
-    onChange(
-      value.map((binding, i) => ({
-        ...binding,
-        isDefaultDownload: i === index,
-      })),
-    );
-  };
-
-  const sourceOptions = sources.map((source) => ({
-    label: source.name,
-    value: source.id,
-  }));
-
+  onBrowse,
+}: {
+  binding: VideoBinding;
+  index: number;
+  sources: VfsDto[];
+  onUpdate: (index: number, patch: Partial<VideoBinding>) => void;
+  onRemove: (index: number) => void;
+  onSetDefault: (index: number) => void;
+  hideDefaultToggle?: boolean;
+  onBrowse?: (args: PathSelectorBrowseArgs) => Promise<string | null>;
+}) {
   return (
-    <div className="space-y-3">
-      {value.map((binding, index) => {
-        // Create a stable key from binding properties
-        const bindingKey = `${binding.sourceId}-${binding.rootPath.replace(/\//g, "-")}-${index}`;
-        return (
-          <Card key={bindingKey} size="small" className="p-4">
-            <div className="space-y-3">
-              {/* VFS Source Select */}
-              <div>
-                <label
-                  htmlFor={`source-select-${index}`}
-                  className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5"
-                >
-                  存储源
-                </label>
-                <Select
-                  value={binding.sourceId}
-                  onChange={(newSourceId) =>
-                    handleUpdate(index, { sourceId: newSourceId as string })
-                  }
-                  options={sourceOptions}
-                  placeholder="选择存储源"
-                  className="w-full"
-                />
-              </div>
-
-              {/* Root Path Input */}
-              <div>
-                <label
-                  htmlFor={`root-path-${index}`}
-                  className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5"
-                >
-                  根路径
-                </label>
-                <Input
-                  id={`root-path-${index}`}
-                  value={binding.rootPath}
-                  onChange={(e) =>
-                    handleUpdate(index, { rootPath: e.target.value })
-                  }
-                  placeholder="/path/to/directory"
-                  className="w-full"
-                />
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center justify-between">
-                {/* Default toggle - only in multi mode */}
-                {mode === "multi" && !hideDefaultToggle && (
-                  <Button
-                    size="small"
-                    variant={binding.isDefaultDownload ? "primary" : "default"}
-                    onClick={() => handleSetDefault(index)}
-                  >
-                    {binding.isDefaultDownload ? "默认下载路径" : "设为默认"}
-                  </Button>
-                )}
-
-                {/* Spacer for single mode */}
-                {(mode === "single" || hideDefaultToggle) && <div />}
-
-                {/* Remove button - only in multi mode or if more than 1 binding */}
-                {(mode === "multi" || value.length > 1) && (
-                  <Button
-                    size="small"
-                    variant="text"
-                    danger
-                    icon={<Trash2 />}
-                    onClick={() => handleRemove(index)}
-                    className="cursor-pointer"
-                  >
-                    移除
-                  </Button>
-                )}
-              </div>
-            </div>
-          </Card>
-        );
-      })}
-
-      {/* Add button - only in multi mode */}
-      {mode === "multi" && (
-        <Button
-          variant="dashed"
-          block
-          onClick={handleAdd}
-          disabled={sources.length === 0}
-          className="cursor-pointer"
-        >
-          + 添加路径
-        </Button>
+    <div
+      className={cn(
+        "rounded-xl border p-4 transition-all",
+        binding.isDefaultDownload && !hideDefaultToggle
+          ? "border-green-300 dark:border-green-700 bg-green-50/40 dark:bg-green-950/15"
+          : "border-border-base bg-white/50 dark:bg-white/[0.02]",
       )}
+    >
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Tag color="success" className="text-xs">
+            文件来源
+          </Tag>
+          {!hideDefaultToggle && binding.isDefaultDownload && (
+            <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+              <CheckCircle className="w-3 h-3" />
+              默认下载位置
+            </span>
+          )}
+        </div>
+        <Button
+          variant="text"
+          danger
+          size="small"
+          icon={<DeleteOutlined />}
+          onClick={() => onRemove(index)}
+        />
+      </div>
 
-      {/* Empty state - only in multi mode when no bindings */}
-      {mode === "multi" && value.length === 0 && (
-        <div className="text-center py-6 text-[var(--text-tertiary)] text-sm">
-          暂无存储绑定，点击"添加路径"开始配置
+      <StorageBindingForm
+        sources={sources}
+        value={{ sourceId: binding.sourceId, path: binding.rootPath }}
+        onChange={({ sourceId, path }) =>
+          onUpdate(index, { sourceId, rootPath: path })
+        }
+        onBrowse={onBrowse}
+      />
+
+      {!hideDefaultToggle && !binding.isDefaultDownload && (
+        <div className="mt-3 pt-3 border-t border-border-base">
+          <button
+            type="button"
+            onClick={() => onSetDefault(index)}
+            className="text-xs text-fg-muted hover:text-green-600 dark:hover:text-green-400 transition-colors cursor-pointer"
+          >
+            设为默认下载位置
+          </button>
         </div>
       )}
     </div>
   );
 }
+
+export default function StorageBindingsField({
+  sources,
+  form,
+  initialSources,
+  maxBindings,
+  onBrowse,
+}: {
+  sources: VfsDto[];
+  form: ReturnType<typeof Form.useForm>[0];
+  initialSources?: Array<{
+    sourceId: string;
+    rootPath: string;
+    isDefaultDownload?: boolean | null;
+  }>;
+  maxBindings?: number;
+  onBrowse?: (args: PathSelectorBrowseArgs) => Promise<string | null>;
+}) {
+  const nextKeyRef = useRef(0);
+  const [bindings, setBindings] = useState<VideoBinding[]>([]);
+  const initializedRef = useRef(false);
+
+  const sync = useCallback(
+    (next: VideoBinding[]) => {
+      setBindings(next);
+      form.setFieldValue("bindings", next);
+    },
+    [form],
+  );
+
+  useEffect(() => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+    const items: VideoBinding[] = (initialSources ?? []).map((s) => ({
+      _key: nextKeyRef.current++,
+      sourceId: s.sourceId,
+      rootPath: s.rootPath,
+      isDefaultDownload: s.isDefaultDownload ?? false,
+    }));
+    sync(items);
+  }, [initialSources, sync]);
+
+  const add = () => {
+    const hasDefault = bindings.some((b) => b.isDefaultDownload);
+    sync([
+      ...bindings,
+      {
+        _key: nextKeyRef.current++,
+        sourceId: "",
+        rootPath: "",
+        isDefaultDownload: !hasDefault,
+      },
+    ]);
+  };
+
+  const remove = (index: number) =>
+    sync(bindings.filter((_, i) => i !== index));
+
+  const update = (index: number, patch: Partial<VideoBinding>) => {
+    const next = [...bindings];
+    next[index] = { ...next[index], ...patch };
+    if ("sourceId" in patch) next[index].rootPath = "";
+    sync(next);
+  };
+
+  const setDefaultDownload = (index: number) => {
+    sync(bindings.map((b, i) => ({ ...b, isDefaultDownload: i === index })));
+  };
+
+  const isSingleMode = maxBindings === 1;
+  const canAdd =
+    typeof maxBindings === "number" ? bindings.length < maxBindings : true;
+
+  return (
+    <div className="space-y-6">
+      <Form.Item name="bindings" hidden>
+        <Input />
+      </Form.Item>
+
+      <div className="rounded-2xl border border-border-base bg-surface-base/50 dark:bg-white/[0.02] p-5">
+        <div className="flex items-start gap-3 mb-4">
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg shrink-0 bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400">
+            <HardDrive className="w-[18px] h-[18px]" />
+          </div>
+          <div className="min-w-0">
+            <h4 className="text-sm font-semibold text-fg-primary">文件来源</h4>
+            <p className="text-xs text-fg-muted mt-0.5">
+              连接本地磁盘、NAS
+              或远程存储路径，系统将自动扫描并导入其中的媒体文件
+            </p>
+          </div>
+        </div>
+
+        {bindings.length > 0 && (
+          <div className="space-y-3 mb-4">
+            {bindings.map((binding, index) => (
+              <BindingCard
+                key={binding._key}
+                binding={binding}
+                index={index}
+                sources={sources}
+                onUpdate={update}
+                onRemove={remove}
+                onSetDefault={setDefaultDownload}
+                hideDefaultToggle={isSingleMode}
+                onBrowse={onBrowse}
+              />
+            ))}
+          </div>
+        )}
+
+        {bindings.length === 0 ? (
+          <button
+            type="button"
+            onClick={add}
+            className="w-full flex flex-col items-center justify-center gap-2 py-8 rounded-xl border-2 border-dashed border-border-base hover:border-green-300 dark:hover:border-green-700 hover:bg-green-50/50 dark:hover:bg-green-950/10 transition-all cursor-pointer group"
+          >
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-fill-tertiary group-hover:bg-green-100 dark:group-hover:bg-green-900/30 transition-colors">
+              <FolderOpen className="w-5 h-5 text-fg-muted group-hover:text-green-500 transition-colors" />
+            </div>
+            <span className="text-sm text-fg-muted group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+              添加文件来源
+            </span>
+          </button>
+        ) : canAdd ? (
+          <Button
+            variant="text"
+            size="small"
+            icon={<PlusOutlined />}
+            onClick={add}
+          >
+            添加文件来源
+          </Button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+export { StorageBindingsField };
