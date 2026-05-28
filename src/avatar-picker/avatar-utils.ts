@@ -1,9 +1,10 @@
 export type AvatarData =
   | { type: "icon"; icon: string; color: string }
-  | { type: "text"; text: string; color: string };
+  | { type: "text"; text: string; color: string }
+  | { type: "image"; src: string };
 
 export function parseAvatar(value: unknown): AvatarData | null {
-  if (!value || typeof value !== "object") {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
     return null;
   }
 
@@ -18,6 +19,12 @@ export function parseAvatar(value: unknown): AvatarData | null {
   if (obj.type === "text") {
     if (typeof obj.text === "string" && typeof obj.color === "string") {
       return { type: "text", text: obj.text, color: obj.color };
+    }
+  }
+
+  if (obj.type === "image") {
+    if (typeof obj.src === "string") {
+      return { type: "image", src: obj.src };
     }
   }
 
