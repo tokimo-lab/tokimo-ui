@@ -1,6 +1,7 @@
 export type {
   StorageBindingFormProps,
   StorageBindingValue,
+  VfsDisplayHints,
   VfsDto,
 } from "./StorageBindingForm";
 export { StorageBindingForm } from "./StorageBindingForm";

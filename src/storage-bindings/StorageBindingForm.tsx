@@ -5,10 +5,18 @@ import {
 } from "../path-selector/PathSelector";
 import { Select } from "../Select";
 
+export interface VfsDisplayHints {
+  protocolPrefix?: string;
+  rootPath?: string;
+}
+
 export interface VfsDto {
   id: string;
   name: string;
   type: string;
+  /** Server-computed safe display hints (preferred for protocol prefix). */
+  displayHints?: VfsDisplayHints;
+  /** Legacy raw config — host no longer sends this; kept for back-compat. */
   config?: unknown;
 }
 
@@ -55,6 +63,7 @@ function RootPathField({
   sourceId,
   sourceType,
   sourceConfig,
+  displayHints,
   value,
   onChange,
   disabled,
@@ -63,12 +72,15 @@ function RootPathField({
   sourceId: string;
   sourceType: string;
   sourceConfig: Record<string, unknown> | null | undefined;
+  displayHints?: VfsDisplayHints;
   value: string;
   onChange: (v: string) => void;
   disabled?: boolean;
   onBrowse?: (args: PathSelectorBrowseArgs) => Promise<string | null>;
 }) {
   const getLocalSourceRoot = () => {
+    const fromHint = displayHints?.rootPath?.trim();
+    if (fromHint) return fromHint;
     const rawRoot =
       (sourceConfig?.root_folder_path as string | undefined) ||
       (sourceConfig?.path as string | undefined);
@@ -90,10 +102,10 @@ function RootPathField({
   };
 
   if (isPathType(sourceType)) {
-    let protocolPrefix: string | undefined;
+    let protocolPrefix: string | undefined = displayHints?.protocolPrefix;
     let browserInitialPath: string | undefined;
     let onSelectTransform: ((path: string) => string) | undefined;
-    if (sourceType === "smb" && sourceConfig) {
+    if (!protocolPrefix && sourceType === "smb" && sourceConfig) {
       const host = sourceConfig.host as string | undefined;
       const share = sourceConfig.share as string | undefined;
       const displayShare =
@@ -101,16 +113,17 @@ function RootPathField({
       if (host) {
         protocolPrefix = `smb://${host}${displayShare ? `/${displayShare}` : ""}`;
       }
-    } else if (sourceType === "nfs" && sourceConfig) {
+    } else if (!protocolPrefix && sourceType === "nfs" && sourceConfig) {
       const host = sourceConfig.host as string | undefined;
       const exportPath = sourceConfig.exportPath as string | undefined;
       if (host) {
         protocolPrefix = `nfs://${host}${exportPath ? `${exportPath}` : ""}`;
       }
-    } else if (sourceType === "local") {
+    }
+    if (sourceType === "local") {
       const localRoot = getLocalSourceRoot();
       if (localRoot) {
-        protocolPrefix = localRoot;
+        protocolPrefix = protocolPrefix ?? localRoot;
         browserInitialPath = toLocalBrowserPath(value, localRoot);
         onSelectTransform = (path) => fromLocalBrowserPath(path, localRoot);
       }
@@ -217,6 +230,7 @@ export default function StorageBindingForm({
                 | null
                 | undefined
             }
+            displayHints={selectedSource?.displayHints}
             value={value.path}
             onChange={handlePathChange}
             disabled={disabled}
