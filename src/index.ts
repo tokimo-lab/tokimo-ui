@@ -24,6 +24,9 @@ export {
   getAvatarInitial,
   setAvatarUrlResolver,
 } from "./Avatar";
+export type { AvatarData } from "./avatar-picker";
+// ─── Avatar Picker ───
+export { AvatarPicker, parseAvatar } from "./avatar-picker";
 export type { BadgeProps } from "./Badge";
 export { Badge } from "./Badge";
 export type { ButtonProps } from "./Button";
@@ -200,6 +203,9 @@ export type { StickySaveBarProps } from "./StickySaveBar";
 export { StickySaveBar } from "./StickySaveBar";
 export type { SwitchProps } from "./Switch";
 export { Switch } from "./Switch";
+export type { StorageBinding, VfsSource } from "./storage-bindings";
+// ─── Storage Bindings ───
+export { StorageBindingsField } from "./storage-bindings";
 export type { TableColumn, TableColumnsType, TableProps } from "./Table";
 export { Table } from "./Table";
 export type { TabItem, TabsProps } from "./Tabs";
