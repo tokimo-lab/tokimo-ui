@@ -110,18 +110,13 @@ export function PathBar({
         )}
         style={{ scrollbarWidth: "none" }}
       >
-        {/* Root segment — always visible */}
-        <button
-          type="button"
-          className="flex items-center gap-1 px-1.5 py-0.5 rounded transition-colors cursor-pointer hover:bg-black/[0.06] dark:hover:bg-white/[0.08] shrink-0"
-          style={{ color: "var(--text-tertiary)" }}
-          onClick={() => {
-            onNavigate("/");
-            setEditing(false);
-          }}
-        >
-          {rootLabel ?? <span>/</span>}
-        </button>
+        {/*
+          NOTE: Do NOT render the root "/" button while editing — the input's
+          value already starts with "/" (it mirrors the full path), so a
+          separate "/" button would visually duplicate the slash, e.g.
+          "smb:" + "/" + "/foo/bar" → "smb://foo/bar". The root reset
+          affordance is still available in display mode.
+        */}
 
         {/* Input replaces segments */}
         <input
