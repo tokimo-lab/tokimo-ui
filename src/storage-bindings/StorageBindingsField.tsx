@@ -122,9 +122,12 @@ export default function StorageBindingsField({
   );
 
   useEffect(() => {
-    if (initializedRef.current) return;
+    // Wait until initialSources is actually provided (not undefined) before
+    // initializing.  This avoids a race where the effect fires before the
+    // parent's async data has loaded, locking out the real sources.
+    if (initializedRef.current || initialSources === undefined) return;
     initializedRef.current = true;
-    const items: VideoBinding[] = (initialSources ?? []).map((s) => ({
+    const items: VideoBinding[] = initialSources.map((s) => ({
       _key: nextKeyRef.current++,
       sourceId: s.sourceId,
       rootPath: s.rootPath,
