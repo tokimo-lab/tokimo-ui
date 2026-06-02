@@ -58,10 +58,10 @@
   font-weight: 700;
   line-height: 1.3;
 }
-.tk-md .tk-md-h1 { font-size: 1.75em; margin-top: var(--tk-md-h1-mt); margin-bottom: var(--tk-md-h1-mb); }
-.tk-md .tk-md-h2 { font-size: 1.5em;  margin-top: var(--tk-md-h2-mt); margin-bottom: var(--tk-md-h2-mb); }
-.tk-md .tk-md-h3 { font-size: 1.25em; margin-top: var(--tk-md-h3-mt); margin-bottom: var(--tk-md-h3-mb); }
-.tk-md .tk-md-h4 { font-size: 1.1em;  margin-top: var(--tk-md-h4-mt); margin-bottom: var(--tk-md-h4-mb); }
+.tk-md .tk-md-h1 { font-size: 1.35em; margin-top: var(--tk-md-h1-mt); margin-bottom: var(--tk-md-h1-mb); }
+.tk-md .tk-md-h2 { font-size: 1.2em;  margin-top: var(--tk-md-h2-mt); margin-bottom: var(--tk-md-h2-mb); }
+.tk-md .tk-md-h3 { font-size: 1.1em;  margin-top: var(--tk-md-h3-mt); margin-bottom: var(--tk-md-h3-mb); }
+.tk-md .tk-md-h4 { font-size: 1.05em; margin-top: var(--tk-md-h4-mt); margin-bottom: var(--tk-md-h4-mb); }
 .tk-md .tk-md-h5 { font-size: 1em;    margin-top: var(--tk-md-h5-mt); margin-bottom: var(--tk-md-h5-mb); }
 .tk-md .tk-md-h6 {
   font-size: 0.9em;
