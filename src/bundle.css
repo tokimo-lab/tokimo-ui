@@ -1,12 +1,33 @@
 /* @tokimo/ui — Tailwind v4 entry for third-party Tokimo app bundles.
  *
- * One-line setup for an app's main CSS. Differs from the host's setup
- * in two ways: skips Tailwind's preflight (the shell already applies
- * it globally), and explicitly layers the utilities (without
- * `layer(utilities)`, the bundle would emit unlayered rules that
- * outrank ANY layered host rule regardless of specificity, breaking
- * the shell's `dark:`-based toasts when bundle CSS injects after host
- * CSS).
+ * Goal: an app bundle must emit ONLY the utility classes its own source
+ * uses — never the design tokens, accent palettes, or Tailwind theme
+ * defaults. The shell host emits those exactly once for the whole
+ * desktop (via packages/web/src/index.css → @tokimo/ui/tailwind.css).
+ *
+ * Why this matters (two distinct problems with the old approach of
+ * `@import "@tokimo/ui/tailwind.css"`, which re-emitted the full theme):
+ *
+ *   1. Correctness — every app's CSS is injected as a global
+ *      `<link>` into the shared `document.head`. A re-emitted
+ *      `:root { --accent: … }` block is a GLOBAL declaration, so the
+ *      last-loaded app's frozen, build-time token values would clobber
+ *      the host's (and every other app's) tokens by cascade order.
+ *      Changing a color in the host then "doesn't take effect" because
+ *      a stale app bundle overrides it desktop-wide.
+ *
+ *   2. Size — the token block + accent palettes (~80 KB) were
+ *      duplicated into every single app bundle.
+ *
+ * The fix: `@reference` loads tailwind.css (theme.css tokens + the
+ * `@theme` utility→var mapping + the `dark` variant) for the compiler's
+ * reference ONLY — it emits nothing. We then import just the utilities
+ * layer, so the bundle contains the app's used utilities (which resolve
+ * to `var(--color-…)` provided globally by the host) and nothing else.
+ *
+ * Preflight is intentionally NOT imported here: the shell already
+ * applies it globally. Layers are declared explicitly so the bundle's
+ * utilities stay properly layered and never outrank host rules.
  *
  * Usage in an app's index.css:
  *
@@ -15,12 +36,8 @@
  *   @source "./**​/*.{ts,tsx}";   // your own app source
  *
  * `@tokimo/ui`'s own component sources are auto-scanned via tailwind.css
- * — consumers never need to spell out paths into the UI library.
- *
- * Everything else (design tokens, accent palettes, dark variant,
- * utility class → token mapping) comes from `tailwind.css` so the
- * shell host and bundle stay byte-for-byte consistent. */
+ * (for reference), and their utilities are emitted by the host — apps
+ * never need to spell out paths into the UI library. */
 @layer theme, base, components, utilities;
-@import "tailwindcss/theme.css" layer(theme);
+@reference "./tailwind.css";
 @import "tailwindcss/utilities.css" layer(utilities);
-@import "./tailwind.css";

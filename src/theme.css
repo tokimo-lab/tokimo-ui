@@ -4,10 +4,13 @@
    Plain CSS-variable design tokens consumed by every component
    in @tokimo/ui (Button / Card / Input / …).
 
-   This file MUST be imported by:
-     • the Tokimo shell (packages/web)
-     • every third-party Tokimo app (so it can run standalone
-       in `vite dev` and look identical to running inside the shell)
+   These tokens are emitted globally exactly ONCE, by the Tokimo shell
+   (packages/web → @tokimo/ui/tailwind.css → this file). Third-party app
+   bundles must NOT re-emit them: their CSS is injected as a global
+   <link> into the shared document.head, so a re-emitted `:root { … }`
+   would clobber the host's tokens desktop-wide by cascade order. App
+   bundles therefore reference these tokens via @reference only (see
+   bundle.css) and pick them up from the host through the CSS cascade.
 
    Usage:
      @import "@tokimo/ui/theme.css";
@@ -43,10 +46,10 @@
   --border-hover: rgba(0, 0, 0, 0.14);
   --scrollbar-thumb: rgba(0, 0, 0, 0.18);
   --scrollbar-thumb-hover: rgba(0, 0, 0, 0.12);
-  --text-primary: rgba(15, 23, 42, 0.95);
-  --text-secondary: rgba(15, 23, 42, 0.72);
-  --text-muted: rgba(15, 23, 42, 0.55);
-  --text-disabled: rgba(15, 23, 42, 0.32);
+  --text-primary: rgba(0, 0, 0, 0.88);
+  --text-secondary: rgba(0, 0, 0, 0.62);
+  --text-muted: rgba(0, 0, 0, 0.45);
+  --text-disabled: rgba(0, 0, 0, 0.28);
   --sidebar-bg: rgba(255, 255, 255, 0.3);
   --header-bg: rgba(255, 255, 255, 0.7);
   --overlay-blur: 4px;

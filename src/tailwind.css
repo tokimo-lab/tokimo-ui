@@ -40,7 +40,7 @@
  * theme.css and remain safe to use outside Tailwind. */
 @import "./theme.css";
 
-@theme {
+@theme inline {
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-subtle: var(--accent-subtle);
