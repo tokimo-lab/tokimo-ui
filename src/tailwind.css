@@ -1,74 +1,119 @@
 /* @tokimo/ui — Tailwind v4 integration entry.
  *
- * Wires up the Tokimo design system to Tailwind v4 utility classes.
- * Imported by both the shell host (packages/web) and third-party app
- * bundles (via bundle.css), so utility class semantics, dark mode, and
- * accent tokens stay perfectly in sync across the boundary.
+ * Wires the Tokimo design system (theme.css) into Tailwind v4 utility
+ * namespaces. Imported by both the shell host (packages/web) and
+ * third-party app bundles (via bundle.css), so utility class semantics,
+ * dark mode, and accent tokens stay perfectly in sync.
  *
- * Two parts:
+ * Architecture:
  *
- *   1. `@theme` maps Tokimo CSS variables (defined in theme.css) onto
- *      Tailwind utility namespaces — e.g. `bg-accent` → `var(--accent)`,
- *      `text-fg-primary` → `var(--text-primary)`. Because these point
- *      at runtime CSS vars, theme switching at the
- *      `<html data-accent="…">` / `<html class="dark">` level still
- *      cascades to every consumer.
+ *   • All design tokens live in theme.css under the canonical
+ *     `--color-*` / `--shadow-*` / `--radius-*` / `--motion-*`
+ *     namespaces — the SAME names Tailwind v4 uses internally.
  *
- *   2. `@custom-variant dark (.dark &)` pins v4's `dark:` variant to a
- *      high-specificity selector. Two reasons it must be set this way:
+ *   • `@theme inline { --color-x: var(--color-x); … }` is an
+ *     intentional identity mapping. `inline` tells Tailwind NOT to
+ *     substitute the literal value into utilities (which would freeze
+ *     light-mode values into the bundle); instead utilities resolve
+ *     to `var(--color-x)` at runtime. The actual values come from
+ *     `:root` / `.dark` / `[data-accent="…"]` in theme.css and cascade
+ *     into both Tailwind utilities (e.g. `bg-surface-base`) and any
+ *     hand-written `var(--color-surface-base)`. There is exactly one
+ *     name per token — no double naming.
  *
- *        • The shell toggles `<html class="dark">` for manual light/dark
- *          switching. v4's default `dark:` falls back to
- *          `@media (prefers-color-scheme: dark)`, which would desync
- *          from the shell's manual toggle.
- *
- *        • `(.dark &)` compiles to `.dark .foo` (specificity (0,2,0)),
- *          which beats any plain utility (specificity (0,1,0)) within
- *          the same `@layer utilities`. This protects the host from
- *          third-party bundles that re-define utilities like
- *          `.bg-white/90`: even if a bundle's CSS is injected after
- *          the host's, the host's `dark:bg-…` rules still win in dark
- *          mode.
+ *   • `@custom-variant dark (.dark &)` pins v4's `dark:` variant to a
+ *     class selector. Two reasons:
+ *       - the shell toggles `<html class="dark">` for manual switching;
+ *         v4's default `dark:` falls back to `prefers-color-scheme`,
+ *         which would desync from the manual toggle.
+ *       - `(.dark &)` compiles to `.dark .foo` (specificity 0,2,0),
+ *         which beats any plain utility (0,1,0) within the same
+ *         `@layer utilities`. Third-party bundles cannot override host
+ *         dark-mode rules just by loading after the host.
  *
  * Usage:
  *   @import "tailwindcss";              // host: full v4 entry
  *   @import "@tokimo/ui/tailwind.css";  // shared mapping + dark variant
  *
- *   …or via @tokimo/ui/bundle.css for third-party app bundles.
- *
- * Pure design tokens (with no Tailwind dependency) still live in
- * theme.css and remain safe to use outside Tailwind. */
+ *   …or via @tokimo/ui/bundle.css for third-party app bundles. */
+
 @import "./theme.css";
 
 @theme inline {
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-subtle: var(--accent-subtle);
-  --color-accent-subtle-hover: var(--accent-subtle-hover);
-  --color-accent-muted: var(--accent-muted);
-  --color-accent-text: var(--accent-text);
-  --color-accent-secondary: var(--accent-secondary);
-  --color-accent-secondary-text: var(--accent-secondary-text);
+  /* Surfaces */
+  --color-surface-base: var(--color-surface-base);
+  --color-surface-raised: var(--color-surface-raised);
+  --color-surface-overlay: var(--color-surface-overlay);
+  --color-surface-overlay-hover: var(--color-surface-overlay-hover);
+  --color-surface-sunken: var(--color-surface-sunken);
+  --color-surface-sidebar: var(--color-surface-sidebar);
+  --color-surface-inverted: var(--color-surface-inverted);
 
-  --color-surface-base: var(--bg-base);
-  --color-surface-elevated: var(--bg-elevated);
-  --color-surface-glass: var(--bg-glass);
-  --color-surface-glass-hover: var(--bg-glass-hover);
+  /* Foreground */
+  --color-fg-primary: var(--color-fg-primary);
+  --color-fg-secondary: var(--color-fg-secondary);
+  --color-fg-muted: var(--color-fg-muted);
+  --color-fg-disabled: var(--color-fg-disabled);
+  --color-fg-on-raised: var(--color-fg-on-raised);
+  --color-fg-on-overlay: var(--color-fg-on-overlay);
+  --color-fg-on-inverted: var(--color-fg-on-inverted);
+  --color-fg-on-accent: var(--color-fg-on-accent);
 
-  --color-border-base: var(--border-base);
-  --color-border-subtle: var(--border-subtle);
-  --color-border-hover: var(--border-hover);
+  /* Borders */
+  --color-border-subtle: var(--color-border-subtle);
+  --color-border-base: var(--color-border-base);
+  --color-border-strong: var(--color-border-strong);
+  --color-border-accent: var(--color-border-accent);
 
-  --color-fg-primary: var(--text-primary);
-  --color-fg-secondary: var(--text-secondary);
-  --color-fg-muted: var(--text-muted);
-  --color-fg-disabled: var(--text-disabled);
+  /* Fills */
+  --color-fill-tertiary: var(--color-fill-tertiary);
+  --color-fill-secondary: var(--color-fill-secondary);
+  --color-fill-primary: var(--color-fill-primary);
+  --color-fill-skeleton: var(--color-fill-skeleton);
 
-  --color-fill-tertiary: var(--fill-tertiary);
-  --color-fill-secondary: var(--fill-secondary);
+  /* Accent */
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-active: var(--color-accent-active);
+  --color-accent-subtle: var(--color-accent-subtle);
+  --color-accent-subtle-hover: var(--color-accent-subtle-hover);
+  --color-accent-muted: var(--color-accent-muted);
+  --color-accent-text: var(--color-accent-text);
+  --color-accent-contrast: var(--color-accent-contrast);
+  --color-accent-secondary: var(--color-accent-secondary);
+  --color-accent-secondary-text: var(--color-accent-secondary-text);
 
+  /* State */
+  --color-state-success-base: var(--color-state-success-base);
+  --color-state-success-subtle: var(--color-state-success-subtle);
+  --color-state-success-text: var(--color-state-success-text);
+  --color-state-warning-base: var(--color-state-warning-base);
+  --color-state-warning-subtle: var(--color-state-warning-subtle);
+  --color-state-warning-text: var(--color-state-warning-text);
+  --color-state-danger-base: var(--color-state-danger-base);
+  --color-state-danger-subtle: var(--color-state-danger-subtle);
+  --color-state-danger-text: var(--color-state-danger-text);
+  --color-state-info-base: var(--color-state-info-base);
+  --color-state-info-subtle: var(--color-state-info-subtle);
+  --color-state-info-text: var(--color-state-info-text);
+
+  /* Shadows / radius (Tailwind v4 namespaces) */
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-glass: var(--shadow-glass);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-pill: var(--radius-pill);
+
+  /* Backdrop blur tokens */
   --backdrop-blur-glass: var(--glass-blur);
+  --backdrop-blur-window: var(--window-blur);
 
+  /* Composed gradient */
   --background-image-gradient-accent: linear-gradient(
     135deg,
     var(--gradient-from),
