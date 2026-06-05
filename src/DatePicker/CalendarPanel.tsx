@@ -236,7 +236,9 @@ export function CalendarPanel({
               isSelected
                 ? "bg-[var(--color-accent)] text-white"
                 : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
-              isCurrent && !isSelected && "text-[var(--color-accent)] font-semibold",
+              isCurrent &&
+                !isSelected &&
+                "text-[var(--color-accent)] font-semibold",
             )}
             onClick={() => handleMonthSelect(i)}
           >

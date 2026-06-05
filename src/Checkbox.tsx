@@ -88,7 +88,9 @@ const BaseCheckbox = forwardRef<HTMLInputElement, CheckboxProps>(
           </span>
         </span>
         {children ? (
-          <span className="text-sm text-[var(--color-fg-primary)]">{children}</span>
+          <span className="text-sm text-[var(--color-fg-primary)]">
+            {children}
+          </span>
         ) : null}
       </label>
     );

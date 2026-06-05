@@ -131,7 +131,9 @@ export function FileToolbar({
             className="px-2 py-1 transition-colors cursor-pointer"
             style={{
               background:
-                viewMode === "grid" ? "var(--color-accent-subtle)" : "transparent",
+                viewMode === "grid"
+                  ? "var(--color-accent-subtle)"
+                  : "transparent",
               color:
                 viewMode === "grid"
                   ? "var(--color-accent-text)"
@@ -148,7 +150,9 @@ export function FileToolbar({
             className="px-2 py-1 transition-colors border-l border-black/[0.08] dark:border-white/[0.1] cursor-pointer"
             style={{
               background:
-                viewMode === "list" ? "var(--color-accent-subtle)" : "transparent",
+                viewMode === "list"
+                  ? "var(--color-accent-subtle)"
+                  : "transparent",
               color:
                 viewMode === "list"
                   ? "var(--color-accent-text)"
@@ -165,7 +169,9 @@ export function FileToolbar({
             className="px-2 py-1 transition-colors border-l border-black/[0.08] dark:border-white/[0.1] cursor-pointer"
             style={{
               background:
-                viewMode === "column" ? "var(--color-accent-subtle)" : "transparent",
+                viewMode === "column"
+                  ? "var(--color-accent-subtle)"
+                  : "transparent",
               color:
                 viewMode === "column"
                   ? "var(--color-accent-text)"

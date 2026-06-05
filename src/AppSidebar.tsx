@@ -820,7 +820,9 @@ function InlineSidebarInner(props: AppSidebarProps) {
         className={cn(
           "relative flex shrink-0 flex-col overflow-hidden border-r border-border-base select-none",
           "transition-[width] duration-200 ease-out",
-          _transparentBg ? "bg-transparent" : "bg-[var(--color-surface-sidebar)]",
+          _transparentBg
+            ? "bg-transparent"
+            : "bg-[var(--color-surface-sidebar)]",
           className,
         )}
         style={{ width: railWidth, ...style }}
