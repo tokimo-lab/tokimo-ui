@@ -6,6 +6,8 @@
 
 export type { AlertProps } from "./Alert";
 export { Alert } from "./Alert";
+export type { TokenKey, TokenName } from "./tokens";
+export { cssVar, TOKEN } from "./tokens";
 export type { AppAccentColor, AppSetupGuideProps } from "./AppSetupGuide";
 export { AppSetupGuide } from "./AppSetupGuide";
 export type {
