@@ -436,7 +436,7 @@ export function Modal({
         {(title || closable) && (
           <div className="flex items-center justify-between px-6 py-3 border-b border-black/[0.06] dark:border-white/[0.08] shrink-0">
             {title ? (
-              <h3 className="text-base font-semibold text-[var(--text-primary)] m-0">
+              <h3 className="text-base font-semibold text-[var(--color-fg-primary)] m-0">
                 {title}
               </h3>
             ) : (
@@ -447,7 +447,7 @@ export function Modal({
               {closable ? (
                 <button
                   type="button"
-                  className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors cursor-pointer"
+                  className="text-[var(--color-fg-muted)] hover:text-[var(--color-fg-secondary)] transition-colors cursor-pointer"
                   onClick={onCancel}
                 >
                   <X className="h-5 w-5" />
@@ -552,11 +552,11 @@ function ConfirmIconBody({
     <div className="flex gap-4 items-start py-1">
       {icon && <div className="mt-0.5 shrink-0">{icon}</div>}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-[var(--text-primary)] leading-snug">
+        <p className="text-sm font-semibold text-[var(--color-fg-primary)] leading-snug">
           {title}
         </p>
         {content && (
-          <div className="mt-1.5 text-sm text-[var(--text-secondary)] leading-relaxed">
+          <div className="mt-1.5 text-sm text-[var(--color-fg-secondary)] leading-relaxed">
             {content}
           </div>
         )}

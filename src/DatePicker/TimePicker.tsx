@@ -183,9 +183,9 @@ export function TimePicker({
       <div
         ref={refs.setReference}
         className={cn(
-          "inline-flex items-center gap-2 rounded-md border bg-[var(--input-bg)] transition-colors",
+          "inline-flex items-center gap-2 rounded-md border bg-[var(--color-surface-sunken)] transition-colors",
           isOpen
-            ? "border-[var(--accent)] ring-1 ring-[var(--accent)]"
+            ? "border-[var(--color-accent)] ring-1 ring-[var(--color-accent)]"
             : status === "error"
               ? "border-red-500"
               : status === "warning"
@@ -201,7 +201,7 @@ export function TimePicker({
       >
         <input
           ref={inputRef}
-          className="flex-1 min-w-0 bg-transparent outline-none placeholder:text-[var(--text-muted)] text-inherit"
+          className="flex-1 min-w-0 bg-transparent outline-none placeholder:text-[var(--color-fg-muted)] text-inherit"
           placeholder={placeholder}
           value={inputValue}
           onChange={handleInputChange}
@@ -212,13 +212,13 @@ export function TimePicker({
         {allowClear && value && !disabled ? (
           <button
             type="button"
-            className="shrink-0 cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+            className="shrink-0 cursor-pointer text-[var(--color-fg-muted)] hover:text-[var(--color-fg-secondary)]"
             onClick={handleClear}
           >
             <X className="h-3.5 w-3.5" />
           </button>
         ) : (
-          <Clock className="h-3.5 w-3.5 shrink-0 text-[var(--text-muted)]" />
+          <Clock className="h-3.5 w-3.5 shrink-0 text-[var(--color-fg-muted)]" />
         )}
       </div>
 

@@ -73,6 +73,11 @@ export const TOKEN = {
   glassBlur: "--glass-blur",
   glassSaturate: "--glass-saturate",
   overlayBlur: "--overlay-blur",
+  headerBg: "--header-bg",
+  surfaceOverlayRgb: "--color-surface-overlay-rgb",
+
+  // Layout calculation vars (set programmatically, not theme constants)
+  submenuAvailH: "--submenu-avail-h",
 
   // Decorative
   aurora1: "--aurora-1",
@@ -107,6 +112,14 @@ export const TOKEN = {
   radiusLg: "--radius-lg",
   radiusXl: "--radius-xl",
   radiusPill: "--radius-pill",
+
+  // Runtime component variables (set via React inline style, not theme.css)
+  playerSubtitleColor: "--player-subtitle-color",
+  playerSubtitleFontFamily: "--player-subtitle-font-family",
+  playerSubtitleFontSize: "--player-subtitle-font-size",
+  playerSubtitleBg: "--player-subtitle-bg",
+  playerSubtitleWeight: "--player-subtitle-weight",
+  playerSubtitleShadow: "--player-subtitle-shadow",
 } as const;
 
 export type TokenKey = keyof typeof TOKEN;

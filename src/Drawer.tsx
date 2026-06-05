@@ -211,7 +211,7 @@ export function Drawer({
             className="flex items-center justify-between px-6 py-4 border-b border-black/[0.06] dark:border-white/[0.08] shrink-0"
             style={styles?.header}
           >
-            <h3 className="text-base font-semibold text-[var(--text-primary)] m-0">
+            <h3 className="text-base font-semibold text-[var(--color-fg-primary)] m-0">
               {title}
             </h3>
             <div className="flex items-center gap-2">
@@ -219,7 +219,7 @@ export function Drawer({
               {closable ? (
                 <button
                   type="button"
-                  className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
+                  className="text-[var(--color-fg-muted)] hover:text-[var(--color-fg-secondary)] transition-colors"
                   onClick={onClose}
                 >
                   <X className="h-5 w-5" />

@@ -81,7 +81,7 @@ export function TimePanel({
           {showNow ? (
             <button
               type="button"
-              className="text-xs text-[var(--accent)] cursor-pointer hover:text-[var(--accent-hover)] transition-colors"
+              className="text-xs text-[var(--color-accent)] cursor-pointer hover:text-[var(--color-accent-hover)] transition-colors"
               onClick={onNow}
             >
               {locale.now}
@@ -92,7 +92,7 @@ export function TimePanel({
           {showOk ? (
             <button
               type="button"
-              className="text-xs px-3 py-0.5 rounded bg-[var(--accent)] text-white cursor-pointer hover:bg-[var(--accent-hover)] transition-colors"
+              className="text-xs px-3 py-0.5 rounded bg-[var(--color-accent)] text-white cursor-pointer hover:bg-[var(--color-accent-hover)] transition-colors"
               onClick={onOk}
             >
               {locale.ok}
@@ -148,8 +148,8 @@ function TimeColumn({
               className={cn(
                 "w-full h-7 text-xs text-center cursor-pointer transition-colors",
                 isSelected
-                  ? "bg-[var(--accent-subtle)] text-[var(--accent)] font-medium"
-                  : "text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
+                  ? "bg-[var(--color-accent-subtle)] text-[var(--color-accent)] font-medium"
+                  : "text-[var(--color-fg-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
               )}
               onClick={() => onSelect(v)}
             >

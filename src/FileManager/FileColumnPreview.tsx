@@ -51,7 +51,7 @@ export function FileColumnPreview({
               size={96}
             />
             {ext && (
-              <span className="text-xs text-[var(--text-tertiary)] uppercase tracking-wide">
+              <span className="text-xs text-[var(--color-fg-muted)] uppercase tracking-wide">
                 {ext}
               </span>
             )}
@@ -62,7 +62,7 @@ export function FileColumnPreview({
       {/* Metadata */}
       <div className="shrink-0 px-3 py-3 border-t border-black/[0.06] dark:border-white/[0.06] space-y-2 text-xs">
         <div
-          className="font-medium text-[var(--text-primary)] break-all line-clamp-2"
+          className="font-medium text-[var(--color-fg-primary)] break-all line-clamp-2"
           title={node.name}
         >
           {node.name}
@@ -84,10 +84,10 @@ export function FileColumnPreview({
 function MetaRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex gap-2">
-      <span className="shrink-0 text-[var(--text-quaternary)] min-w-[64px]">
+      <span className="shrink-0 text-[var(--color-fg-disabled)] min-w-[64px]">
         {label}
       </span>
-      <span className="flex-1 min-w-0 text-[var(--text-secondary)] truncate">
+      <span className="flex-1 min-w-0 text-[var(--color-fg-secondary)] truncate">
         {value}
       </span>
     </div>

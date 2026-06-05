@@ -68,10 +68,10 @@ const BaseCheckbox = forwardRef<HTMLInputElement, CheckboxProps>(
             className={cn(
               "flex items-center justify-center h-4 w-4 rounded border transition-colors",
               isChecked || indeterminate
-                ? "bg-[var(--accent)] border-[var(--accent)] text-white"
-                : "border-black/20 dark:border-white/25 bg-[var(--bg-elevated)]",
+                ? "bg-[var(--color-accent)] border-[var(--color-accent)] text-white"
+                : "border-black/20 dark:border-white/25 bg-[var(--color-surface-raised)]",
               !disabled &&
-                "peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--accent)] peer-focus-visible:ring-offset-1",
+                "peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--color-accent)] peer-focus-visible:ring-offset-1",
             )}
           >
             {indeterminate ? (
@@ -88,7 +88,7 @@ const BaseCheckbox = forwardRef<HTMLInputElement, CheckboxProps>(
           </span>
         </span>
         {children ? (
-          <span className="text-sm text-[var(--text-primary)]">{children}</span>
+          <span className="text-sm text-[var(--color-fg-primary)]">{children}</span>
         ) : null}
       </label>
     );
@@ -153,10 +153,10 @@ function CheckboxGroup({
               className={cn(
                 "flex items-center justify-center h-4 w-4 rounded border transition-colors",
                 value.includes(opt.value)
-                  ? "bg-[var(--accent)] border-[var(--accent)] text-white"
-                  : "border-black/20 dark:border-white/25 bg-[var(--bg-elevated)]",
+                  ? "bg-[var(--color-accent)] border-[var(--color-accent)] text-white"
+                  : "border-black/20 dark:border-white/25 bg-[var(--color-surface-raised)]",
                 !(disabled || opt.disabled) &&
-                  "peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--accent)] peer-focus-visible:ring-offset-1",
+                  "peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--color-accent)] peer-focus-visible:ring-offset-1",
               )}
             >
               <Check
@@ -168,7 +168,7 @@ function CheckboxGroup({
               />
             </span>
           </span>
-          <span className="text-sm text-[var(--text-primary)]">
+          <span className="text-sm text-[var(--color-fg-primary)]">
             {opt.label}
           </span>
         </label>

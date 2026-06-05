@@ -113,7 +113,7 @@ export function EmojiPicker({
   const iconTriggerContent = value ? (
     <span className="text-[1em] leading-none">{value}</span>
   ) : (
-    <Smile className="w-[1em] h-[1em] text-[var(--text-muted)]" />
+    <Smile className="w-[1em] h-[1em] text-[var(--color-fg-muted)]" />
   );
 
   if (variant === "icon") {
@@ -186,7 +186,7 @@ export function EmojiPicker({
         className={cn(
           "flex h-9 w-9 items-center justify-center rounded-lg border text-xl transition-colors",
           open
-            ? "border-[var(--accent)] bg-[var(--accent)]/10"
+            ? "border-[var(--color-accent)] bg-[var(--color-accent)]/10"
             : "border-border-base bg-surface-elevated hover:border-border-base ",
           disabled && "cursor-not-allowed opacity-50",
           className,
@@ -197,7 +197,7 @@ export function EmojiPicker({
         {value ? (
           <span className="text-base leading-none">{value}</span>
         ) : (
-          <Smile className="h-4 w-4 text-[var(--text-muted)]" />
+          <Smile className="h-4 w-4 text-[var(--color-fg-muted)]" />
         )}
       </button>
       {onClear && value && (

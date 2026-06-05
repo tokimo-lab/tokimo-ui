@@ -461,8 +461,8 @@ export function AppSidebar(props: AppSidebarProps) {
           // sits above it. Add backdrop blur so text below doesn't bleed
           // through the translucent layer.
           hoverExpand
-            ? "bg-[var(--titlebar-bg,var(--sidebar-bg))] backdrop-blur-2xl"
-            : "bg-[var(--sidebar-bg)]",
+            ? "bg-[var(--color-surface-sidebar)] backdrop-blur-2xl"
+            : "bg-[var(--color-surface-sidebar)]",
           "transition-[width] duration-200 ease-out",
           className,
         )}
@@ -760,7 +760,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
                 className={cn(
                   "flex h-9 w-full shrink-0 cursor-pointer items-center gap-2 rounded-lg px-2 transition-colors",
                   action.variant === "primary"
-                    ? "bg-[var(--accent)] text-white hover:opacity-90"
+                    ? "bg-[var(--color-accent)] text-white hover:opacity-90"
                     : "text-fg-muted hover:bg-black/[0.06] hover:text-fg-base dark:hover:bg-white/[0.06]",
                 )}
               >
@@ -784,7 +784,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
                   className={cn(
                     "flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg transition-colors",
                     action.variant === "primary"
-                      ? "bg-[var(--accent)] text-white hover:opacity-90"
+                      ? "bg-[var(--color-accent)] text-white hover:opacity-90"
                       : "text-fg-muted hover:bg-black/[0.06] hover:text-fg-base dark:hover:bg-white/[0.06]",
                   )}
                 >
@@ -820,7 +820,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
         className={cn(
           "relative flex shrink-0 flex-col overflow-hidden border-r border-border-base select-none",
           "transition-[width] duration-200 ease-out",
-          _transparentBg ? "bg-transparent" : "bg-[var(--sidebar-bg)]",
+          _transparentBg ? "bg-transparent" : "bg-[var(--color-surface-sidebar)]",
           className,
         )}
         style={{ width: railWidth, ...style }}
@@ -864,7 +864,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
                   and preview modes since icons don't move. */}
               {indicator && (
                 <span
-                  className="pointer-events-none absolute left-0 z-20 w-[3px] rounded-r-full bg-[var(--accent)]"
+                  className="pointer-events-none absolute left-0 z-20 w-[3px] rounded-r-full bg-[var(--color-accent)]"
                   style={{
                     top: indicator.top + (indicator.height - 28) / 2,
                     height: 28,
@@ -952,7 +952,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
                           className="relative flex w-full items-center"
                         >
                           {renderStaticAccent && (
-                            <span className="pointer-events-none absolute top-1/2 left-0 z-20 h-7 w-[3px] -translate-y-1/2 rounded-r-full bg-[var(--accent)]" />
+                            <span className="pointer-events-none absolute top-1/2 left-0 z-20 h-7 w-[3px] -translate-y-1/2 rounded-r-full bg-[var(--color-accent)]" />
                           )}
                           {rowButton}
                           {item.extra && (
@@ -1001,7 +1001,7 @@ function InlineSidebarInner(props: AppSidebarProps) {
     <div
       className={cn(
         "flex shrink-0 flex-col overflow-hidden border-r border-border-base select-none",
-        _transparentBg ? "bg-transparent" : "bg-[var(--sidebar-bg)]",
+        _transparentBg ? "bg-transparent" : "bg-[var(--color-surface-sidebar)]",
         className,
       )}
       style={{ width, ...style }}

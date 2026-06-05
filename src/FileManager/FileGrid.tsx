@@ -263,7 +263,7 @@ export function FileGrid({
     return (
       // biome-ignore lint/a11y/noStaticElementInteractions: intentional context menu on empty area
       <div
-        className="h-full flex flex-col items-center justify-center gap-2 select-none text-sm text-[var(--text-quaternary)]"
+        className="h-full flex flex-col items-center justify-center gap-2 select-none text-sm text-[var(--color-fg-disabled)]"
         onContextMenu={(e) => {
           e.preventDefault();
           onEmptyContextMenu(e);
@@ -300,7 +300,7 @@ export function FileGrid({
           document.body,
         )}
       {viewMode === "list" && (
-        <div className="flex items-center gap-3 px-3 py-1.5 text-xs font-medium border-b border-black/[0.06] dark:border-white/[0.06] bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm text-[var(--text-tertiary)] shrink-0">
+        <div className="flex items-center gap-3 px-3 py-1.5 text-xs font-medium border-b border-black/[0.06] dark:border-white/[0.06] bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm text-[var(--color-fg-muted)] shrink-0">
           <span className="w-4 shrink-0" />
           <span className="flex-1">{t("pathSelector.colName")}</span>
           {!isNarrow && (
@@ -343,9 +343,9 @@ export function FileGrid({
           onClick={onNavigateUp}
         >
           <span className="shrink-0">
-            <ArrowUp size={16} className="text-[var(--text-tertiary)]" />
+            <ArrowUp size={16} className="text-[var(--color-fg-muted)]" />
           </span>
-          <span className="flex-1 min-w-0 text-sm text-[var(--text-secondary)]">
+          <span className="flex-1 min-w-0 text-sm text-[var(--color-fg-secondary)]">
             ..
           </span>
         </button>

@@ -236,7 +236,7 @@ function renderRows<T>(
                 {ci === 0 && isExpandable ? (
                   <button
                     type="button"
-                    className="shrink-0 text-[var(--text-muted)] hover:text-[var(--text-secondary)] w-4 cursor-pointer"
+                    className="shrink-0 text-[var(--color-fg-muted)] hover:text-[var(--color-fg-secondary)] w-4 cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleExpand(key, record, !expanded);
@@ -583,10 +583,10 @@ export function Table<T = Record<string, unknown>>({
                     key={col.key ?? col.dataIndex ?? ci}
                     className={cn(
                       sizeClass,
-                      "text-left font-medium text-[var(--text-secondary)] whitespace-nowrap border-b border-black/[0.06] dark:border-white/[0.08]",
+                      "text-left font-medium text-[var(--color-fg-secondary)] whitespace-nowrap border-b border-black/[0.06] dark:border-white/[0.08]",
                       isSortable &&
-                        "cursor-pointer select-none hover:text-[var(--text-primary)] transition-colors",
-                      isActiveSorted && "!text-[var(--accent)]",
+                        "cursor-pointer select-none hover:text-[var(--color-fg-primary)] transition-colors",
+                      isActiveSorted && "!text-[var(--color-accent)]",
                       col.align === "center" && "text-center",
                       col.align === "right" && "text-right",
                       virtual &&
@@ -642,8 +642,8 @@ export function Table<T = Record<string, unknown>>({
                           className={cn(
                             "inline-flex shrink-0",
                             isActiveSorted
-                              ? "text-[var(--accent)]"
-                              : "text-[var(--text-muted)] opacity-40",
+                              ? "text-[var(--color-accent)]"
+                              : "text-[var(--color-fg-muted)] opacity-40",
                           )}
                         >
                           {isActiveSorted && sortState?.dir === "asc" ? (
@@ -666,7 +666,7 @@ export function Table<T = Record<string, unknown>>({
               <tr>
                 <td colSpan={effectiveColumns.length}>
                   <div className="flex items-center justify-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin text-[var(--accent)]" />
+                    <Loader2 className="h-6 w-6 animate-spin text-[var(--color-accent)]" />
                   </div>
                 </td>
               </tr>

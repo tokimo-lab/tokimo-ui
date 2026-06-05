@@ -216,7 +216,7 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
       ? status === "error"
         ? "border-red-500 focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500/30"
         : "border-amber-500 focus-within:border-amber-500 focus-within:ring-1 focus-within:ring-amber-500/30"
-      : "border-black/[0.08] dark:border-white/[0.1] focus-within:border-[var(--accent)] focus-within:ring-1 focus-within:ring-[var(--accent)]";
+      : "border-black/[0.08] dark:border-white/[0.1] focus-within:border-[var(--color-accent)] focus-within:ring-1 focus-within:ring-[var(--color-accent)]";
 
     return (
       <div
@@ -228,7 +228,7 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
           ref={refs.setReference}
           {...getReferenceProps()}
           className={cn(
-            "flex items-center rounded-md border bg-[var(--input-bg)] transition-colors focus-within:ring-2",
+            "flex items-center rounded-md border bg-[var(--color-surface-sunken)] transition-colors focus-within:ring-2",
             wrapperSizeClass,
             borderClass,
             disabled &&
@@ -239,7 +239,7 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
             ref={inputRef}
             type="text"
             className={cn(
-              "flex-1 min-w-0 bg-transparent outline-none text-[var(--text-primary)] placeholder:text-[var(--text-muted)]",
+              "flex-1 min-w-0 bg-transparent outline-none text-[var(--color-fg-primary)] placeholder:text-[var(--color-fg-muted)]",
               sizeClass,
               disabled && "cursor-not-allowed",
             )}
@@ -282,7 +282,7 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
           {allowClear && val ? (
             <button
               type="button"
-              className="mr-2.5 cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+              className="mr-2.5 cursor-pointer text-[var(--color-fg-muted)] hover:text-[var(--color-fg-secondary)]"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => {
                 updateVal("");
@@ -315,8 +315,8 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
                     className={cn(
                       "px-3 py-1.5 text-sm cursor-pointer select-none transition-colors",
                       i === activeIdx
-                        ? "bg-black/[0.04] dark:bg-white/[0.06] text-[var(--text-primary)]"
-                        : "text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
+                        ? "bg-black/[0.04] dark:bg-white/[0.06] text-[var(--color-fg-primary)]"
+                        : "text-[var(--color-fg-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
                       opt.disabled && "opacity-40 cursor-not-allowed",
                     )}
                     onMouseDown={(e) => e.preventDefault()}
@@ -342,7 +342,7 @@ export const AutoComplete = forwardRef<HTMLDivElement, AutoCompleteProps>(
               ref={refs.setFloating}
               style={floatingStyles}
               {...getFloatingProps()}
-              className="z-[9999] bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] rounded-md shadow-lg py-4 px-3 text-center text-sm text-[var(--text-muted)]"
+              className="z-[9999] bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] rounded-md shadow-lg py-4 px-3 text-center text-sm text-[var(--color-fg-muted)]"
             >
               {notFoundContent}
             </div>

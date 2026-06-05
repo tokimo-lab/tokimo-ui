@@ -41,3 +41,10 @@
 @layer theme, base, components, utilities;
 @reference "./tailwind.css";
 @import "tailwindcss/utilities.css" layer(utilities);
+
+/* Responsive variant support — Tailwind v4 generates sm:/md:/lg: etc.
+   as @media rules inside the utilities layer.  The @theme block in
+   tailwind.css (loaded via @reference) defines the breakpoints; this
+   import makes the variant generator available so @source-scanned
+   classes like sm:items-center actually emit @media rules. */
+@import "tailwindcss/theme.css" layer(theme);

@@ -23,7 +23,7 @@ export function FileBreadcrumb({
 }: FileBreadcrumbProps) {
   const rootLabel = sourceType ? (
     <>
-      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-[var(--accent-subtle)] text-[var(--accent-text)]">
+      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-[var(--color-accent-subtle)] text-[var(--color-accent-text)]">
         {sourceType}
       </span>
       <span className="text-xs font-mono truncate max-w-[280px]">
@@ -39,7 +39,7 @@ export function FileBreadcrumb({
 
   const separator = (
     <RightOutlined
-      style={{ width: 14, height: 14, color: "var(--text-quaternary)" }}
+      style={{ width: 14, height: 14, color: "var(--color-fg-disabled)" }}
     />
   );
 
@@ -56,7 +56,7 @@ export function FileBreadcrumb({
           onClick={() => !isLast && onNavigate(seg.path)}
           className="flex items-center gap-1 px-1.5 py-0.5 rounded transition-colors focus:outline-none hover:bg-black/[0.06] dark:hover:bg-white/[0.08]"
           style={{
-            color: isLast ? undefined : "var(--text-tertiary)",
+            color: isLast ? undefined : "var(--color-fg-muted)",
             fontWeight: isLast ? 500 : 400,
             cursor: isLast ? "default" : "pointer",
           }}
@@ -69,7 +69,7 @@ export function FileBreadcrumb({
         onClose ? (
           <button
             type="button"
-            className="shrink-0 p-1 rounded transition-colors cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-black/[0.06] dark:hover:bg-white/[0.08]"
+            className="shrink-0 p-1 rounded transition-colors cursor-pointer text-[var(--color-fg-muted)] hover:text-[var(--color-fg-secondary)] hover:bg-black/[0.06] dark:hover:bg-white/[0.08]"
             onClick={onClose}
           >
             <X size={16} />

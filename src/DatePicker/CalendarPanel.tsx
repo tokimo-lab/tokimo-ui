@@ -112,14 +112,14 @@ export function CalendarPanel({
           <div className="flex items-center gap-1 text-sm font-medium">
             <button
               type="button"
-              className="cursor-pointer hover:text-[var(--accent)] transition-colors px-1"
+              className="cursor-pointer hover:text-[var(--color-accent)] transition-colors px-1"
               onClick={() => setViewMode("year")}
             >
               {locale.formatYear(viewYear)}
             </button>
             <button
               type="button"
-              className="cursor-pointer hover:text-[var(--accent)] transition-colors px-1"
+              className="cursor-pointer hover:text-[var(--color-accent)] transition-colors px-1"
               onClick={() => setViewMode("month")}
             >
               {locale.formatMonth(viewMonth + 1)}
@@ -145,7 +145,7 @@ export function CalendarPanel({
           </NavBtn>
           <button
             type="button"
-            className="text-sm font-medium cursor-pointer hover:text-[var(--accent)] transition-colors px-1"
+            className="text-sm font-medium cursor-pointer hover:text-[var(--color-accent)] transition-colors px-1"
             onClick={() => setViewMode("year")}
           >
             {locale.formatYear(viewYear)}
@@ -178,7 +178,7 @@ export function CalendarPanel({
         {locale.weekDays.map((d) => (
           <div
             key={d}
-            className="text-center text-xs text-[var(--text-muted)] py-1"
+            className="text-center text-xs text-[var(--color-fg-muted)] py-1"
           >
             {d}
           </div>
@@ -197,21 +197,21 @@ export function CalendarPanel({
               className={cn(
                 "h-7 w-full text-xs rounded cursor-pointer transition-colors relative",
                 day.isCurrentMonth
-                  ? "text-[var(--text-primary)]"
-                  : "text-[var(--text-muted)]",
+                  ? "text-[var(--color-fg-primary)]"
+                  : "text-[var(--color-fg-muted)]",
                 isSelected
-                  ? "bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]"
+                  ? "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)]"
                   : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
                 day.isToday &&
                   !isSelected &&
-                  "text-[var(--accent)] font-semibold",
+                  "text-[var(--color-accent)] font-semibold",
                 isDisabled && "opacity-30 !cursor-not-allowed",
               )}
               onClick={() => handleDaySelect(day)}
             >
               {day.day}
               {day.isToday && !isSelected ? (
-                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[var(--accent)]" />
+                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[var(--color-accent)]" />
               ) : null}
             </button>
           );
@@ -234,9 +234,9 @@ export function CalendarPanel({
             className={cn(
               "py-2 text-sm rounded cursor-pointer transition-colors",
               isSelected
-                ? "bg-[var(--accent)] text-white"
+                ? "bg-[var(--color-accent)] text-white"
                 : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
-              isCurrent && !isSelected && "text-[var(--accent)] font-semibold",
+              isCurrent && !isSelected && "text-[var(--color-accent)] font-semibold",
             )}
             onClick={() => handleMonthSelect(i)}
           >
@@ -264,13 +264,13 @@ export function CalendarPanel({
               type="button"
               className={cn(
                 "py-2 text-sm rounded cursor-pointer transition-colors",
-                !isInDecade && "text-[var(--text-muted)]",
+                !isInDecade && "text-[var(--color-fg-muted)]",
                 isSelected
-                  ? "bg-[var(--accent)] text-white"
+                  ? "bg-[var(--color-accent)] text-white"
                   : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
                 isCurrent &&
                   !isSelected &&
-                  "text-[var(--accent)] font-semibold",
+                  "text-[var(--color-accent)] font-semibold",
               )}
               onClick={() => handleYearSelect(y)}
             >
@@ -296,7 +296,7 @@ export function CalendarPanel({
         <div className="border-t border-black/[0.06] dark:border-white/[0.08] px-3 py-1.5 text-center">
           <button
             type="button"
-            className="text-xs text-[var(--accent)] cursor-pointer hover:text-[var(--accent-hover)] transition-colors"
+            className="text-xs text-[var(--color-accent)] cursor-pointer hover:text-[var(--color-accent-hover)] transition-colors"
             onClick={handleToday}
           >
             {locale.today}
@@ -317,7 +317,7 @@ function NavBtn({
   return (
     <button
       type="button"
-      className="p-1 rounded cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors"
+      className="p-1 rounded cursor-pointer text-[var(--color-fg-muted)] hover:text-[var(--color-fg-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors"
       onClick={onClick}
     >
       {children}

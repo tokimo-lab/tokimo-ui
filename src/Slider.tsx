@@ -20,7 +20,7 @@ export interface SliderProps
   onCommit?: (value: number) => void;
   /** Size variant */
   size?: "default" | "small";
-  /** Custom accent color (CSS color string, defaults to var(--accent)) */
+  /** Custom accent color (CSS color string, defaults to var(--color-accent)) */
   accentColor?: string;
 }
 
@@ -50,12 +50,12 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
     const value =
       valueProp ?? (typeof defaultValue === "number" ? defaultValue : 0);
     const pct = max > min ? ((value - min) / (max - min)) * 100 : 0;
-    const fill = accentColor ?? "var(--accent)";
+    const fill = accentColor ?? "var(--color-accent)";
 
     const trackStyle = useMemo(
       () => ({
         ...style,
-        background: `linear-gradient(to right, ${fill} ${pct}%, var(--slider-track, #d4d4d4) ${pct}%)`,
+        background: `linear-gradient(to right, ${fill} ${pct}%, var(--color-fill-tertiary, #d4d4d4) ${pct}%)`,
       }),
       [pct, fill, style],
     );

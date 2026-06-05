@@ -24,7 +24,7 @@ export const MaterialFileIcon = memo(function MaterialFileIcon({
         style={{
           width: size,
           height: size,
-          backgroundColor: "var(--accent)",
+          backgroundColor: "var(--color-accent)",
           mask: `url(${url}) center/contain no-repeat`,
           WebkitMask: `url(${url}) center/contain no-repeat`,
         }}

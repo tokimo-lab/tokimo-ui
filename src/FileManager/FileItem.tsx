@@ -179,7 +179,7 @@ export function FileItem({
           isDropTarget
             ? "bg-blue-500/10 ring-2 ring-inset ring-blue-400"
             : selected
-              ? "bg-[var(--fill-tertiary)] hover:bg-black/[0.08] dark:hover:bg-white/[0.10]"
+              ? "bg-[var(--color-fill-tertiary)] hover:bg-black/[0.08] dark:hover:bg-white/[0.10]"
               : "hover:bg-black/[0.04] dark:hover:bg-white/[0.04]",
         ].join(" ")}
         style={{
@@ -258,7 +258,7 @@ export function FileItem({
         isDropTarget
           ? "bg-blue-500/10 ring-2 ring-inset ring-blue-400"
           : selected
-            ? "bg-[var(--fill-tertiary)] hover:bg-black/[0.08] dark:hover:bg-white/[0.10]"
+            ? "bg-[var(--color-fill-tertiary)] hover:bg-black/[0.08] dark:hover:bg-white/[0.10]"
             : "hover:bg-black/[0.04] dark:hover:bg-white/[0.04]",
       ].join(" ")}
       style={{
@@ -321,7 +321,7 @@ export function FileItem({
         )}
       </span>
       <span
-        className={`text-xs w-24 text-right shrink-0 text-[var(--text-tertiary)] truncate${isNarrow ? " hidden" : ""}`}
+        className={`text-xs w-24 text-right shrink-0 text-[var(--color-fg-muted)] truncate${isNarrow ? " hidden" : ""}`}
         title={getMimeType(node)}
       >
         {getMimeType(node)}
@@ -329,7 +329,7 @@ export function FileItem({
       {!isNarrow && showSource && (
         <button
           type="button"
-          className={`text-xs w-32 text-right shrink-0 truncate transition-colors${onSourceClick ? " text-[var(--accent)] cursor-pointer hover:underline" : " text-[var(--text-tertiary)]"}`}
+          className={`text-xs w-32 text-right shrink-0 truncate transition-colors${onSourceClick ? " text-[var(--color-accent)] cursor-pointer hover:underline" : " text-[var(--color-fg-muted)]"}`}
           title={node.sourceName}
           onClick={
             onSourceClick
@@ -344,23 +344,23 @@ export function FileItem({
         </button>
       )}
       {!isNarrow && showPermissions && (
-        <span className="text-xs w-16 text-right shrink-0 text-[var(--text-tertiary)] tabular-nums font-mono">
+        <span className="text-xs w-16 text-right shrink-0 text-[var(--color-fg-muted)] tabular-nums font-mono">
           {node.stat?.mode ?? node.mode ?? ""}
         </span>
       )}
       {!isNarrow && showPermissions && (
-        <span className="text-xs w-24 text-right shrink-0 text-[var(--text-tertiary)] truncate">
+        <span className="text-xs w-24 text-right shrink-0 text-[var(--color-fg-muted)] truncate">
           {/* NOTE: owner field assumed to exist on extended FileNode — consumer responsibility */}
           {(node as unknown as { owner?: string }).owner ?? ""}
         </span>
       )}
       <span
-        className={`text-xs w-20 text-right shrink-0 text-[var(--text-tertiary)] tabular-nums${isNarrow ? " hidden" : ""}`}
+        className={`text-xs w-20 text-right shrink-0 text-[var(--color-fg-muted)] tabular-nums${isNarrow ? " hidden" : ""}`}
       >
         {isFolder ? "" : formatFileSize(size)}
       </span>
       <span
-        className={`text-xs w-36 text-right shrink-0 text-[var(--text-quaternary)] tabular-nums${isNarrow ? " hidden" : ""}`}
+        className={`text-xs w-36 text-right shrink-0 text-[var(--color-fg-disabled)] tabular-nums${isNarrow ? " hidden" : ""}`}
       >
         {formatDate(modifiedAt, dateFormat)}
       </span>

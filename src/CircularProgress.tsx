@@ -61,7 +61,7 @@ export function CircularProgress({
         cy={center}
         r={radius}
         fill="none"
-        stroke={color ?? "var(--accent, #f97316)"}
+        stroke={color ?? "var(--color-accent, #f97316)"}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeDasharray={circumference}

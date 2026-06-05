@@ -327,7 +327,7 @@ function PresetSwatches({
           className={cn(
             "h-5 w-5 cursor-pointer rounded-md transition-all hover:scale-110",
             value.toLowerCase() === color.toLowerCase()
-              ? "ring-2 ring-[var(--accent)] ring-offset-1 ring-offset-[var(--bg-elevated)]"
+              ? "ring-2 ring-[var(--color-accent)] ring-offset-1 ring-offset-[var(--color-surface-raised)]"
               : "ring-1 ring-black/[0.08] dark:ring-white/[0.1]",
           )}
           style={{ backgroundColor: color }}
@@ -391,7 +391,7 @@ function HexInput({
         style={{ backgroundColor: value }}
       />
       <div className="relative flex-1">
-        <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-[var(--text-muted)]">
+        <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-[var(--color-fg-muted)]">
           #
         </span>
         <input
@@ -403,7 +403,7 @@ function HexInput({
           placeholder="000000"
           maxLength={6}
           spellCheck={false}
-          className="h-8 w-full rounded-lg border border-black/[0.08] bg-[var(--input-bg)] pl-6 pr-2.5 font-mono text-xs text-[var(--text-primary)] uppercase outline-none transition-colors focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] dark:border-white/[0.1]"
+          className="h-8 w-full rounded-lg border border-black/[0.08] bg-[var(--color-surface-sunken)] pl-6 pr-2.5 font-mono text-xs text-[var(--color-fg-primary)] uppercase outline-none transition-colors focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)] dark:border-white/[0.1]"
         />
       </div>
     </div>
@@ -542,7 +542,7 @@ function ColorPickerPanel({
           <button
             type="button"
             onClick={handleEyeDropper}
-            className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-black/[0.06] text-[var(--text-secondary)] transition-colors hover:bg-black/[0.04] dark:border-white/[0.08] dark:hover:bg-white/[0.06]"
+            className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-black/[0.06] text-[var(--color-fg-secondary)] transition-colors hover:bg-black/[0.04] dark:border-white/[0.08] dark:hover:bg-white/[0.06]"
             title="Pick from screen"
           >
             <Pipette size={14} />

@@ -151,7 +151,7 @@ export function PathBar({
         type="button"
         className="flex items-center gap-1 px-1.5 py-0.5 rounded transition-colors cursor-pointer hover:bg-black/[0.06] dark:hover:bg-white/[0.08] shrink-0"
         style={{
-          color: segments.length === 0 ? undefined : "var(--text-tertiary)",
+          color: segments.length === 0 ? undefined : "var(--color-fg-muted)",
         }}
         onClick={() => segments.length > 0 && onNavigate("/")}
       >
@@ -187,7 +187,7 @@ export function PathBar({
                     onClick={() => !isLast && onNavigate(seg.path)}
                     className="px-1.5 py-0.5 rounded transition-colors hover:bg-black/[0.06] dark:hover:bg-white/[0.08]"
                     style={{
-                      color: isLast ? undefined : "var(--text-tertiary)",
+                      color: isLast ? undefined : "var(--color-fg-muted)",
                       fontWeight: isLast ? 500 : 400,
                       cursor: isLast ? "default" : "pointer",
                     }}

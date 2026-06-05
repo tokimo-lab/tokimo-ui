@@ -97,10 +97,10 @@ export function FileToolbar({
           className="p-1.5 rounded transition-colors cursor-pointer"
           style={{
             color: showHidden
-              ? "var(--color-primary-500, #3b82f6)"
-              : "var(--text-tertiary)",
+              ? "var(--color-accent, #3b82f6)"
+              : "var(--color-fg-muted)",
             background: showHidden
-              ? "var(--color-primary-50, rgba(59,130,246,0.1))"
+              ? "var(--color-accent-subtle, rgba(59,130,246,0.1))"
               : "transparent",
           }}
         >
@@ -115,7 +115,7 @@ export function FileToolbar({
       >
         <button
           type="button"
-          className="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors text-[var(--text-tertiary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] cursor-pointer"
+          className="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors text-[var(--color-fg-muted)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] cursor-pointer"
         >
           <ArrowUpDown size={13} />
           <span>{sortLabel}</span>
@@ -131,11 +131,11 @@ export function FileToolbar({
             className="px-2 py-1 transition-colors cursor-pointer"
             style={{
               background:
-                viewMode === "grid" ? "var(--accent-subtle)" : "transparent",
+                viewMode === "grid" ? "var(--color-accent-subtle)" : "transparent",
               color:
                 viewMode === "grid"
-                  ? "var(--accent-text)"
-                  : "var(--text-tertiary)",
+                  ? "var(--color-accent-text)"
+                  : "var(--color-fg-muted)",
             }}
           >
             <LayoutGrid size={13} />
@@ -148,11 +148,11 @@ export function FileToolbar({
             className="px-2 py-1 transition-colors border-l border-black/[0.08] dark:border-white/[0.1] cursor-pointer"
             style={{
               background:
-                viewMode === "list" ? "var(--accent-subtle)" : "transparent",
+                viewMode === "list" ? "var(--color-accent-subtle)" : "transparent",
               color:
                 viewMode === "list"
-                  ? "var(--accent-text)"
-                  : "var(--text-tertiary)",
+                  ? "var(--color-accent-text)"
+                  : "var(--color-fg-muted)",
             }}
           >
             <List size={13} />
@@ -165,11 +165,11 @@ export function FileToolbar({
             className="px-2 py-1 transition-colors border-l border-black/[0.08] dark:border-white/[0.1] cursor-pointer"
             style={{
               background:
-                viewMode === "column" ? "var(--accent-subtle)" : "transparent",
+                viewMode === "column" ? "var(--color-accent-subtle)" : "transparent",
               color:
                 viewMode === "column"
-                  ? "var(--accent-text)"
-                  : "var(--text-tertiary)",
+                  ? "var(--color-accent-text)"
+                  : "var(--color-fg-muted)",
             }}
           >
             <Columns3 size={13} />
@@ -181,7 +181,7 @@ export function FileToolbar({
         <button
           type="button"
           onClick={onRefresh}
-          className="p-1.5 rounded transition-colors text-[var(--text-tertiary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] cursor-pointer"
+          className="p-1.5 rounded transition-colors text-[var(--color-fg-muted)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] cursor-pointer"
         >
           <RefreshCw size={13} className={isFetching ? "animate-spin" : ""} />
         </button>

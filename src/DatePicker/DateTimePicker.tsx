@@ -207,9 +207,9 @@ export function DateTimePicker({
       <div
         ref={refs.setReference}
         className={cn(
-          "inline-flex items-center gap-2 rounded-md border bg-[var(--input-bg)] transition-colors",
+          "inline-flex items-center gap-2 rounded-md border bg-[var(--color-surface-sunken)] transition-colors",
           isOpen
-            ? "border-[var(--accent)] ring-1 ring-[var(--accent)]"
+            ? "border-[var(--color-accent)] ring-1 ring-[var(--color-accent)]"
             : status === "error"
               ? "border-red-500"
               : status === "warning"
@@ -225,7 +225,7 @@ export function DateTimePicker({
       >
         <input
           ref={inputRef}
-          className="flex-1 min-w-0 bg-transparent outline-none placeholder:text-[var(--text-muted)] text-inherit"
+          className="flex-1 min-w-0 bg-transparent outline-none placeholder:text-[var(--color-fg-muted)] text-inherit"
           placeholder={placeholder}
           value={inputValue}
           onChange={handleInputChange}
@@ -236,13 +236,13 @@ export function DateTimePicker({
         {allowClear && value && !disabled ? (
           <button
             type="button"
-            className="shrink-0 cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+            className="shrink-0 cursor-pointer text-[var(--color-fg-muted)] hover:text-[var(--color-fg-secondary)]"
             onClick={handleClear}
           >
             <X className="h-3.5 w-3.5" />
           </button>
         ) : (
-          <CalendarDays className="h-3.5 w-3.5 shrink-0 text-[var(--text-muted)]" />
+          <CalendarDays className="h-3.5 w-3.5 shrink-0 text-[var(--color-fg-muted)]" />
         )}
       </div>
 
@@ -284,14 +284,14 @@ export function DateTimePicker({
               <div className="flex items-center justify-between border-t border-black/[0.06] dark:border-white/[0.08] px-3 py-1.5">
                 <button
                   type="button"
-                  className="text-xs text-[var(--accent)] cursor-pointer hover:text-[var(--accent-hover)] transition-colors"
+                  className="text-xs text-[var(--color-accent)] cursor-pointer hover:text-[var(--color-accent-hover)] transition-colors"
                   onClick={handleNow}
                 >
                   {locale.now}
                 </button>
                 <button
                   type="button"
-                  className="text-xs px-3 py-0.5 rounded bg-[var(--accent)] text-white cursor-pointer hover:bg-[var(--accent-hover)] transition-colors"
+                  className="text-xs px-3 py-0.5 rounded bg-[var(--color-accent)] text-white cursor-pointer hover:bg-[var(--color-accent-hover)] transition-colors"
                   onClick={handleOk}
                 >
                   {locale.ok}

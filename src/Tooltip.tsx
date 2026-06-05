@@ -101,7 +101,7 @@ export function Tooltip({
               className ?? "max-w-xs break-all px-2 py-1 text-xs",
               color
                 ? color
-                : "bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(15,15,25,calc(var(--window-opacity,85)/100))] text-[var(--text-primary)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08]",
+                : "bg-[rgba(255,255,255,calc(var(--window-opacity,85)/100))] dark:bg-[rgba(15,15,25,calc(var(--window-opacity,85)/100))] text-[var(--color-fg-primary)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08]",
             )}
             {...getFloatingProps()}
           >

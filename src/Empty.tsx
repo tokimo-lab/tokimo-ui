@@ -37,7 +37,7 @@ export function Empty({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center py-8 text-[var(--text-muted)]",
+        "flex flex-col items-center justify-center py-8 text-[var(--color-fg-muted)]",
         className,
       )}
     >

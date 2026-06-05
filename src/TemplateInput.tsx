@@ -351,8 +351,8 @@ export const TemplateInput = forwardRef<HTMLInputElement, TemplateInputProps>(
           className={cn(
             "w-full rounded-md border bg-white/70 dark:bg-white/[0.03] backdrop-blur-sm px-3 py-1.5 text-sm h-8 font-mono outline-none transition-colors",
             "border-black/[0.08] dark:border-white/[0.1]",
-            "focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]",
-            "placeholder:text-[var(--text-muted)]",
+            "focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)]",
+            "placeholder:text-[var(--color-fg-muted)]",
             "disabled:cursor-not-allowed disabled:opacity-50",
             className,
           )}

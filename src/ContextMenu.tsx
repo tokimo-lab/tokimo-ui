@@ -141,7 +141,7 @@ function SubmenuItem({ item }: { item: ContextMenuItem }) {
           "transition-colors duration-100 cursor-default select-none",
           item.danger
             ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40"
-            : "text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
+            : "text-[var(--color-fg-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
           item.disabled && "opacity-40 !cursor-not-allowed",
           open && !item.danger && "bg-black/[0.04] dark:bg-white/[0.06]",
         )}
@@ -225,7 +225,7 @@ function MenuItemList({
           return (
             <div
               key={item.key ?? `g-${i}`}
-              className="px-3 py-1 text-xs font-medium text-[var(--text-tertiary)] select-none"
+              className="px-3 py-1 text-xs font-medium text-[var(--color-fg-muted)] select-none"
             >
               {item.label}
             </div>
@@ -251,7 +251,7 @@ function MenuItemList({
               "transition-colors duration-100 cursor-pointer select-none",
               item.danger
                 ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40"
-                : "text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
+                : "text-[var(--color-fg-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
               item.disabled && "opacity-40 !cursor-not-allowed",
             )}
             onClick={() => {

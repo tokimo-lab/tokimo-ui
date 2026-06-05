@@ -50,7 +50,7 @@ export const PosterCard = memo(function PosterCard({
     >
       <div
         className={cn(
-          "relative overflow-hidden bg-[var(--bg-skeleton)]",
+          "relative overflow-hidden bg-[var(--color-fill-skeleton)]",
           landscape ? "aspect-video" : "aspect-[2/3]",
         )}
       >

@@ -290,7 +290,7 @@ function MenuList({
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-1 mb-3 text-sm text-[var(--accent)] hover:underline cursor-pointer"
+          className="flex items-center gap-1 mb-3 text-sm text-[var(--color-accent)] hover:underline cursor-pointer"
         >
           <ArrowLeft size={14} />
           {backLabel && <span>{backLabel}</span>}
@@ -299,7 +299,7 @@ function MenuList({
       {groups.map((group) => (
         <div key={group.heading ?? `group-${group.startIndex}`}>
           {group.heading && (
-            <div className="px-1 pb-1.5 pt-0.5 text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
+            <div className="px-1 pb-1.5 pt-0.5 text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
               {group.heading}
             </div>
           )}
@@ -386,7 +386,7 @@ function LeafView({
       <button
         type="button"
         onClick={onBack}
-        className="flex items-center gap-1 mb-4 text-sm text-[var(--accent)] hover:underline cursor-pointer"
+        className="flex items-center gap-1 mb-4 text-sm text-[var(--color-accent)] hover:underline cursor-pointer"
       >
         <ArrowLeft size={14} />
         {backLabel && <span>{backLabel}</span>}

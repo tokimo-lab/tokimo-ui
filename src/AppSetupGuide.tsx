@@ -84,7 +84,7 @@ export function AppSetupGuide({
   return (
     <div
       className={cn(
-        "h-full w-full overflow-auto bg-[var(--bg-glass)] backdrop-blur-xl",
+        "h-full w-full overflow-auto bg-[var(--color-surface-overlay)] backdrop-blur-xl",
         className,
       )}
     >
@@ -116,10 +116,10 @@ export function AppSetupGuide({
 
           {/* Title + tagline */}
           <div className="flex flex-col items-center gap-3">
-            <h2 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+            <h2 className="text-3xl font-bold tracking-tight text-[var(--color-fg-primary)]">
               {title}
             </h2>
-            <p className="max-w-xs text-base leading-relaxed text-[var(--text-secondary)]">
+            <p className="max-w-xs text-base leading-relaxed text-[var(--color-fg-secondary)]">
               {description}
             </p>
           </div>
@@ -131,7 +131,7 @@ export function AppSetupGuide({
               return (
                 <div
                   key={f.label}
-                  className="flex items-center gap-3 rounded-2xl bg-[var(--fill-tertiary)] px-4 py-3 text-left"
+                  className="flex items-center gap-3 rounded-2xl bg-[var(--color-fill-tertiary)] px-4 py-3 text-left"
                 >
                   <div
                     className={cn(
@@ -141,7 +141,7 @@ export function AppSetupGuide({
                   >
                     <FeatureIcon className="h-5 w-5" />
                   </div>
-                  <span className="text-sm leading-snug text-[var(--text-primary)]">
+                  <span className="text-sm leading-snug text-[var(--color-fg-primary)]">
                     {f.label}
                   </span>
                 </div>

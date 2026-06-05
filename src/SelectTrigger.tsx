@@ -71,7 +71,7 @@ export const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(
         {!hideChevron && (
           <ChevronDown
             className={cn(
-              "h-3.5 w-3.5 shrink-0 text-[var(--text-muted)] transition-transform",
+              "h-3.5 w-3.5 shrink-0 text-[var(--color-fg-muted)] transition-transform",
               "group-data-[open=true]:rotate-180",
               open && "rotate-180",
             )}

@@ -68,7 +68,7 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div
         className={cn(
-          "inline-flex items-center gap-2 rounded-md border bg-[var(--input-bg)] transition-colors focus-within:border-[var(--accent)] focus-within:ring-1 focus-within:ring-[var(--accent)] dark:focus-within:border-[var(--accent)]",
+          "inline-flex items-center gap-2 rounded-md border bg-[var(--color-surface-sunken)] transition-colors focus-within:border-[var(--color-accent)] focus-within:ring-1 focus-within:ring-[var(--color-accent)] dark:focus-within:border-[var(--color-accent)]",
           status === "error"
             ? "border-red-500"
             : status === "warning"
@@ -79,14 +79,14 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
         )}
       >
         {prefix ? (
-          <span className="text-[var(--text-muted)] shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
+          <span className="text-[var(--color-fg-muted)] shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
             {prefix}
           </span>
         ) : null}
         <input
           ref={ref}
           autoComplete={autoComplete}
-          className="w-full min-w-0 bg-transparent outline-none placeholder:text-[var(--text-muted)] text-inherit"
+          className="w-full min-w-0 bg-transparent outline-none placeholder:text-[var(--color-fg-muted)] text-inherit"
           {...rest}
           value={isControlled ? localValue : valueProp}
           onChange={(e) => {
@@ -109,7 +109,7 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
           }}
         />
         {suffix ? (
-          <span className="text-[var(--text-muted)] shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
+          <span className="text-[var(--color-fg-muted)] shrink-0 [&>svg]:w-[1em] [&>svg]:h-[1em]">
             {suffix}
           </span>
         ) : null}
@@ -141,7 +141,7 @@ export const Password = forwardRef<HTMLInputElement, PasswordProps>(
           <button
             type="button"
             tabIndex={-1}
-            className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] focus:outline-none"
+            className="text-[var(--color-fg-muted)] hover:text-[var(--color-fg-secondary)] focus:outline-none"
             onClick={() => setVisible((v) => !v)}
           >
             {visible ? (
@@ -170,7 +170,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     <textarea
       ref={ref}
       className={cn(
-        "w-full rounded-md border bg-[var(--input-bg)] transition-colors focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] outline-none placeholder:text-[var(--text-muted)]",
+        "w-full rounded-md border bg-[var(--color-surface-sunken)] transition-colors focus:border-[var(--color-accent)] focus:ring-1 focus:ring-[var(--color-accent)] outline-none placeholder:text-[var(--color-fg-muted)]",
         status === "error"
           ? "border-red-500"
           : status === "warning"

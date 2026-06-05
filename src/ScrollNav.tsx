@@ -126,7 +126,7 @@ function ScrollNavRoot({
                 className={cn(
                   "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors text-left cursor-pointer",
                   isActive
-                    ? "bg-[var(--accent)]/10 text-[var(--accent-text)] font-medium"
+                    ? "bg-[var(--color-accent)]/10 text-[var(--color-accent-text)] font-medium"
                     : "text-fg-muted hover:bg-fill-tertiary",
                 )}
               >

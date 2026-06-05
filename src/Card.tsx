@@ -79,9 +79,9 @@ export function Card({
       >
         {loading ? (
           <div className="space-y-3">
-            <div className="h-4 bg-[var(--bg-skeleton)] rounded w-3/4" />
-            <div className="h-4 bg-[var(--bg-skeleton)] rounded w-1/2" />
-            <div className="h-4 bg-[var(--bg-skeleton)] rounded w-5/6" />
+            <div className="h-4 bg-[var(--color-fill-skeleton)] rounded w-3/4" />
+            <div className="h-4 bg-[var(--color-fill-skeleton)] rounded w-1/2" />
+            <div className="h-4 bg-[var(--color-fill-skeleton)] rounded w-5/6" />
           </div>
         ) : (
           children

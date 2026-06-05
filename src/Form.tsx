@@ -27,7 +27,7 @@ export function FormItemTooltip({ content }: { content: ReactNode }) {
       <span className="inline-flex cursor-help">
         <QuestionCircleOutlined
           size={13}
-          className="text-[var(--accent-muted)] hover:text-[var(--accent)] transition-colors"
+          className="text-[var(--color-accent-muted)] hover:text-[var(--color-accent)] transition-colors"
         />
       </span>
     </Tooltip>
@@ -576,7 +576,7 @@ Form.Item = function FormItem({
         <div className="mb-2 flex items-center gap-1.5">
           <label
             htmlFor={fieldId}
-            className="text-sm font-medium text-[var(--text-primary)]"
+            className="text-sm font-medium text-[var(--color-fg-primary)]"
             onMouseDown={() => {
               focusFieldControl();
             }}
@@ -595,7 +595,7 @@ Form.Item = function FormItem({
       </div>
       {error ? <div className="mt-1 text-xs text-red-500">{error}</div> : null}
       {extra ? (
-        <div className="mt-1 text-xs text-[var(--text-muted)]">{extra}</div>
+        <div className="mt-1 text-xs text-[var(--color-fg-muted)]">{extra}</div>
       ) : null}
     </div>
   );

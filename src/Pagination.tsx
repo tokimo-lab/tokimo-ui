@@ -66,17 +66,17 @@ export function Pagination({
   const inactiveClass = cn(
     "bg-white/70 dark:bg-white/[0.04]",
     "border-black/[0.08] dark:border-white/[0.1]",
-    "text-[var(--text-primary)]",
+    "text-[var(--color-fg-primary)]",
     disabled
       ? "opacity-40 cursor-not-allowed"
-      : "hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--accent-subtle)] cursor-pointer",
+      : "hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent-subtle)] cursor-pointer",
   );
 
   const activeClass = cn(
-    "border-[var(--accent)] text-white bg-[var(--accent)]",
+    "border-[var(--color-accent)] text-white bg-[var(--color-accent)]",
     disabled
       ? "opacity-40 cursor-not-allowed"
-      : "hover:bg-[var(--accent-hover)] cursor-pointer",
+      : "hover:bg-[var(--color-accent-hover)] cursor-pointer",
   );
 
   // Page number generation with ellipsis
@@ -102,7 +102,7 @@ export function Pagination({
   return (
     <div className={cn("flex items-center gap-1.5 flex-wrap", className)}>
       {showTotal ? (
-        <span className="text-sm text-[var(--text-muted)] mr-1">
+        <span className="text-sm text-[var(--color-fg-muted)] mr-1">
           {showTotal(total, range)}
         </span>
       ) : null}
@@ -117,7 +117,7 @@ export function Pagination({
           >
             ‹
           </button>
-          <span className="text-sm text-[var(--text-secondary)] px-1">
+          <span className="text-sm text-[var(--color-fg-secondary)] px-1">
             {current} / {totalPages}
           </span>
           <button
@@ -144,7 +144,7 @@ export function Pagination({
               <span
                 // biome-ignore lint/suspicious/noArrayIndexKey: ellipsis items have no unique key
                 key={`e${i}`}
-                className="text-[var(--text-muted)] px-0.5 text-sm"
+                className="text-[var(--color-fg-muted)] px-0.5 text-sm"
               >
                 …
               </span>

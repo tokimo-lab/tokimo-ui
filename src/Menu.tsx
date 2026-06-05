@@ -123,7 +123,7 @@ function MenuItemRenderer({
   if (item.type === "group") {
     return (
       <li>
-        <div className="px-3 py-1.5 text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+        <div className="px-3 py-1.5 text-xs font-medium text-[var(--color-fg-muted)] uppercase tracking-wider">
           {!collapsed && item.label}
         </div>
         <ul className="list-none p-0 m-0">
@@ -157,8 +157,8 @@ function MenuItemRenderer({
         className={cn(
           "flex items-center gap-2 w-full rounded-md px-3 py-2 text-sm transition-colors cursor-pointer",
           isSelected
-            ? "bg-gradient-to-r from-[var(--accent-subtle)] to-transparent text-[var(--accent)] font-medium border-l-2 border-[var(--accent)]"
-            : "text-[var(--text-secondary,#475569)] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] hover:text-[var(--text-primary)]",
+            ? "bg-gradient-to-r from-[var(--color-accent-subtle)] to-transparent text-[var(--color-accent)] font-medium border-l-2 border-[var(--color-accent)]"
+            : "text-[var(--color-fg-secondary,#475569)] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] hover:text-[var(--color-fg-primary)]",
           item.disabled && "opacity-50 !cursor-not-allowed",
           item.danger && "text-red-500 hover:bg-red-50 dark:hover:bg-red-950",
         )}
@@ -182,9 +182,9 @@ function MenuItemRenderer({
         {!collapsed && hasChildren ? (
           <span className="shrink-0">
             {isOpen ? (
-              <ChevronDown className="h-4 w-4 text-[var(--text-muted)]" />
+              <ChevronDown className="h-4 w-4 text-[var(--color-fg-muted)]" />
             ) : (
-              <ChevronRight className="h-4 w-4 text-[var(--text-muted)]" />
+              <ChevronRight className="h-4 w-4 text-[var(--color-fg-muted)]" />
             )}
           </span>
         ) : null}

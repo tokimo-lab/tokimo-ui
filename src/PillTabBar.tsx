@@ -67,7 +67,7 @@ export function PillTabBar<K extends string>({
   trailingClassName = "right-4",
 }: PillTabBarProps<K>) {
   const stickyClass = sticky
-    ? "sticky top-0 z-10 -mx-3 -mt-3 mb-0 bg-[var(--bg-primary)] px-3 pt-3 pb-3 lg:-mx-4 lg:-mt-4 lg:px-4 lg:pt-4 lg:pb-3"
+    ? "sticky top-0 z-10 -mx-3 -mt-3 mb-0 bg-[var(--color-surface-base)] px-3 pt-3 pb-3 lg:-mx-4 lg:-mt-4 lg:px-4 lg:pt-4 lg:pb-3"
     : "pb-3";
 
   const hasDropdowns = !!sort || (filters && filters.length > 0);
@@ -126,7 +126,7 @@ export function PillTabBar<K extends string>({
                 className={`relative z-10 flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 text-[13px] font-medium transition-colors duration-200 ${
                   active
                     ? "text-fg-primary"
-                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    : "text-[var(--color-fg-secondary)] hover:text-[var(--color-fg-primary)]"
                 }`}
                 onClick={() => onTabChange(t.key)}
               >
@@ -169,7 +169,7 @@ export function PillTabBar<K extends string>({
             >
               <button
                 type="button"
-                className="relative z-10 flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 text-[13px] font-medium text-[var(--text-secondary)] transition-colors duration-200 hover:text-[var(--text-primary)]"
+                className="relative z-10 flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 text-[13px] font-medium text-[var(--color-fg-secondary)] transition-colors duration-200 hover:text-[var(--color-fg-primary)]"
               >
                 {sort.options.find((o) => o.value === sort.value)?.label}
                 <ChevronDown className="h-3 w-3" />
@@ -194,7 +194,7 @@ export function PillTabBar<K extends string>({
             >
               <button
                 type="button"
-                className="relative z-10 flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 text-[13px] font-medium text-[var(--text-secondary)] transition-colors duration-200 hover:text-[var(--text-primary)]"
+                className="relative z-10 flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 text-[13px] font-medium text-[var(--color-fg-secondary)] transition-colors duration-200 hover:text-[var(--color-fg-primary)]"
               >
                 {f.label && <span className="opacity-60">{f.label}</span>}
                 {f.options.find((o) => o.value === f.value)?.label}

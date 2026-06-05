@@ -343,7 +343,7 @@ export function FileColumnView({
     return (
       // biome-ignore lint/a11y/noStaticElementInteractions: intentional context menu on empty area
       <div
-        className="h-full flex items-center justify-center text-sm text-[var(--text-quaternary)] select-none"
+        className="h-full flex items-center justify-center text-sm text-[var(--color-fg-disabled)] select-none"
         onContextMenu={(e) => {
           e.preventDefault();
           onEmptyContextMenu(e);
@@ -535,7 +535,7 @@ function Column({
       onDrop={handleColumnDrop}
     >
       {column.nodes.length === 0 ? (
-        <div className="h-full flex items-center justify-center text-xs text-[var(--text-quaternary)] select-none">
+        <div className="h-full flex items-center justify-center text-xs text-[var(--color-fg-disabled)] select-none">
           {t("fileManager.emptyFolder")}
         </div>
       ) : (
@@ -695,7 +695,7 @@ function ColumnItem({
         isDropTarget
           ? "bg-blue-500/10 ring-2 ring-inset ring-blue-400"
           : selected || isColumnSelected
-            ? "bg-[var(--fill-tertiary)] hover:bg-black/[0.08] dark:hover:bg-white/[0.10]"
+            ? "bg-[var(--color-fill-tertiary)] hover:bg-black/[0.08] dark:hover:bg-white/[0.10]"
             : "hover:bg-black/[0.04] dark:hover:bg-white/[0.04]",
       ].join(" ")}
       style={{
@@ -771,7 +771,7 @@ function ColumnItem({
       {isFolder && (
         <ChevronRight
           size={12}
-          className="shrink-0 text-[var(--text-quaternary)]"
+          className="shrink-0 text-[var(--color-fg-disabled)]"
         />
       )}
     </div>

@@ -105,14 +105,14 @@ export function selectTriggerClassName({
   className?: string;
 }) {
   return cn(
-    "inline-flex items-center gap-1 px-2 rounded-md border bg-[var(--input-bg)] cursor-pointer transition-colors",
+    "inline-flex items-center gap-1 px-2 rounded-md border bg-[var(--color-surface-sunken)] cursor-pointer transition-colors",
     open
-      ? "border-[var(--accent)] ring-1 ring-[var(--accent)]"
+      ? "border-[var(--color-accent)] ring-1 ring-[var(--color-accent)]"
       : status === "error"
         ? "border-red-500"
         : status === "warning"
           ? "border-amber-500"
-          : "border-black/[0.08] dark:border-white/[0.1] data-[open=true]:border-[var(--accent)] data-[open=true]:ring-1 data-[open=true]:ring-[var(--accent)]",
+          : "border-black/[0.08] dark:border-white/[0.1] data-[open=true]:border-[var(--color-accent)] data-[open=true]:ring-1 data-[open=true]:ring-[var(--color-accent)]",
     disabled &&
       "opacity-50 cursor-not-allowed bg-black/[0.02] dark:bg-white/[0.02]",
     sizeMap[size],
@@ -425,7 +425,7 @@ export function Select({
               {showSearch ? (
                 <input
                   ref={inputRef}
-                  className="min-w-16 flex-1 bg-transparent py-0.5 text-sm outline-none placeholder:text-[var(--text-muted)]"
+                  className="min-w-16 flex-1 bg-transparent py-0.5 text-sm outline-none placeholder:text-[var(--color-fg-muted)]"
                   placeholder={
                     selectedValues.length === 0 ? placeholder : undefined
                   }
@@ -442,17 +442,17 @@ export function Select({
                   disabled={disabled}
                 />
               ) : selectedValues.length === 0 ? (
-                <span className="text-[var(--text-muted)] truncate">
+                <span className="text-[var(--color-fg-muted)] truncate">
                   {placeholder}
                 </span>
               ) : null}
             </div>
           ) : hasValue ? (
-            <span className="truncate text-[var(--text-primary)]">
+            <span className="truncate text-[var(--color-fg-primary)]">
               {getLabel(value as string | number)}
             </span>
           ) : (
-            <span className="text-[var(--text-muted)] truncate">
+            <span className="text-[var(--color-fg-muted)] truncate">
               {placeholder}
             </span>
           )}
@@ -460,7 +460,7 @@ export function Select({
         {allowClear && hasValue && !disabled ? (
           <button
             type="button"
-            className="shrink-0 cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+            className="shrink-0 cursor-pointer text-[var(--color-fg-muted)] hover:text-[var(--color-fg-secondary)]"
             onClick={handleClear}
           >
             <X className="h-3.5 w-3.5" />
@@ -468,7 +468,7 @@ export function Select({
         ) : null}
         {loading ? (
           <svg
-            className="h-3.5 w-3.5 animate-spin text-[var(--text-muted)] shrink-0"
+            className="h-3.5 w-3.5 animate-spin text-[var(--color-fg-muted)] shrink-0"
             viewBox="0 0 24 24"
             fill="none"
           >
@@ -489,7 +489,7 @@ export function Select({
         ) : (
           <ChevronDown
             className={cn(
-              "h-3.5 w-3.5 shrink-0 text-[var(--text-muted)] transition-transform",
+              "h-3.5 w-3.5 shrink-0 text-[var(--color-fg-muted)] transition-transform",
               open && "rotate-180",
             )}
           />
@@ -521,10 +521,10 @@ export function Select({
               {showSearch && !isMultiple ? (
                 <div className="relative p-2 border-b border-black/[0.06] dark:border-white/[0.08]">
                   <div className="flex items-center gap-1.5 px-2 py-1 bg-black/[0.03] dark:bg-white/[0.04] rounded">
-                    <Search className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                    <Search className="h-3.5 w-3.5 text-[var(--color-fg-muted)]" />
                     <input
                       ref={inputRef}
-                      className="flex-1 bg-transparent outline-none text-sm placeholder:text-[var(--text-muted)]"
+                      className="flex-1 bg-transparent outline-none text-sm placeholder:text-[var(--color-fg-muted)]"
                       placeholder={localeSelect.searchPlaceholder}
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
@@ -538,7 +538,7 @@ export function Select({
                 className="relative max-h-60 overflow-y-auto py-1"
               >
                 {filtered.length === 0 ? (
-                  <div className="px-3 py-4 text-center text-sm text-[var(--text-muted)]">
+                  <div className="px-3 py-4 text-center text-sm text-[var(--color-fg-muted)]">
                     {notFoundContent ?? localeSelect.notFoundContent}
                   </div>
                 ) : virtual ? (
@@ -567,8 +567,8 @@ export function Select({
                         className={cn(
                           "flex items-start gap-2 px-3 py-2 text-sm cursor-pointer transition-colors",
                           selected
-                            ? "text-[var(--accent)] bg-[var(--accent-subtle)]"
-                            : "text-[var(--text-primary)]",
+                            ? "text-[var(--color-accent)] bg-[var(--color-accent-subtle)]"
+                            : "text-[var(--color-fg-primary)]",
                           !selected &&
                             activeIndex === i &&
                             "bg-black/[0.04] dark:bg-white/[0.06]",
@@ -583,7 +583,7 @@ export function Select({
                         <div className="flex-1 min-w-0">
                           <div className="truncate">{opt.label}</div>
                           {opt.description ? (
-                            <div className="mt-0.5 text-[11px] leading-tight text-[var(--text-muted)]">
+                            <div className="mt-0.5 text-[11px] leading-tight text-[var(--color-fg-muted)]">
                               {opt.description}
                             </div>
                           ) : null}
@@ -662,8 +662,8 @@ function VirtualList({
             className={cn(
               "flex items-center gap-2 px-3 text-sm cursor-pointer transition-colors absolute inset-x-0",
               selected
-                ? "text-[var(--accent)] bg-[var(--accent-subtle)]"
-                : "text-[var(--text-primary)]",
+                ? "text-[var(--color-accent)] bg-[var(--color-accent-subtle)]"
+                : "text-[var(--color-fg-primary)]",
               !selected &&
                 activeIndex === i &&
                 "bg-black/[0.04] dark:bg-white/[0.06]",

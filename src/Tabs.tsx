@@ -255,9 +255,9 @@ function LineTabs({
                   "border border-b-0 border-black/[0.06] dark:border-white/[0.08] rounded-t -mb-px",
                 activeKey === item.key
                   ? type === "card"
-                    ? "bg-white/70 dark:bg-white/[0.03] text-[var(--accent)] border-b-transparent"
-                    : "text-[var(--accent)]"
-                  : "text-[var(--text-muted)] hover:text-[var(--text-primary)]",
+                    ? "bg-white/70 dark:bg-white/[0.03] text-[var(--color-accent)] border-b-transparent"
+                    : "text-[var(--color-accent)]"
+                  : "text-[var(--color-fg-muted)] hover:text-[var(--color-fg-primary)]",
                 type === "card" &&
                   activeKey !== item.key &&
                   "bg-black/[0.02] dark:bg-white/[0.03]",
@@ -273,7 +273,7 @@ function LineTabs({
           ))}
           {type === "line" && (
             <span
-              className="absolute bottom-0 h-0.5 bg-[var(--accent)] rounded-t"
+              className="absolute bottom-0 h-0.5 bg-[var(--color-accent)] rounded-t"
               style={{
                 left: indicatorStyle.left,
                 width: indicatorStyle.width,
@@ -342,8 +342,8 @@ function PillTabs({
               "rounded-full font-medium transition-colors cursor-pointer",
               sizeClass,
               activeKey === item.key
-                ? "bg-[var(--accent)] text-white"
-                : "bg-[var(--fill-tertiary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
+                ? "bg-[var(--color-accent)] text-white"
+                : "bg-[var(--color-fill-tertiary)] text-[var(--color-fg-secondary)] hover:text-[var(--color-fg-primary)]",
               item.disabled && "opacity-50 !cursor-not-allowed",
             )}
             onClick={() => !item.disabled && handleChange(item.key)}
@@ -465,7 +465,7 @@ function LeftTabs({
       style={{ gridTemplateColumns: "188px 1fr" }}
     >
       {/* Left: nav sidebar */}
-      <div className="border-r border-border-base bg-[var(--sidebar-bg)] flex flex-col overflow-hidden select-none">
+      <div className="border-r border-border-base bg-[var(--color-surface-sidebar)] flex flex-col overflow-hidden select-none">
         {tabBarHeader}
         <div className="px-2 pt-3 overflow-y-auto flex-1">
           {items.map((item) => (
@@ -478,7 +478,7 @@ function LeftTabs({
                 "w-full flex items-center gap-2.5 rounded-lg mb-0.5 text-left transition-colors cursor-pointer",
                 sizeClass,
                 activeKey === item.key
-                  ? "bg-[var(--accent-subtle)] text-[var(--accent)] font-semibold hover:bg-[var(--accent-subtle-hover)]"
+                  ? "bg-[var(--color-accent-subtle)] text-[var(--color-accent)] font-semibold hover:bg-[var(--color-accent-subtle-hover)]"
                   : "text-fg-secondary hover:bg-black/[0.08] dark:hover:bg-white/[0.08]",
                 item.disabled && "opacity-50 !cursor-not-allowed",
               )}

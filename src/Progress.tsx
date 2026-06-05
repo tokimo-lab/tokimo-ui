@@ -97,7 +97,7 @@ export function Progress({
               y="50%"
               textAnchor="middle"
               dominantBaseline="central"
-              className="fill-[var(--text-secondary)] text-sm font-medium"
+              className="fill-[var(--color-fg-secondary)] text-sm font-medium"
             >
               {`${Math.round(clampedPercent)}%`}
             </text>

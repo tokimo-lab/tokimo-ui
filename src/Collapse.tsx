@@ -105,12 +105,12 @@ export function Collapse({
               {item.showArrow !== false && (
                 <ChevronRight
                   className={cn(
-                    "h-4 w-4 shrink-0 transition-transform duration-200 text-[var(--text-muted)]",
+                    "h-4 w-4 shrink-0 transition-transform duration-200 text-[var(--color-fg-muted)]",
                     isOpen && "rotate-90",
                   )}
                 />
               )}
-              <span className="flex-1 text-left font-medium text-[var(--text-primary)]">
+              <span className="flex-1 text-left font-medium text-[var(--color-fg-primary)]">
                 {item.label}
               </span>
               {item.extra && <span className="shrink-0">{item.extra}</span>}
@@ -120,7 +120,7 @@ export function Collapse({
                 className={cn(
                   padClass,
                   !isOpen && "hidden",
-                  "text-[var(--text-secondary)]",
+                  "text-[var(--color-fg-secondary)]",
                   !ghost && "bg-transparent",
                 )}
               >

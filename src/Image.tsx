@@ -45,7 +45,7 @@ export function Image({
     <>
       <span
         className={cn(
-          "inline-block overflow-hidden relative bg-[var(--bg-skeleton)]",
+          "inline-block overflow-hidden relative bg-[var(--color-fill-skeleton)]",
           !loaded && !error && "animate-pulse",
           isPreviewable && "cursor-zoom-in",
           className,

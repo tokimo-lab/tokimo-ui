@@ -100,7 +100,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
     return (
       <div
         className={cn(
-          "inline-flex items-center rounded-md border bg-[var(--input-bg)] transition-colors focus-within:border-[var(--accent)] focus-within:ring-1 focus-within:ring-[var(--accent)] dark:focus-within:border-[var(--accent)]",
+          "inline-flex items-center rounded-md border bg-[var(--color-surface-sunken)] transition-colors focus-within:border-[var(--color-accent)] focus-within:ring-1 focus-within:ring-[var(--color-accent)] dark:focus-within:border-[var(--color-accent)]",
           status === "error"
             ? "border-red-500"
             : status === "warning"
@@ -113,7 +113,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
         style={style}
       >
         {addonBefore ? (
-          <span className="px-2 text-[var(--text-muted)] border-r border-black/[0.08] dark:border-white/[0.1] bg-black/[0.03] dark:bg-white/[0.05] h-full flex items-center rounded-l-md text-sm">
+          <span className="px-2 text-[var(--color-fg-muted)] border-r border-black/[0.08] dark:border-white/[0.1] bg-black/[0.03] dark:bg-white/[0.05] h-full flex items-center rounded-l-md text-sm">
             {addonBefore}
           </span>
         ) : null}
@@ -157,7 +157,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
           </div>
         ) : null}
         {addonAfter ? (
-          <span className="px-2 text-[var(--text-muted)] border-l border-black/[0.08] dark:border-white/[0.1] bg-black/[0.03] dark:bg-white/[0.05] h-full flex items-center rounded-r-md text-sm whitespace-nowrap">
+          <span className="px-2 text-[var(--color-fg-muted)] border-l border-black/[0.08] dark:border-white/[0.1] bg-black/[0.03] dark:bg-white/[0.05] h-full flex items-center rounded-r-md text-sm whitespace-nowrap">
             {addonAfter}
           </span>
         ) : null}

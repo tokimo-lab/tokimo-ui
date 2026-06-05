@@ -31,13 +31,13 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
   primary:
-    "bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] active:brightness-90 border-transparent shadow-sm",
+    "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] active:brightness-90 border-transparent shadow-sm",
   default:
-    "bg-white/70 dark:bg-white/[0.05] text-[var(--text-primary)] border-black/[0.08] dark:border-white/[0.1] hover:text-[var(--accent)] hover:border-[var(--accent)] backdrop-blur-sm",
+    "bg-white/70 dark:bg-white/[0.05] text-[var(--color-fg-primary)] border-black/[0.08] dark:border-white/[0.1] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)] backdrop-blur-sm",
   dashed:
-    "bg-white/70 dark:bg-white/[0.05] text-[var(--text-primary)] border-black/[0.08] dark:border-white/[0.1] border-dashed hover:text-[var(--accent)] hover:border-[var(--accent)] backdrop-blur-sm",
-  text: "bg-transparent text-[var(--text-primary)] border-transparent hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
-  link: "bg-transparent text-[var(--accent)] border-transparent underline hover:brightness-110 p-0 h-auto",
+    "bg-white/70 dark:bg-white/[0.05] text-[var(--color-fg-primary)] border-black/[0.08] dark:border-white/[0.1] border-dashed hover:text-[var(--color-accent)] hover:border-[var(--color-accent)] backdrop-blur-sm",
+  text: "bg-transparent text-[var(--color-fg-primary)] border-transparent hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
+  link: "bg-transparent text-[var(--color-accent)] border-transparent underline hover:brightness-110 p-0 h-auto",
   danger:
     "bg-white/70 dark:bg-white/[0.05] text-red-500 border-red-300 hover:text-red-600 hover:border-red-400 dark:text-red-400 dark:border-red-500",
   unstyled: "",
@@ -81,7 +81,7 @@ export function Button({
       type={htmlType}
       disabled={isDisabled}
       className={cn(
-        "inline-flex items-center justify-center gap-1.5 border font-medium transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] select-none cursor-pointer",
+        "inline-flex items-center justify-center gap-1.5 border font-medium transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] select-none cursor-pointer",
         variantClasses[variant],
         variant !== "link" && sizeClasses[size],
         shapeClass,

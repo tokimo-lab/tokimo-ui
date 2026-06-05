@@ -93,7 +93,7 @@ function MenuList({
           return (
             <div
               key={item.key ?? `label-${i}`}
-              className="px-3 pt-1.5 pb-0.5 text-xs text-[var(--text-muted)]"
+              className="px-3 pt-1.5 pb-0.5 text-xs text-[var(--color-fg-muted)]"
             >
               {item.label}
             </div>
@@ -108,7 +108,7 @@ function MenuList({
               "flex w-full items-center gap-2 px-3 py-1.5 text-sm text-left transition-colors cursor-pointer",
               item.danger
                 ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40"
-                : "text-[var(--text-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
+                : "text-[var(--color-fg-primary)] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]",
               item.disabled && "opacity-50 !cursor-not-allowed",
             )}
             onClick={() => {

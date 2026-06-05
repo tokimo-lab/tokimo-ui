@@ -159,7 +159,7 @@ export function Popover({
             >
               <FloatingVibrancy />
               {title ? (
-                <div className="relative font-medium text-sm text-[var(--text-primary)] mb-2">
+                <div className="relative font-medium text-sm text-[var(--color-fg-primary)] mb-2">
                   {title}
                 </div>
               ) : null}
@@ -168,7 +168,7 @@ export function Popover({
                   className={
                     contentClassName != null
                       ? cn("relative", contentClassName)
-                      : "relative text-sm text-[var(--text-secondary)]"
+                      : "relative text-sm text-[var(--color-fg-secondary)]"
                   }
                 >
                   {content}

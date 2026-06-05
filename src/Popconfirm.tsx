@@ -133,11 +133,11 @@ export function Popconfirm({
                 {icon ?? <AlertCircle className="h-4 w-4" />}
               </span>
               <div>
-                <div className="text-sm font-medium text-[var(--text-primary)]">
+                <div className="text-sm font-medium text-[var(--color-fg-primary)]">
                   {title}
                 </div>
                 {description ? (
-                  <div className="mt-1 text-xs text-[var(--text-muted)]">
+                  <div className="mt-1 text-xs text-[var(--color-fg-muted)]">
                     {description}
                   </div>
                 ) : null}
