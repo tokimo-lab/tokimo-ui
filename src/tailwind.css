@@ -65,6 +65,24 @@
   --color-border-strong: var(--color-border-strong);
   --color-border-accent: var(--color-border-accent);
 
+  /* Border-only short aliases. Tailwind v4 looks at the more specific
+   * --border-color-* / --divide-color-* / --ring-color-* namespaces
+   * before falling back to --color-*. Registering aliases here makes
+   * the shorter `border-base` / `divide-subtle` / `ring-strong` form
+   * a first-class utility alongside the doubled `border-border-base`
+   * form, so app authors can pick whichever reads better. */
+  --border-color-base: var(--color-border-base);
+  --border-color-subtle: var(--color-border-subtle);
+  --border-color-strong: var(--color-border-strong);
+  --border-color-accent: var(--color-border-accent);
+  --divide-color-base: var(--color-border-base);
+  --divide-color-subtle: var(--color-border-subtle);
+  --divide-color-strong: var(--color-border-strong);
+  --ring-color-base: var(--color-border-base);
+  --ring-color-subtle: var(--color-border-subtle);
+  --ring-color-strong: var(--color-border-strong);
+  --ring-color-accent: var(--color-accent);
+
   /* Fills */
   --color-fill-tertiary: var(--color-fill-tertiary);
   --color-fill-secondary: var(--color-fill-secondary);
