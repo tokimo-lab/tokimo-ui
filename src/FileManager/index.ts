@@ -5,6 +5,7 @@ export { FileGrid } from "./FileGrid";
 export { FileItem } from "./FileItem";
 export { FileToolbar } from "./FileToolbar";
 export { MaterialFileIcon } from "./MaterialFileIcon";
+export { NewFolderModal } from "./NewFolderModal";
 export * from "./types";
 export {
   type UseInlineRenameOptions,
