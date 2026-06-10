@@ -28,7 +28,12 @@
   --color-surface-overlay-hover: rgba(255, 255, 255, 0.85);
   --color-surface-overlay-rgb: 255 255 255;
   --color-surface-sunken: rgba(255, 255, 255, 0.92);
-  --color-surface-sidebar: rgba(255, 255, 255, 0.3);
+  /* Sidebar is intentionally MORE transparent than content. Two knobs:
+     lower --color-surface-sidebar = more see-through sidebar; raise
+     --color-surface-content = more solid content. Both layer over the
+     global --window-opacity glass floor. */
+  --color-surface-sidebar: rgba(255, 255, 255, 0.12);
+  --color-surface-content: rgba(255, 255, 255, 0.28);
   --color-surface-inverted: #0a0a0f;
 
   /* ── Foreground ── */
@@ -121,7 +126,12 @@
   --color-surface-overlay-hover: rgba(255, 255, 255, 0.06);
   --color-surface-overlay-rgb: 15 15 25;
   --color-surface-sunken: rgba(255, 255, 255, 0.07);
-  --color-surface-sidebar: rgba(10, 10, 15, 0.3);
+  /* Sidebar is intentionally MORE transparent than content. Two knobs:
+     lower --color-surface-sidebar = more see-through sidebar; raise
+     --color-surface-content = more solid content. Both layer over the
+     global --window-opacity glass floor. */
+  --color-surface-sidebar: rgba(10, 10, 15, 0.12);
+  --color-surface-content: rgba(10, 10, 15, 0.30);
   --color-surface-inverted: #ffffff;
 
   --color-fg-primary: rgba(255, 255, 255, 0.92);

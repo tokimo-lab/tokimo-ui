@@ -47,6 +47,7 @@
   --color-surface-overlay-hover: var(--color-surface-overlay-hover);
   --color-surface-sunken: var(--color-surface-sunken);
   --color-surface-sidebar: var(--color-surface-sidebar);
+  --color-surface-content: var(--color-surface-content);
   --color-surface-inverted: var(--color-surface-inverted);
 
   /* Foreground */

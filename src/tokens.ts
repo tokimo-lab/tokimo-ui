@@ -16,6 +16,7 @@ export const TOKEN = {
   surfaceOverlayHover: "--color-surface-overlay-hover",
   surfaceSunken: "--color-surface-sunken",
   surfaceSidebar: "--color-surface-sidebar",
+  surfaceContent: "--color-surface-content",
   surfaceInverted: "--color-surface-inverted",
 
   // Foreground
