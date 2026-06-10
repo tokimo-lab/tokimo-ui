@@ -14,6 +14,8 @@ export interface TabItem {
   disabled?: boolean;
   icon?: ReactNode;
   closable?: boolean;
+  /** Numeric badge shown next to the label (e.g. upload count) */
+  badge?: number;
 }
 
 export interface TabsProps {
@@ -139,6 +141,17 @@ export function Tabs({
         className,
       }}
     />
+  );
+}
+
+// ── Badge (shared) ──
+
+function TabBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  return (
+    <span className="ml-0.5 inline-flex items-center justify-center min-w-[14px] h-3.5 px-0.5 rounded-full bg-blue-500 text-white text-[9px] font-bold leading-none">
+      {count > 99 ? "99+" : count}
+    </span>
   );
 }
 
@@ -268,6 +281,7 @@ function LineTabs({
               <span className="flex items-center gap-1.5 [&>svg]:w-[1em] [&>svg]:h-[1em]">
                 {item.icon}
                 {item.label}
+                {item.badge != null && <TabBadge count={item.badge} />}
               </span>
             </button>
           ))}
@@ -351,6 +365,7 @@ function PillTabs({
             <span className="flex items-center gap-1.5 [&>svg]:w-[1em] [&>svg]:h-[1em]">
               {item.icon}
               {item.label}
+              {item.badge != null && <TabBadge count={item.badge} />}
             </span>
           </button>
         ))}
@@ -414,6 +429,7 @@ function SegmentTabs({
           >
             {item.icon}
             {item.label}
+            {item.badge != null && <TabBadge count={item.badge} />}
           </button>
         ))}
       </div>
@@ -485,6 +501,7 @@ function LeftTabs({
             >
               {item.icon && <span className="shrink-0">{item.icon}</span>}
               <span className="leading-tight">{item.label}</span>
+              {item.badge != null && <TabBadge count={item.badge} />}
             </button>
           ))}
           {tabBarExtraContent}
