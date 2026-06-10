@@ -105,7 +105,7 @@ export function selectTriggerClassName({
   className?: string;
 }) {
   return cn(
-    "inline-flex items-center gap-1 px-2 rounded-md border bg-[var(--color-surface-sunken)] cursor-pointer transition-colors",
+    "inline-flex items-center gap-1 px-1.5 rounded-md border bg-[var(--color-surface-sunken)] cursor-pointer transition-colors",
     open
       ? "border-[var(--color-accent)] ring-1 ring-[var(--color-accent)]"
       : status === "error"
@@ -519,7 +519,7 @@ export function Select({
             >
               <FloatingVibrancy />
               {showSearch && !isMultiple ? (
-                <div className="relative p-2 border-b border-black/[0.06] dark:border-white/[0.08]">
+                <div className="relative px-2 py-1.5 border-b border-black/[0.06] dark:border-white/[0.08]">
                   <div className="flex items-center gap-1.5 px-2 py-1 bg-black/[0.03] dark:bg-white/[0.04] rounded">
                     <Search className="h-3.5 w-3.5 text-[var(--color-fg-muted)]" />
                     <input
@@ -565,7 +565,7 @@ export function Select({
                           listRef.current[i] = node;
                         }}
                         className={cn(
-                          "flex items-start gap-2 px-3 py-2 text-sm cursor-pointer transition-colors",
+                          "flex items-start gap-2 px-2 py-2 text-sm cursor-pointer transition-colors",
                           selected
                             ? "text-[var(--color-accent)] bg-[var(--color-accent-subtle)]"
                             : "text-[var(--color-fg-primary)]",
@@ -660,7 +660,7 @@ function VirtualList({
               listRef.current[i] = node;
             }}
             className={cn(
-              "flex items-center gap-2 px-3 text-sm cursor-pointer transition-colors absolute inset-x-0",
+              "flex items-center gap-2 px-2 text-sm cursor-pointer transition-colors absolute inset-x-0",
               selected
                 ? "text-[var(--color-accent)] bg-[var(--color-accent-subtle)]"
                 : "text-[var(--color-fg-primary)]",
