@@ -5,5 +5,10 @@ export type {
   VfsDto,
 } from "./StorageBindingForm";
 export { StorageBindingForm } from "./StorageBindingForm";
-export type { StorageBinding, VideoBinding } from "./StorageBindingsField";
+export type {
+  PickedBinding,
+  StorageBinding,
+  StorageShellApi,
+  VideoBinding,
+} from "./StorageBindingsField";
 export { StorageBindingsField } from "./StorageBindingsField";

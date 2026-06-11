@@ -217,9 +217,11 @@ export { StickySaveBar } from "./StickySaveBar";
 export type { SwitchProps } from "./Switch";
 export { Switch } from "./Switch";
 export type {
+  PickedBinding,
   StorageBinding,
   StorageBindingFormProps,
   StorageBindingValue,
+  StorageShellApi,
   VfsDto,
   VideoBinding,
 } from "./storage-bindings";

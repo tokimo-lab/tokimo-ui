@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Input } from "../Input";
 import {
   PathSelector,
@@ -188,6 +189,7 @@ export default function StorageBindingForm({
   disabled = false,
   onBrowse,
 }: StorageBindingFormProps) {
+  const { t } = useTranslation();
   const selectedSource = sources.find((s) => s.id === value.sourceId);
 
   const handleSourceChange = (sourceId: string) => {
@@ -203,7 +205,7 @@ export default function StorageBindingForm({
       {showSourceSelect && (
         <div>
           <div className="block text-xs font-medium text-fg-muted mb-1">
-            存储源
+            {t("storageBindings.source", "存储源")}
           </div>
           <Select
             className="w-full"
@@ -213,13 +215,15 @@ export default function StorageBindingForm({
             }))}
             value={value.sourceId || undefined}
             onChange={(v) => handleSourceChange(v as string)}
-            placeholder="选择存储源"
+            placeholder={t("storageBindings.selectSource", "选择存储源")}
             disabled={disabled}
           />
         </div>
       )}
       <div>
-        <div className="block text-xs font-medium text-fg-muted mb-1">路径</div>
+        <div className="block text-xs font-medium text-fg-muted mb-1">
+          {t("storageBindings.path", "路径")}
+        </div>
         {value.sourceId ? (
           <RootPathField
             sourceId={value.sourceId}
@@ -237,7 +241,13 @@ export default function StorageBindingForm({
             onBrowse={onBrowse}
           />
         ) : (
-          <Input placeholder="请先选择存储源" disabled />
+          <Input
+            placeholder={t(
+              "storageBindings.selectSourceFirst",
+              "请先选择存储源",
+            )}
+            disabled
+          />
         )}
       </div>
     </div>
