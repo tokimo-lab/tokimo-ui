@@ -146,7 +146,9 @@ export default function StorageBindingsField({
       shell?.pickFilePath({
         sourceId: args.sourceId,
         initialPath: args.initialPath,
-      }) ?? onBrowseProp?.(args) ?? Promise.resolve(null),
+      }) ??
+      onBrowseProp?.(args) ??
+      Promise.resolve(null),
     [shell, onBrowseProp],
   );
   const [bindings, setBindings] = useState<VideoBinding[]>([]);
@@ -190,12 +192,15 @@ export default function StorageBindingsField({
     if (initialSources !== undefined) return; // will be handled by the other effect
     if (minBindings <= 0) return;
     initializedRef.current = true;
-    const items: VideoBinding[] = Array.from({ length: minBindings }, (_, i) => ({
-      _key: nextKeyRef.current++,
-      sourceId: "",
-      rootPath: "",
-      isDefaultDownload: i === 0,
-    }));
+    const items: VideoBinding[] = Array.from(
+      { length: minBindings },
+      (_, i) => ({
+        _key: nextKeyRef.current++,
+        sourceId: "",
+        rootPath: "",
+        isDefaultDownload: i === 0,
+      }),
+    );
     sync(items);
   }, [initialSources, minBindings, sync]);
 
