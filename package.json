@@ -42,18 +42,18 @@
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
     "@floating-ui/react": "^0.27.19",
+    "@tanstack/react-virtual": "^3.13.23",
     "dayjs": "^1.11.20",
     "highlight.js": "11.11.1",
-    "marked": "^16.4.2",
     "lucide-react": "^1.7.0",
+    "marked": "^16.4.2",
     "material-icon-theme": "^5.32.0",
     "mime": "^4.0.5",
-    "react-i18next": "^15.2.1",
-    "@tanstack/react-virtual": "^3.13.23"
+    "react-i18next": "^15.2.1"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.9",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "typescript": "^6.0.2"
   },
