@@ -67,7 +67,7 @@ export function PillTabBar<K extends string>({
   trailingClassName = "right-4",
 }: PillTabBarProps<K>) {
   const stickyClass = sticky
-    ? "sticky top-0 z-10 -mx-3 -mt-3 mb-0 bg-[var(--color-surface-base)] px-3 pt-3 pb-3 lg:-mx-4 lg:-mt-4 lg:px-4 lg:pt-4 lg:pb-3"
+    ? "glass-header sticky top-0 z-10 -mx-3 -mt-3 mb-0 px-3 pt-3 pb-3 lg:-mx-4 lg:-mt-4 lg:px-4 lg:pt-4 lg:pb-3"
     : "pb-3";
 
   const hasDropdowns = !!sort || (filters && filters.length > 0);
