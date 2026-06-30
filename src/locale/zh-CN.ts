@@ -32,6 +32,8 @@ export const zhCN: Locale = {
   },
   Pagination: {
     pageSizeSuffix: "/ 页",
+    quickJumpLabel: "跳至",
+    quickJumpButton: "跳转",
   },
   Form: {
     required: (name) => `${name} 为必填项`,

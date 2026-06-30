@@ -32,6 +32,8 @@ export const jaJP: Locale = {
   },
   Pagination: {
     pageSizeSuffix: "/ ページ",
+    quickJumpLabel: "移動",
+    quickJumpButton: "移動",
   },
   Form: {
     required: (name) => `${name}は必須項目です`,

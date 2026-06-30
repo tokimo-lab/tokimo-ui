@@ -32,6 +32,8 @@ export const enUS: Locale = {
   },
   Pagination: {
     pageSizeSuffix: "/ page",
+    quickJumpLabel: "Go to",
+    quickJumpButton: "Go",
   },
   Form: {
     required: (name) => `${name} is required`,

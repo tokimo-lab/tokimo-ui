@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { Button } from "./Button";
+import { InputNumber } from "./InputNumber";
 import { useLocale } from "./locale";
 import { Select } from "./Select";
 import { cn } from "./utils";
@@ -42,20 +45,31 @@ export function Pagination({
   pageSizeOptions = [10, 20, 50, 100],
   onShowSizeChange,
   showTotal,
-  showQuickJumper: _showQuickJumper = false,
+  showQuickJumper = false,
   size = "default",
   simple = false,
   disabled = false,
   className,
 }: PaginationProps) {
-  const pageSizeSuffix = useLocale().Pagination.pageSizeSuffix;
+  const locale = useLocale().Pagination;
+  const pageSizeSuffix = locale.pageSizeSuffix;
   const pageSize = pageSizeProp ?? defaultPageSize;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const [quickPage, setQuickPage] = useState<number | null>(current);
+
+  useEffect(() => {
+    setQuickPage(current);
+  }, [current]);
 
   const goTo = (page: number) => {
     if (disabled) return;
     const p = Math.max(1, Math.min(totalPages, page));
     if (p !== current) onChange?.(p, pageSize);
+  };
+
+  const submitQuickJump = () => {
+    if (quickPage == null) return;
+    goTo(quickPage);
   };
 
   const sizeClass =
@@ -94,10 +108,10 @@ export function Pagination({
     return pages;
   };
 
-  const range: [number, number] = [
-    (current - 1) * pageSize + 1,
-    Math.min(current * pageSize, total),
-  ];
+  const range: [number, number] =
+    total > 0
+      ? [(current - 1) * pageSize + 1, Math.min(current * pageSize, total)]
+      : [0, 0];
 
   return (
     <div className={cn("flex items-center gap-1.5 flex-wrap", className)}>
@@ -188,6 +202,35 @@ export function Pagination({
             onChange?.(1, val);
           }}
         />
+      ) : null}
+
+      {showQuickJumper ? (
+        <div className="inline-flex items-center gap-1.5 text-sm text-[var(--color-fg-secondary)]">
+          <span className="whitespace-nowrap">{locale.quickJumpLabel}</span>
+          <InputNumber
+            value={quickPage}
+            min={1}
+            max={totalPages}
+            step={1}
+            precision={0}
+            controls={false}
+            disabled={disabled}
+            size={size === "small" ? "small" : "middle"}
+            className={size === "small" ? "w-16" : "w-20"}
+            aria-label={locale.quickJumpLabel}
+            onChange={setQuickPage}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") submitQuickJump();
+            }}
+          />
+          <Button
+            size={size === "small" ? "small" : "middle"}
+            disabled={disabled || quickPage == null}
+            onClick={submitQuickJump}
+          >
+            {locale.quickJumpButton}
+          </Button>
+        </div>
       ) : null}
     </div>
   );

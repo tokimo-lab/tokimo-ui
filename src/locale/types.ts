@@ -40,6 +40,10 @@ export interface Locale {
   Pagination: {
     /** Suffix appended to page size option, e.g. "/ page" or "/ 页". */
     pageSizeSuffix: string;
+    /** Label before the quick-jump page input. */
+    quickJumpLabel: string;
+    /** Button text for the quick-jump action. */
+    quickJumpButton: string;
   };
   Form: {
     required: (name: string) => string;
