@@ -8,6 +8,8 @@ import { FileItem } from "./FileItem";
 import type { FileNode } from "./types";
 import { useMarqueeSelection } from "./useMarqueeSelection";
 
+type FileGridI18n = NonNullable<Parameters<typeof useTranslation>[1]>["i18n"];
+
 interface FileGridProps {
   nodes: FileNode[];
   selectedPaths: Set<string>;
@@ -45,6 +47,8 @@ interface FileGridProps {
   onSourceClick?: (node: FileNode) => void;
   /** Custom icon renderer, overrides default MaterialFileIcon for every node */
   renderIcon?: (node: FileNode) => ReactNode;
+  /** Explicit translation runtime for standalone apps loaded by the host shell */
+  i18n?: FileGridI18n;
 }
 
 const GRID_ITEM_SIZE = 100;
@@ -77,8 +81,9 @@ export function FileGrid({
   showSource = false,
   onSourceClick,
   renderIcon,
+  i18n,
 }: FileGridProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(undefined, { i18n });
   const parentRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
 
