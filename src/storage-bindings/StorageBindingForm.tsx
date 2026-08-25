@@ -6,6 +6,10 @@ import {
 } from "../path-selector/PathSelector";
 import { Select } from "../Select";
 
+type StorageBindingI18n = NonNullable<
+  Parameters<typeof useTranslation>[1]
+>["i18n"];
+
 export interface VfsDisplayHints {
   protocolPrefix?: string;
   rootPath?: string;
@@ -179,6 +183,8 @@ export interface StorageBindingFormProps {
   showSourceSelect?: boolean;
   disabled?: boolean;
   onBrowse?: (args: PathSelectorBrowseArgs) => Promise<string | null>;
+  /** Explicit translation runtime for standalone apps loaded by the host shell. */
+  i18n?: StorageBindingI18n;
 }
 
 export default function StorageBindingForm({
@@ -188,8 +194,9 @@ export default function StorageBindingForm({
   showSourceSelect = true,
   disabled = false,
   onBrowse,
+  i18n,
 }: StorageBindingFormProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(undefined, { i18n });
   const selectedSource = sources.find((s) => s.id === value.sourceId);
 
   const handleSourceChange = (sourceId: string) => {

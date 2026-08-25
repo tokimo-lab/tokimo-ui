@@ -10,6 +10,10 @@ import { Tag } from "../Tag";
 import { cn } from "../utils";
 import StorageBindingForm, { type VfsDto } from "./StorageBindingForm";
 
+type StorageBindingsI18n = NonNullable<
+  Parameters<typeof useTranslation>[1]
+>["i18n"];
+
 export type VideoBinding = {
   _key: number;
   sourceId: string;
@@ -30,6 +34,7 @@ function BindingCard({
   hideDefaultToggle = false,
   hideRemove = false,
   browse,
+  i18n,
 }: {
   binding: VideoBinding;
   index: number;
@@ -40,8 +45,9 @@ function BindingCard({
   hideDefaultToggle?: boolean;
   hideRemove?: boolean;
   browse: (args: PathSelectorBrowseArgs) => Promise<string | null>;
+  i18n?: StorageBindingsI18n;
 }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(undefined, { i18n });
   return (
     <div
       className={cn(
@@ -81,6 +87,7 @@ function BindingCard({
           onUpdate(index, { sourceId, rootPath: path })
         }
         onBrowse={browse}
+        i18n={i18n}
       />
 
       {!hideDefaultToggle && !binding.isDefaultDownload && (
@@ -122,6 +129,7 @@ export default function StorageBindingsField({
   maxBindings,
   onBrowse: onBrowseProp,
   shell,
+  i18n,
 }: {
   sources: VfsDto[];
   form: ReturnType<typeof Form.useForm>[0];
@@ -136,8 +144,10 @@ export default function StorageBindingsField({
   onBrowse?: (args: PathSelectorBrowseArgs) => Promise<string | null>;
   /** Shell API for built-in browse. When provided, browse buttons appear automatically. */
   shell?: StorageShellApi;
+  /** Explicit translation runtime for standalone apps loaded by the host shell. */
+  i18n?: StorageBindingsI18n;
 }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(undefined, { i18n });
   const nextKeyRef = useRef(0);
 
   // Built-in browse: use shell.pickFilePath for path browsing, fallback to onBrowse prop
@@ -301,6 +311,7 @@ export default function StorageBindingsField({
                 hideDefaultToggle={isFixed}
                 hideRemove={isFixed || !canRemove}
                 browse={browse}
+                i18n={i18n}
               />
             ))}
           </div>
