@@ -22,6 +22,8 @@ export interface ScrollNavProps {
   items: ScrollNavItem[];
   /** Width of the left nav rail (px). @default 140 */
   navWidth?: number;
+  /** Navigation placement. Horizontal uses a scrollable top rail. @default "vertical" */
+  orientation?: "vertical" | "horizontal";
   className?: string;
   children: ReactNode;
 }
@@ -52,6 +54,7 @@ function Section({ id, title, className, children }: ScrollNavSectionProps) {
 function ScrollNavRoot({
   items,
   navWidth = 140,
+  orientation = "vertical",
   className,
   children,
 }: ScrollNavProps) {
@@ -111,10 +114,27 @@ function ScrollNavRoot({
   };
 
   return (
-    <div className={cn("flex", className)}>
+    <div
+      className={cn(
+        "flex",
+        orientation === "horizontal" && "flex-col",
+        className,
+      )}
+    >
       {/* Left nav rail */}
-      <nav className="shrink-0 select-none" style={{ width: navWidth }}>
-        <div className="flex flex-col gap-1 sticky top-0">
+      <nav
+        className={cn(
+          "shrink-0 select-none",
+          orientation === "horizontal" && "min-w-0 overflow-x-auto pb-3",
+        )}
+        style={orientation === "vertical" ? { width: navWidth } : undefined}
+      >
+        <div
+          className={cn(
+            "flex gap-1",
+            orientation === "vertical" ? "flex-col sticky top-0" : "w-max",
+          )}
+        >
           {items.map((item) => {
             const Icon = item.icon;
             const isActive = activeKey === item.key;
@@ -123,8 +143,11 @@ function ScrollNavRoot({
                 key={item.key}
                 type="button"
                 onClick={() => handleNavClick(item.key)}
+                aria-current={isActive ? "location" : undefined}
                 className={cn(
                   "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors text-left cursor-pointer",
+                  orientation === "horizontal" &&
+                    "min-h-11 shrink-0 whitespace-nowrap",
                   isActive
                     ? "bg-[var(--color-accent)]/10 text-[var(--color-accent-text)] font-medium"
                     : "text-fg-muted hover:bg-fill-tertiary",
@@ -143,8 +166,11 @@ function ScrollNavRoot({
         ref={scrollAreaRef}
         direction="vertical"
         onScrollChange={handleScroll}
-        className="flex-1 min-w-0 border-l border-border-base"
-        innerClassName="pl-6 pr-6"
+        className={cn(
+          "flex-1 min-h-0 min-w-0",
+          orientation === "vertical" && "border-l border-border-base",
+        )}
+        innerClassName={orientation === "horizontal" ? "px-4" : "pl-6 pr-6"}
       >
         <div ref={contentRef}>{children}</div>
       </ScrollArea>
