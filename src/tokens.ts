@@ -87,6 +87,10 @@ export const TOKEN = {
   appSafeAreaRight: "--app-safe-area-right",
   appSafeAreaBottom: "--app-safe-area-bottom",
   appSafeAreaLeft: "--app-safe-area-left",
+  appSafeAreaPadding: "--app-safe-area-padding",
+  appSafeAreaPaddingTop: "--app-safe-area-padding-top",
+  appSafeAreaPaddingBottom: "--app-safe-area-padding-bottom",
+  appSafeAreaPaddingX: "--app-safe-area-padding-x",
 
   // Decorative
   aurora1: "--aurora-1",

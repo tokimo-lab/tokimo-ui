@@ -1,0 +1,47 @@
+:root {
+  --app-safe-area-top: 0px;
+  --app-safe-area-right: 0px;
+  --app-safe-area-bottom: 0px;
+  --app-safe-area-left: 0px;
+}
+
+/* Apply spacing on the surface that paints the edge, then consume the insets. */
+.app-safe-area {
+  padding-top: calc(var(--app-safe-area-top, 0px) + var(--app-safe-area-padding-top, var(--app-safe-area-padding, 0px)));
+  padding-right: calc(var(--app-safe-area-right, 0px) + var(--app-safe-area-padding-x, var(--app-safe-area-padding, 0px)));
+  padding-bottom: calc(var(--app-safe-area-bottom, 0px) + var(--app-safe-area-padding-bottom, var(--app-safe-area-padding, 0px)));
+  padding-left: calc(var(--app-safe-area-left, 0px) + var(--app-safe-area-padding-x, var(--app-safe-area-padding, 0px)));
+}
+
+.app-safe-area > * {
+  --app-safe-area-top: 0px;
+  --app-safe-area-right: 0px;
+  --app-safe-area-bottom: 0px;
+  --app-safe-area-left: 0px;
+}
+
+.app-safe-area-top {
+  padding-top: calc(var(--app-safe-area-top, 0px) + var(--app-safe-area-padding-top, 0px));
+}
+
+.app-safe-area-top > * {
+  --app-safe-area-top: 0px;
+}
+
+.app-safe-area-bottom {
+  padding-bottom: calc(var(--app-safe-area-bottom, 0px) + var(--app-safe-area-padding-bottom, 0px));
+}
+
+.app-safe-area-bottom > * {
+  --app-safe-area-bottom: 0px;
+}
+
+.app-safe-area-x {
+  padding-right: calc(var(--app-safe-area-right, 0px) + var(--app-safe-area-padding-x, 0px));
+  padding-left: calc(var(--app-safe-area-left, 0px) + var(--app-safe-area-padding-x, 0px));
+}
+
+.app-safe-area-x > * {
+  --app-safe-area-right: 0px;
+  --app-safe-area-left: 0px;
+}

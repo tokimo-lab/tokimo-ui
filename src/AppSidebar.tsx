@@ -50,6 +50,7 @@ import {
 import { MobileAppSidebar } from "./MobileAppSidebar";
 import { ScrollArea } from "./ScrollArea/ScrollArea";
 import { Tooltip } from "./Tooltip";
+import { cssVar, TOKEN } from "./tokens";
 import { cn } from "./utils";
 
 export interface AppSidebarItem {
@@ -458,7 +459,9 @@ function DesktopAppSidebar(props: AppSidebarProps) {
       <div
         aria-hidden
         className="shrink-0 transition-[width] duration-200 ease-out"
-        style={{ width: placeholderWidth }}
+        style={{
+          width: `calc(${placeholderWidth}px + ${cssVar(TOKEN.appSafeAreaLeft)} + ${cssVar(TOKEN.appSafeAreaRight)})`,
+        }}
       />
       {/* Floating aside — absolutely positioned over the parent (which MUST
           be position: relative). Smoothly grows on hover-expand without
@@ -468,7 +471,7 @@ function DesktopAppSidebar(props: AppSidebarProps) {
         className={cn(
           // Base z-10; bumps to z-30 while hover-expanded so the preview
           // overlays nested floating sidebars (e.g. SecondaryMasterDetailLayout).
-          "absolute inset-y-0 left-0 flex flex-col overflow-hidden select-none",
+          "app-safe-area absolute inset-y-0 left-0 flex flex-col overflow-hidden select-none",
           hoverExpand ? "z-30" : "z-10",
           "border-r border-border-base",
           // Hover-preview reuses the host window's titlebar background
@@ -482,7 +485,7 @@ function DesktopAppSidebar(props: AppSidebarProps) {
           className,
         )}
         style={{
-          width: effectiveWidth,
+          width: `calc(${effectiveWidth}px + ${cssVar(TOKEN.appSafeAreaLeft)} + ${cssVar(TOKEN.appSafeAreaRight)})`,
           willChange: "width",
           contain: "layout paint",
           ...style,

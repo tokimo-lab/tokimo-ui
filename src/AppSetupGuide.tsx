@@ -84,7 +84,7 @@ export function AppSetupGuide({
   return (
     <div
       className={cn(
-        "h-full w-full overflow-auto bg-[var(--color-surface-overlay)] backdrop-blur-xl",
+        "app-safe-area h-full w-full overflow-auto bg-[var(--color-surface-overlay)] backdrop-blur-xl",
         className,
       )}
     >

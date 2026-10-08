@@ -38,6 +38,7 @@
  *   …or via @tokimo/ui/bundle.css for third-party app bundles. */
 
 @import "./theme.css";
+@import "./safe-area.css";
 
 @theme inline {
   /* Surfaces */
