@@ -12,6 +12,8 @@ import {
 import { createPortal } from "react-dom";
 import { pushEscapeHandler, removeEscapeHandler } from "./escape-stack";
 import { ModalContainerContext } from "./Modal";
+import { resolveOverlayContainer } from "./overlay-container";
+import { StandaloneDocumentScrollContext } from "./StandaloneDocumentScrollContext";
 import { cn } from "./utils";
 
 export interface DrawerProps {
@@ -87,7 +89,9 @@ export function Drawer({
 }: DrawerProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const ctxContainer = useContext(ModalContainerContext);
-  const resolvedContainer = container ?? ctxContainer;
+  const resolvedContainer = resolveOverlayContainer(
+    (container ?? ctxContainer)?.current,
+  );
   const [mounted, setMounted] = useState(open);
   const [visible, setVisible] = useState(false);
   const rafRef = useRef(0);
@@ -142,7 +146,7 @@ export function Drawer({
 
   // Body scroll lock — skip when rendering inside a container
   useEffect(() => {
-    if (open && !resolvedContainer?.current) {
+    if (open && !resolvedContainer) {
       const prev = document.body.style.overflow;
       document.body.style.overflow = "hidden";
       return () => {
@@ -171,103 +175,105 @@ export function Drawer({
     bottom: "bottom-0 left-0",
   }[placement];
 
-  const isInline = !!resolvedContainer?.current;
-  const portalTarget = resolvedContainer?.current ?? document.body;
+  const isInline = !!resolvedContainer;
+  const portalTarget = resolvedContainer ?? document.body;
 
   return createPortal(
-    <div
-      className={isInline ? "absolute inset-0" : "fixed inset-0"}
-      style={{ zIndex }}
-    >
-      {/* Mask */}
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: overlay mask click-to-dismiss */}
+    <StandaloneDocumentScrollContext.Provider value={false}>
       <div
-        className="absolute inset-0 bg-black/45 backdrop-blur-sm"
-        style={{
-          opacity: visible ? 1 : 0,
-          transition: `opacity ${DURATION}ms ease`,
-        }}
-        role="presentation"
-        onClick={maskClosable ? onClose : undefined}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={
-          isInline
-            ? {
-                top: "var(--app-safe-area-top, 0px)",
-                right: "var(--app-safe-area-right, 0px)",
-                bottom: "var(--app-safe-area-bottom, 0px)",
-                left: "var(--app-safe-area-left, 0px)",
-              }
-            : {
-                top: "var(--safe-area-top, env(safe-area-inset-top, 0px))",
-                right:
-                  "var(--safe-area-right, env(safe-area-inset-right, 0px))",
-                bottom:
-                  "var(--safe-area-bottom, env(safe-area-inset-bottom, 0px))",
-                left: "var(--safe-area-left, env(safe-area-inset-left, 0px))",
-              }
-        }
+        className={isInline ? "absolute inset-0" : "fixed inset-0"}
+        style={{ zIndex }}
       >
-        {/* Panel */}
-        {/* biome-ignore lint/a11y/noStaticElementInteractions: dialog panel stopPropagation */}
+        {/* Mask */}
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: overlay mask click-to-dismiss */}
         <div
-          ref={panelRef}
-          className={cn(
-            "absolute max-h-full max-w-full pointer-events-auto shadow-2xl flex flex-col",
-            "bg-white/85 dark:bg-[rgba(15,15,25,0.85)] backdrop-blur-xl border-black/[0.06] dark:border-white/[0.08]",
-            positionClass,
-            className,
-          )}
-          style={{ ...panelStyle, ...styles?.wrapper }}
+          className="absolute inset-0 bg-black/45 backdrop-blur-sm"
+          style={{
+            opacity: visible ? 1 : 0,
+            transition: `opacity ${DURATION}ms ease`,
+          }}
           role="presentation"
-          onClick={(e) => e.stopPropagation()}
-          onTransitionEnd={handleTransitionEnd}
+          onClick={maskClosable ? onClose : undefined}
+        />
+        <div
+          className="absolute pointer-events-none"
+          style={
+            isInline
+              ? {
+                  top: "var(--app-safe-area-top, 0px)",
+                  right: "var(--app-safe-area-right, 0px)",
+                  bottom: "var(--app-safe-area-bottom, 0px)",
+                  left: "var(--app-safe-area-left, 0px)",
+                }
+              : {
+                  top: "var(--safe-area-top, env(safe-area-inset-top, 0px))",
+                  right:
+                    "var(--safe-area-right, env(safe-area-inset-right, 0px))",
+                  bottom:
+                    "var(--safe-area-bottom, env(safe-area-inset-bottom, 0px))",
+                  left: "var(--safe-area-left, env(safe-area-inset-left, 0px))",
+                }
+          }
         >
-          {/* Header */}
-          {(title || closable) && (
-            <div
-              className="flex items-center justify-between px-6 py-4 border-b border-black/[0.06] dark:border-white/[0.08] shrink-0"
-              style={styles?.header}
-            >
-              <h3 className="text-base font-semibold text-[var(--color-fg-primary)] m-0">
-                {title}
-              </h3>
-              <div className="flex items-center gap-2">
-                {extra}
-                {closable ? (
-                  <button
-                    type="button"
-                    className="text-[var(--color-fg-muted)] hover:text-[var(--color-fg-secondary)] transition-colors"
-                    onClick={onClose}
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                ) : null}
-              </div>
-            </div>
-          )}
-          {/* Body */}
+          {/* Panel */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: dialog panel stopPropagation */}
           <div
-            className="flex-1 overflow-y-auto px-6 py-4"
-            style={{
-              scrollbarColor: "rgba(128,128,128,0.4) transparent",
-              ...bodyStyle,
-              ...styles?.body,
-            }}
+            ref={panelRef}
+            className={cn(
+              "absolute max-h-full max-w-full pointer-events-auto shadow-2xl flex flex-col",
+              "bg-white/85 dark:bg-[rgba(15,15,25,0.85)] backdrop-blur-xl border-black/[0.06] dark:border-white/[0.08]",
+              positionClass,
+              className,
+            )}
+            style={{ ...panelStyle, ...styles?.wrapper }}
+            role="presentation"
+            onClick={(e) => e.stopPropagation()}
+            onTransitionEnd={handleTransitionEnd}
           >
-            {children}
-          </div>
-          {/* Footer */}
-          {footer ? (
-            <div className="px-6 py-4 border-t border-black/[0.06] dark:border-white/[0.08] shrink-0">
-              {footer}
+            {/* Header */}
+            {(title || closable) && (
+              <div
+                className="flex items-center justify-between px-6 py-4 border-b border-black/[0.06] dark:border-white/[0.08] shrink-0"
+                style={styles?.header}
+              >
+                <h3 className="text-base font-semibold text-[var(--color-fg-primary)] m-0">
+                  {title}
+                </h3>
+                <div className="flex items-center gap-2">
+                  {extra}
+                  {closable ? (
+                    <button
+                      type="button"
+                      className="text-[var(--color-fg-muted)] hover:text-[var(--color-fg-secondary)] transition-colors"
+                      onClick={onClose}
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            )}
+            {/* Body */}
+            <div
+              className="flex-1 overflow-y-auto px-6 py-4"
+              style={{
+                scrollbarColor: "rgba(128,128,128,0.4) transparent",
+                ...bodyStyle,
+                ...styles?.body,
+              }}
+            >
+              {children}
             </div>
-          ) : null}
+            {/* Footer */}
+            {footer ? (
+              <div className="px-6 py-4 border-t border-black/[0.06] dark:border-white/[0.08] shrink-0">
+                {footer}
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
-    </div>,
+    </StandaloneDocumentScrollContext.Provider>,
     portalTarget,
   );
 }

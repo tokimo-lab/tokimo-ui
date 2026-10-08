@@ -15,6 +15,8 @@ import { createRoot } from "react-dom/client";
 import { Button } from "./Button";
 import { pushEscapeHandler, removeEscapeHandler } from "./escape-stack";
 import { ConfigProvider, getGlobalLocale, useLocale } from "./locale";
+import { resolveOverlayContainer } from "./overlay-container";
+import { StandaloneDocumentScrollContext } from "./StandaloneDocumentScrollContext";
 import { cn } from "./utils";
 
 /* ─── Modal container context ─── */
@@ -256,7 +258,9 @@ export function Modal({
   const destroyOnClose = destroyOnCloseProp ?? destroyOnHidden ?? false;
   const contentRef = useRef<HTMLDivElement>(null);
   const contextContainer = useContext(ModalContainerContext);
-  const resolvedContainer = container ?? contextContainer?.current ?? null;
+  const resolvedContainer = resolveOverlayContainer(
+    container ?? contextContainer?.current,
+  );
 
   /* Track whether mousedown started on the mask itself (not on dialog content) */
   const mouseDownOnMask = useRef(false);
@@ -362,124 +366,127 @@ export function Modal({
   const portalTarget = resolvedContainer ?? document.body;
 
   return createPortal(
-    // biome-ignore lint/a11y/noStaticElementInteractions: overlay mask click-to-dismiss
-    <div
-      className={cn(
-        isInline
-          ? "absolute inset-0 flex justify-center transition-colors duration-200"
-          : "fixed inset-0 flex justify-center transition-colors duration-200",
-        isInline
-          ? "items-start overflow-y-auto"
-          : size === "inset" || size === "form" || centered
-            ? "items-center overflow-hidden"
-            : "items-start overflow-y-auto",
-        animClass ? "bg-black/35 backdrop-blur-sm" : "bg-black/0",
-        size === "full" && "items-stretch",
-        wrapClassName,
-      )}
-      style={{
-        zIndex,
-        ...THIN_SCROLLBAR,
-        ...(!isInline && {
-          paddingTop: "var(--safe-area-top, env(safe-area-inset-top, 0px))",
-          paddingRight:
-            "var(--safe-area-right, env(safe-area-inset-right, 0px))",
-          paddingBottom:
-            "var(--safe-area-bottom, env(safe-area-inset-bottom, 0px))",
-          paddingLeft: "var(--safe-area-left, env(safe-area-inset-left, 0px))",
-        }),
-      }}
-      role="presentation"
-      onContextMenu={(e) => e.stopPropagation()}
-      onMouseDown={(e) => {
-        mouseDownOnMask.current = e.target === e.currentTarget;
-      }}
-      onClick={(e) => {
-        if (
-          maskClosable &&
-          e.target === e.currentTarget &&
-          mouseDownOnMask.current
-        ) {
-          onCancel?.();
-        }
-        mouseDownOnMask.current = false;
-      }}
-    >
-      {/* Dialog */}
+    <StandaloneDocumentScrollContext.Provider value={false}>
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: overlay mask click-to-dismiss */}
       <div
-        ref={contentRef}
         className={cn(
-          "relative rounded-lg shadow-2xl flex flex-col shrink-0 transition-all duration-200",
-          "bg-white/72 dark:bg-black/65 backdrop-blur-2xl border border-border-base shadow-[0_8px_32px_rgba(0,0,0,0.3)]",
-          animClass
-            ? "opacity-100 scale-100 translate-y-0"
-            : "opacity-0 scale-95 translate-y-4",
-          size === "full" && "!rounded-none",
           isInline
-            ? size !== "full" && "mt-[5%] mb-[5%]"
-            : !centered &&
-                size !== "full" &&
-                size !== "inset" &&
-                size !== "form" &&
-                "mt-[10vh] mb-[10vh]",
-          className,
+            ? "absolute inset-0 flex justify-center transition-colors duration-200"
+            : "fixed inset-0 flex justify-center transition-colors duration-200",
+          isInline
+            ? "items-start overflow-y-auto"
+            : size === "inset" || size === "form" || centered
+              ? "items-center overflow-hidden"
+              : "items-start overflow-y-auto",
+          animClass ? "bg-black/35 backdrop-blur-sm" : "bg-black/0",
+          size === "full" && "items-stretch",
+          wrapClassName,
         )}
         style={{
-          width: resolvedWidth,
-          maxWidth: size === "default" ? "calc(100% - 32px)" : undefined,
-          maxHeight:
-            size === "default" || size === "large"
-              ? isInline
-                ? "calc(100% - 32px)"
-                : "calc(100dvh - var(--safe-area-top, env(safe-area-inset-top, 0px)) - var(--safe-area-bottom, env(safe-area-inset-bottom, 0px)) - 32px)"
-              : undefined,
-          ...resolvedDialogStyle,
-          ...style,
+          zIndex,
+          ...THIN_SCROLLBAR,
+          ...(!isInline && {
+            paddingTop: "var(--safe-area-top, env(safe-area-inset-top, 0px))",
+            paddingRight:
+              "var(--safe-area-right, env(safe-area-inset-right, 0px))",
+            paddingBottom:
+              "var(--safe-area-bottom, env(safe-area-inset-bottom, 0px))",
+            paddingLeft:
+              "var(--safe-area-left, env(safe-area-inset-left, 0px))",
+          }),
         }}
         role="presentation"
+        onContextMenu={(e) => e.stopPropagation()}
+        onMouseDown={(e) => {
+          mouseDownOnMask.current = e.target === e.currentTarget;
+        }}
+        onClick={(e) => {
+          if (
+            maskClosable &&
+            e.target === e.currentTarget &&
+            mouseDownOnMask.current
+          ) {
+            onCancel?.();
+          }
+          mouseDownOnMask.current = false;
+        }}
       >
-        {/* Header */}
-        {(title || closable) && (
-          <div className="flex items-center justify-between px-6 py-3 border-b border-black/[0.06] dark:border-white/[0.08] shrink-0">
-            {title ? (
-              <h3 className="text-base font-semibold text-[var(--color-fg-primary)] m-0">
-                {title}
-              </h3>
-            ) : (
-              <span />
-            )}
-            <div className="flex items-center gap-1">
-              {extra}
-              {closable ? (
-                <button
-                  type="button"
-                  className="text-[var(--color-fg-muted)] hover:text-[var(--color-fg-secondary)] transition-colors cursor-pointer"
-                  onClick={onCancel}
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              ) : null}
-            </div>
-          </div>
-        )}
-        {/* Body */}
+        {/* Dialog */}
         <div
-          className="px-6 py-4"
+          ref={contentRef}
+          className={cn(
+            "relative rounded-lg shadow-2xl flex flex-col shrink-0 transition-all duration-200",
+            "bg-white/72 dark:bg-black/65 backdrop-blur-2xl border border-border-base shadow-[0_8px_32px_rgba(0,0,0,0.3)]",
+            animClass
+              ? "opacity-100 scale-100 translate-y-0"
+              : "opacity-0 scale-95 translate-y-4",
+            size === "full" && "!rounded-none",
+            isInline
+              ? size !== "full" && "mt-[5%] mb-[5%]"
+              : !centered &&
+                  size !== "full" &&
+                  size !== "inset" &&
+                  size !== "form" &&
+                  "mt-[10vh] mb-[10vh]",
+            className,
+          )}
           style={{
-            ...config.bodyStyle,
-            ...bodyStyle,
-            ...styles?.body,
-            ...(config.containerStyle ?? {}),
+            width: resolvedWidth,
+            maxWidth: size === "default" ? "calc(100% - 32px)" : undefined,
+            maxHeight:
+              size === "default" || size === "large"
+                ? isInline
+                  ? "calc(100% - 32px)"
+                  : "calc(100dvh - var(--safe-area-top, env(safe-area-inset-top, 0px)) - var(--safe-area-bottom, env(safe-area-inset-bottom, 0px)) - 32px)"
+                : undefined,
+            ...resolvedDialogStyle,
+            ...style,
           }}
+          role="presentation"
         >
-          {renderedChildren}
+          {/* Header */}
+          {(title || closable) && (
+            <div className="flex items-center justify-between px-6 py-3 border-b border-black/[0.06] dark:border-white/[0.08] shrink-0">
+              {title ? (
+                <h3 className="text-base font-semibold text-[var(--color-fg-primary)] m-0">
+                  {title}
+                </h3>
+              ) : (
+                <span />
+              )}
+              <div className="flex items-center gap-1">
+                {extra}
+                {closable ? (
+                  <button
+                    type="button"
+                    className="text-[var(--color-fg-muted)] hover:text-[var(--color-fg-secondary)] transition-colors cursor-pointer"
+                    onClick={onCancel}
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                ) : null}
+              </div>
+            </div>
+          )}
+          {/* Body */}
+          <div
+            className="px-6 py-4"
+            style={{
+              ...config.bodyStyle,
+              ...bodyStyle,
+              ...styles?.body,
+              ...(config.containerStyle ?? {}),
+            }}
+          >
+            {renderedChildren}
+          </div>
+          {/* Footer */}
+          {renderedFooter ? (
+            <div className="px-6 pb-4 shrink-0">{renderedFooter}</div>
+          ) : null}
         </div>
-        {/* Footer */}
-        {renderedFooter ? (
-          <div className="px-6 pb-4 shrink-0">{renderedFooter}</div>
-        ) : null}
       </div>
-    </div>,
+    </StandaloneDocumentScrollContext.Provider>,
     portalTarget,
   );
 }

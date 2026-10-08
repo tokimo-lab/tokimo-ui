@@ -212,6 +212,10 @@ export type { SliderProps } from "./Slider";
 export { Slider } from "./Slider";
 export type { SpinProps } from "./Spin";
 export { Spin } from "./Spin";
+export {
+  StandaloneDocumentScrollContext,
+  useStandaloneDocumentScroll,
+} from "./StandaloneDocumentScrollContext";
 export type { StatisticProps } from "./Statistic";
 export { Statistic } from "./Statistic";
 export type { StickySaveBarProps } from "./StickySaveBar";
