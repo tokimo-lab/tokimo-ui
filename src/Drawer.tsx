@@ -194,7 +194,12 @@ export function Drawer({
         className="absolute pointer-events-none"
         style={
           isInline
-            ? { inset: 0 }
+            ? {
+                top: "var(--app-safe-area-top, 0px)",
+                right: "var(--app-safe-area-right, 0px)",
+                bottom: "var(--app-safe-area-bottom, 0px)",
+                left: "var(--app-safe-area-left, 0px)",
+              }
             : {
                 top: "var(--safe-area-top, env(safe-area-inset-top, 0px))",
                 right:
