@@ -22,6 +22,7 @@ import {
   useState,
 } from "react";
 import { FloatingVibrancy } from "./FloatingVibrancy";
+import { safeAreaMenuSize, safeAreaPadding } from "./safe-area";
 import { cn } from "./utils";
 
 /* ─── Types ─── */
@@ -113,8 +114,9 @@ function SubmenuItem({ item }: { item: ContextMenuItem }) {
     placement: "right-start",
     middleware: [
       offset({ mainAxis: 4, crossAxis: -4 }),
-      flip({ padding: 8 }),
-      shift({ padding: 8 }),
+      flip(safeAreaPadding(8)),
+      shift((state) => ({ ...safeAreaPadding(8)(state), crossAxis: true })),
+      safeAreaMenuSize(8),
     ],
   });
 
@@ -294,7 +296,12 @@ function FloatingMenuPanel({
     open,
     onOpenChange,
     placement,
-    middleware: [offset(0), flip({ padding: 8 }), shift({ padding: 8 })],
+    middleware: [
+      offset(0),
+      flip(safeAreaPadding(8)),
+      shift((state) => ({ ...safeAreaPadding(8)(state), crossAxis: true })),
+      safeAreaMenuSize(8),
+    ],
   });
 
   const clientPoint = useClientPoint(context, {

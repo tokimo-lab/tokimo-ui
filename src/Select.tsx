@@ -23,6 +23,7 @@ import React, {
 } from "react";
 import { FloatingVibrancy } from "./FloatingVibrancy";
 import { useLocale } from "./locale";
+import { safeAreaPadding } from "./safe-area";
 import { cn } from "./utils";
 
 export interface SelectOption {
@@ -159,6 +160,7 @@ export function Select({
   // Virtual scroll constants
   const ITEM_HEIGHT = 32;
   const MAX_HEIGHT = 240; // max-h-60
+  const [listMaxHeight, setListMaxHeight] = useState(MAX_HEIGHT);
   const OVERSCAN = 5;
 
   // Scroll active item into view (for keyboard navigation)
@@ -166,12 +168,13 @@ export function Select({
     if (!virtual || activeIndex === null || !scrollContainerRef.current) return;
     const top = activeIndex * ITEM_HEIGHT;
     const container = scrollContainerRef.current;
+    const viewportHeight = Math.min(container.clientHeight, listMaxHeight);
     if (top < container.scrollTop) {
       container.scrollTop = top;
-    } else if (top + ITEM_HEIGHT > container.scrollTop + MAX_HEIGHT) {
-      container.scrollTop = top + ITEM_HEIGHT - MAX_HEIGHT;
+    } else if (top + ITEM_HEIGHT > container.scrollTop + viewportHeight) {
+      container.scrollTop = top + ITEM_HEIGHT - viewportHeight;
     }
-  }, [activeIndex, virtual]);
+  }, [activeIndex, virtual, listMaxHeight]);
 
   const childOptions = useMemo(() => {
     if (options.length > 0) return options;
@@ -205,15 +208,26 @@ export function Select({
     placement: "bottom-start",
     middleware: [
       offset(4),
-      flip(),
-      shift({ padding: 5 }),
-      sizeMiddleware({
-        apply({ rects, elements }) {
+      flip(safeAreaPadding(0)),
+      shift((state) => ({ ...safeAreaPadding(5)(state), crossAxis: true })),
+      sizeMiddleware((state) => ({
+        ...safeAreaPadding(5)(state),
+        apply({ rects, availableHeight, elements }) {
           Object.assign(elements.floating.style, {
             width: `${rects.reference.width}px`,
           });
+          const list = scrollContainerRef.current;
+          if (!list) return;
+          const chromeHeight =
+            elements.floating.offsetHeight - list.offsetHeight;
+          const maxHeight = Math.min(
+            MAX_HEIGHT,
+            Math.max(0, availableHeight - chromeHeight),
+          );
+          list.style.maxHeight = `${maxHeight}px`;
+          setListMaxHeight(maxHeight);
         },
-      }),
+      })),
     ],
     whileElementsMounted: autoUpdate,
   });
@@ -535,7 +549,8 @@ export function Select({
               ) : null}
               <div
                 ref={scrollContainerRef}
-                className="relative max-h-60 overflow-y-auto py-1"
+                className="relative overflow-y-auto py-1"
+                style={{ maxHeight: listMaxHeight }}
               >
                 {filtered.length === 0 ? (
                   <div className="px-3 py-4 text-center text-sm text-[var(--color-fg-muted)]">
@@ -546,7 +561,7 @@ export function Select({
                     items={filtered}
                     scrollContainerRef={scrollContainerRef}
                     itemHeight={ITEM_HEIGHT}
-                    maxHeight={MAX_HEIGHT}
+                    maxHeight={listMaxHeight}
                     overscan={OVERSCAN}
                     listRef={listRef}
                     activeIndex={activeIndex}

@@ -377,7 +377,18 @@ export function Modal({
         size === "full" && "items-stretch",
         wrapClassName,
       )}
-      style={{ zIndex, ...THIN_SCROLLBAR }}
+      style={{
+        zIndex,
+        ...THIN_SCROLLBAR,
+        ...(!isInline && {
+          paddingTop: "var(--safe-area-top, env(safe-area-inset-top, 0px))",
+          paddingRight:
+            "var(--safe-area-right, env(safe-area-inset-right, 0px))",
+          paddingBottom:
+            "var(--safe-area-bottom, env(safe-area-inset-bottom, 0px))",
+          paddingLeft: "var(--safe-area-left, env(safe-area-inset-left, 0px))",
+        }),
+      }}
       role="presentation"
       onContextMenu={(e) => e.stopPropagation()}
       onMouseDown={(e) => {
@@ -415,17 +426,12 @@ export function Modal({
         )}
         style={{
           width: resolvedWidth,
-          maxWidth:
-            size === "default"
-              ? isInline
-                ? "calc(100% - 32px)"
-                : "calc(100vw - 32px)"
-              : undefined,
+          maxWidth: size === "default" ? "calc(100% - 32px)" : undefined,
           maxHeight:
             size === "default" || size === "large"
               ? isInline
                 ? "calc(100% - 32px)"
-                : "calc(100vh - 32px)"
+                : "calc(100dvh - var(--safe-area-top, env(safe-area-inset-top, 0px)) - var(--safe-area-bottom, env(safe-area-inset-bottom, 0px)) - 32px)"
               : undefined,
           ...resolvedDialogStyle,
           ...style,

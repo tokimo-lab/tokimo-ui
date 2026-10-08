@@ -20,6 +20,7 @@ import {
   useState,
 } from "react";
 import { FloatingVibrancy } from "./FloatingVibrancy";
+import { safeAreaPadding } from "./safe-area";
 import { cn } from "./utils";
 
 export interface TooltipProps {
@@ -63,7 +64,11 @@ export function Tooltip({
     open,
     onOpenChange: openProp === undefined ? setIsOpen : undefined,
     placement,
-    middleware: [offset(6), flip(), shift({ padding: 5 })],
+    middleware: [
+      offset(6),
+      flip(safeAreaPadding(0)),
+      shift(safeAreaPadding(5)),
+    ],
     whileElementsMounted: autoUpdate,
   });
 

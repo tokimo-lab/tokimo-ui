@@ -21,6 +21,7 @@ import {
   useState,
 } from "react";
 import { FloatingVibrancy } from "./FloatingVibrancy";
+import { safeAreaPadding } from "./safe-area";
 import { cn } from "./utils";
 
 export interface PopoverProps {
@@ -85,11 +86,15 @@ export function Popover({
   };
   const placement = (placementMap[placementProp] ?? placementProp) as Placement;
 
-  const middleware = [offset(6), flip(), shift({ padding: 5 })];
+  const middleware = [
+    offset(6),
+    flip(safeAreaPadding(0)),
+    shift(safeAreaPadding(5)),
+  ];
   if (fitViewport || matchTriggerWidth) {
     middleware.push(
-      size({
-        padding: 16,
+      size((state) => ({
+        ...safeAreaPadding(16)(state),
         apply({ availableHeight, rects, elements }) {
           const styles: Partial<CSSStyleDeclaration> = {};
           if (fitViewport) {
@@ -101,7 +106,7 @@ export function Popover({
           }
           Object.assign(elements.floating.style, styles);
         },
-      }),
+      })),
     );
   }
 

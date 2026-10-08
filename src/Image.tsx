@@ -98,7 +98,7 @@ export function Image({
       (typeof preview === "object" ? preview.visible : previewVisible) ? (
         // biome-ignore lint/a11y/noStaticElementInteractions: preview overlay click-to-dismiss
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 cursor-zoom-out"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 cursor-zoom-out pt-[var(--safe-area-top,env(safe-area-inset-top,0px))] pr-[var(--safe-area-right,env(safe-area-inset-right,0px))] pb-[var(--safe-area-bottom,env(safe-area-inset-bottom,0px))] pl-[var(--safe-area-left,env(safe-area-inset-left,0px))]"
           role="presentation"
           onClick={() => {
             if (typeof preview === "object" && preview.onVisibleChange) {
@@ -111,7 +111,7 @@ export function Image({
           <img
             src={imgSrc}
             alt={alt}
-            className="max-h-[90vh] max-w-[90vw] object-contain"
+            className="max-h-[calc(90dvh-var(--safe-area-top,env(safe-area-inset-top,0px))-var(--safe-area-bottom,env(safe-area-inset-bottom,0px)))] max-w-[calc(90vw-var(--safe-area-left,env(safe-area-inset-left,0px))-var(--safe-area-right,env(safe-area-inset-right,0px)))] object-contain"
           />
         </div>
       ) : null}

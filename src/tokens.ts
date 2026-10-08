@@ -79,6 +79,10 @@ export const TOKEN = {
 
   // Layout calculation vars (set programmatically, not theme constants)
   submenuAvailH: "--submenu-avail-h",
+  safeAreaTop: "--safe-area-top",
+  safeAreaRight: "--safe-area-right",
+  safeAreaBottom: "--safe-area-bottom",
+  safeAreaLeft: "--safe-area-left",
 
   // Decorative
   aurora1: "--aurora-1",

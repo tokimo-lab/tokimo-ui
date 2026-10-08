@@ -21,6 +21,7 @@ import {
   useState,
 } from "react";
 import { FloatingVibrancy } from "./FloatingVibrancy";
+import { safeAreaMenuSize, safeAreaPadding } from "./safe-area";
 import { cn } from "./utils";
 
 export interface DropdownMenuItem {
@@ -165,7 +166,12 @@ export function Dropdown({
     open,
     onOpenChange: setOpen,
     placement,
-    middleware: [offset(4), flip(), shift({ padding: 5 })],
+    middleware: [
+      offset(4),
+      flip(safeAreaPadding(0)),
+      shift((state) => ({ ...safeAreaPadding(5)(state), crossAxis: true })),
+      safeAreaMenuSize(5),
+    ],
     whileElementsMounted: autoUpdate,
   });
 

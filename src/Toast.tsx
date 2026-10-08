@@ -122,7 +122,15 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={api}>
       {children}
       {createPortal(
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[99999] flex flex-col items-center gap-2 pointer-events-none">
+        <div
+          className="fixed z-[99999] flex flex-col items-center gap-2 pointer-events-none"
+          style={{
+            top: "calc(var(--safe-area-top, env(safe-area-inset-top, 0px)) + 16px)",
+            right:
+              "calc(var(--safe-area-right, env(safe-area-inset-right, 0px)) + 16px)",
+            left: "calc(var(--safe-area-left, env(safe-area-inset-left, 0px)) + 16px)",
+          }}
+        >
           {toasts.map((toast) => (
             <ToastItem
               key={toast.id}
@@ -155,7 +163,7 @@ function ToastItem({
   return (
     <div
       className={cn(
-        "pointer-events-auto flex items-center gap-2 rounded-lg bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg px-4 py-3 text-sm text-[var(--color-fg-primary)] animate-[toastIn_0.2s_ease-out]",
+        "pointer-events-auto max-w-full flex items-center gap-2 rounded-lg bg-white/90 dark:bg-[rgba(15,15,25,0.9)] backdrop-blur-xl border border-black/[0.06] dark:border-white/[0.08] shadow-lg px-4 py-3 text-sm text-[var(--color-fg-primary)] animate-[toastIn_0.2s_ease-out]",
       )}
     >
       {iconMap[toast.type]}
