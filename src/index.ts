@@ -15,6 +15,8 @@ export type {
   AppSidebarSection,
 } from "./AppSidebar";
 export { AppSidebar } from "./AppSidebar";
+export type { AppSidebarListProps } from "./AppSidebarList";
+export { AppSidebarList } from "./AppSidebarList";
 export type { AutoCompleteOption, AutoCompleteProps } from "./AutoComplete";
 export { AutoComplete } from "./AutoComplete";
 export type { AvatarProps } from "./Avatar";
@@ -273,5 +275,9 @@ export type { UIContextValue } from "./UIContext";
 export { UIContext, useUIContext } from "./UIContext";
 export type { UploadChangeInfo, UploadFile, UploadProps } from "./Upload";
 export { Dragger, Upload } from "./Upload";
+export {
+  AppSidebarMobileContext,
+  useAppSidebarMobile,
+} from "./use-app-sidebar-mobile";
 // ─── Utilities ───
 export { cn } from "./utils";

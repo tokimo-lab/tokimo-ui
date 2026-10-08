@@ -47,6 +47,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { MobileAppSidebar } from "./MobileAppSidebar";
 import { ScrollArea } from "./ScrollArea/ScrollArea";
 import { Tooltip } from "./Tooltip";
 import { cn } from "./utils";
@@ -123,6 +124,12 @@ function resolveSectionMetrics(section: AppSidebarSection): {
 }
 
 export interface AppSidebarProps {
+  /** Mobile presentation, independent of the desktop collapsed preference. */
+  mobile?: {
+    title: string;
+    closeLabel: string;
+    footerActions?: AppSidebarFooterAction[];
+  };
   /** Width in pixels (default: 188) */
   width?: number;
   /** Header content rendered inside the standard header wrapper (expanded mode) */
@@ -261,6 +268,14 @@ export const FLOATING_SIDEBAR_PREVIEW_WIDTH = 240;
 export const FLOATING_HOVER_DELAY_MS = 700;
 
 export function AppSidebar(props: AppSidebarProps) {
+  return props.mobile ? (
+    <MobileAppSidebar {...props} />
+  ) : (
+    <DesktopAppSidebar {...props} />
+  );
+}
+
+function DesktopAppSidebar(props: AppSidebarProps) {
   const { width = 188, collapsed, className, style } = props;
 
   const [floatingHover, setFloatingHover] = useState(false);
