@@ -22,7 +22,7 @@ export function MobileAppSidebar(props: AppSidebarProps) {
 
   return (
     <>
-      <div className="app-safe-area-top app-safe-area-x flex min-h-[calc(3.5rem+var(--app-safe-area-top,0px))] shrink-0 items-center border-b border-base bg-surface-sidebar [--app-safe-area-padding-x:0.75rem]">
+      <div className="app-safe-area-header app-safe-area-top app-safe-area-x flex min-h-[calc(3.5rem+var(--app-safe-area-top,0px))] shrink-0 items-center border-b border-base bg-surface-sidebar [--app-safe-area-padding-x:0.75rem]">
         <button
           ref={refs.setReference}
           type="button"

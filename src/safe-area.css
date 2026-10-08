@@ -45,3 +45,8 @@
   --app-safe-area-right: 0px;
   --app-safe-area-left: 0px;
 }
+
+/* A mobile header reserves the top inset for the content panes below it. */
+.app-safe-area-header ~ * {
+  --app-safe-area-top: 0px;
+}
