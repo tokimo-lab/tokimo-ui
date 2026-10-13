@@ -1,3 +1,4 @@
+import { autoUpdate } from "@floating-ui/react";
 import { X } from "lucide-react";
 import {
   type CSSProperties,
@@ -6,6 +7,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -87,6 +89,7 @@ export function Drawer({
   className,
   children,
 }: DrawerProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const ctxContainer = useContext(ModalContainerContext);
   const resolvedContainer = resolveOverlayContainer(
@@ -95,6 +98,49 @@ export function Drawer({
   const [mounted, setMounted] = useState(open);
   const [visible, setVisible] = useState(false);
   const rafRef = useRef(0);
+  const [viewportInsets, setViewportInsets] = useState({
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  });
+  const viewportInsetsRef = useRef(viewportInsets);
+
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!open || !mounted || !resolvedContainer || !root) return;
+
+    const update = () => {
+      const rect = root.getBoundingClientRect();
+      const viewport = window.visualViewport;
+      const top = viewport?.offsetTop ?? 0;
+      const left = viewport?.offsetLeft ?? 0;
+      const right = left + (viewport?.width ?? window.innerWidth);
+      const bottom = top + (viewport?.height ?? window.innerHeight);
+      const inset = (overflow: number, size: number) =>
+        (Math.min(size, Math.max(0, overflow)) / Math.max(1, size)) * 100;
+      const next = {
+        top: inset(top - rect.top, rect.height),
+        right: inset(rect.right - right, rect.width),
+        bottom: inset(rect.bottom - bottom, rect.height),
+        left: inset(left - rect.left, rect.width),
+      };
+      const previous = viewportInsetsRef.current;
+      if (
+        next.top !== previous.top ||
+        next.right !== previous.right ||
+        next.bottom !== previous.bottom ||
+        next.left !== previous.left
+      ) {
+        viewportInsetsRef.current = next;
+        setViewportInsets(next);
+      }
+    };
+
+    return autoUpdate(resolvedContainer, root, update, {
+      animationFrame: true,
+    });
+  }, [open, mounted, resolvedContainer]);
 
   // Open → mount the DOM; Close → start exit animation
   useEffect(() => {
@@ -181,6 +227,7 @@ export function Drawer({
   return createPortal(
     <StandaloneDocumentScrollContext.Provider value={false}>
       <div
+        ref={rootRef}
         className={isInline ? "absolute inset-0" : "fixed inset-0"}
         style={{ zIndex }}
       >
@@ -200,10 +247,10 @@ export function Drawer({
           style={
             isInline
               ? {
-                  top: "var(--app-safe-area-top, 0px)",
-                  right: "var(--app-safe-area-right, 0px)",
-                  bottom: "var(--app-safe-area-bottom, 0px)",
-                  left: "var(--app-safe-area-left, 0px)",
+                  top: `max(var(--app-safe-area-top, 0px), ${viewportInsets.top}%)`,
+                  right: `max(var(--app-safe-area-right, 0px), ${viewportInsets.right}%)`,
+                  bottom: `max(var(--app-safe-area-bottom, 0px), ${viewportInsets.bottom}%)`,
+                  left: `max(var(--app-safe-area-left, 0px), ${viewportInsets.left}%)`,
                 }
               : {
                   top: "var(--safe-area-top, env(safe-area-inset-top, 0px))",
@@ -255,7 +302,7 @@ export function Drawer({
             )}
             {/* Body */}
             <div
-              className="flex-1 overflow-y-auto px-6 py-4"
+              className="min-h-0 flex-1 overflow-y-auto px-6 py-4"
               style={{
                 scrollbarColor: "rgba(128,128,128,0.4) transparent",
                 ...bodyStyle,
